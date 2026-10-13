@@ -125,18 +125,21 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
           <div class="opts" id="modeopts">
             <button type="button" class="opt" id="modeNew"><span class="bx"></span><span>New business</span></button>
             <button type="button" class="opt" id="modeUpd"><span class="bx"></span><span>Update my business</span></button>
+            <button type="button" class="opt" id="modeRem"><span class="bx"></span><span>Remove my business</span></button>
           </div>
           <div class="biglist" id="bizlist" style="display:none"></div>
           <div class="err" id="modeerr">Pick one to continue.</div>
         </div>
         <button type="button" class="b alt" id="modeRetry" style="display:none;margin-top:8px;font-size:16px;min-height:38px;padding:4px 14px">Try again</button>
       </div>
+      <div id="step0rest">
       <h2 style="margin-top:6px">Contact info for person completing form</h2>
       <p class="note">Not published. We only use this if we have questions about your submission.</p>
       <div class="fld" data-req><label class="l" for="name">Name <span class="req">*</span></label><input type="text" id="name" autocomplete="name"><div class="err">Enter your name.</div></div>
       <div class="fld" data-req><label class="l" for="title">Title <span class="req">*</span></label><input type="text" id="title" autocomplete="organization-title"><div class="err">Enter your title.</div></div>
       <div class="fld" data-req><label class="l" for="how">How to contact you with questions about your submission? <span class="req">*</span></label><input type="text" id="how" placeholder="Phone or email"><div class="err" id="howerr">Enter a 10 digit phone number or a valid email.</div></div>
       <div class="nav"><span></span><button type="button" class="b" data-next>Next</button></div>
+      </div>
     </div>
 
     <div class="card step" data-step="1">
@@ -213,7 +216,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 <script>
 var GOOGLE_CLIENT_ID='429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
 var ENDPOINT='https://script.google.com/macros/s/AKfycbwGw2V1QUWKvgE8CEbRJ1cALv8vne_6MlQE0bbq6eVwPLYSYfliHyEI2_UEYn_UjO_lmw/exec';
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Salons, Beauty & Fitness','Professional & Online Services'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services'];
 var TYPES=['Physical Location','Online Only','Mobile Service (landscaping, housecleaner etc)','Other'];
 var AREAS=['Charlotte County','Lee County','Sarasota County','Other'];
 var NAMES=['About you','Business','Contact','Optional','Review'];
@@ -336,13 +339,14 @@ function resetMode(){
   $('modeRetry').style.display='none';$('modemsg').textContent='';
   $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');
   $('oldlogo').style.display='none';$('dellogo').checked=false;
+  $('modeRem').classList.remove('sel');$('step0rest').style.display='';
 }
 function sendToScript(payload,done){
   var fin=false,timer=null;
   function onMsg(ev){
     var host=String(ev.origin||'').replace(/^https?:\/\//,'');
     if(!/(googleusercontent|google)\.com$/.test(host))return;
-    var m=ev.data;if(!m||!m.dirForm||m.kind!=='mine')return;
+    var m=ev.data;if(!m||!m.dirForm)return;if((payload.action==='remove')===(m.kind==='mine'))return;
     window.removeEventListener('message',onMsg);clearTimeout(timer);
     if(!fin){fin=true;done(m)}
   }
@@ -372,19 +376,47 @@ function loadMine(){
 }
 $('modeRetry').addEventListener('click',loadMine);
 $('modeNew').addEventListener('click',function(){
-  mode='new';origName='';origLogoId='';
+  mode='new';origName='';origLogoId='';$('step0rest').style.display='';$('modeRem').classList.remove('sel');
   $('modeNew').classList.add('sel');$('modeUpd').classList.remove('sel');
   $('bizlist').style.display='none';$('modefld').classList.remove('bad');
   clearBiz();
 });
 $('modeUpd').addEventListener('click',function(){
-  mode='update';
+  mode='update';$('step0rest').style.display='';$('modeRem').classList.remove('sel');
   $('modeUpd').classList.add('sel');$('modeNew').classList.remove('sel');
   $('modefld').classList.remove('bad');
   if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);return}
   if(!origName){clearBiz()}
   showBizList();
 });
+$('modeRem').addEventListener('click',function(){
+  mode='remove';origName='';
+  $('modeRem').classList.add('sel');$('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');
+  $('modefld').classList.remove('bad');$('step0rest').style.display='none';
+  showRemoveList('');
+});
+function showRemoveList(msg){
+  var box=$('bizlist');box.style.display='grid';
+  if(!bizList.length){box.innerHTML='<div class="note"><b>'+esc(msg||'No businesses left.')+'</b></div>';return}
+  var h=(msg?'<div class="note"><b>'+esc(msg)+'</b></div>':'')+'<span class="l">Which business do you want to remove?</span><div class="biglist" id="rmbtns">'+bizList.map(function(b,i){return '<button type="button" class="opt" data-ri="'+i+'"><span class="bx"></span><span>'+esc(b.businessName)+'</span></button>'}).join('')+'</div><div id="rmconfirm"></div>';
+  box.innerHTML=h;
+  $('rmbtns').addEventListener('click',function(e){
+    var b=e.target.closest('[data-ri]');if(!b)return;
+    var biz=bizList[+b.dataset.ri];
+    qa('#rmbtns button').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
+    $('rmconfirm').innerHTML='<p class="note"><b>Remove "'+esc(biz.businessName)+'" from the directory?</b></p><button type="button" class="b" id="rmYes">Yes, remove it</button> <button type="button" class="b alt" id="rmNo">Cancel</button><div class="err" id="rmerr" style="display:none"></div>';
+    $('rmNo').addEventListener('click',function(){$('rmconfirm').innerHTML='';b.classList.remove('sel')});
+    $('rmYes').addEventListener('click',function(){
+      var yes=$('rmYes');yes.disabled=true;yes.textContent='Removing...';
+      sendToScript({action:'remove',idToken:idToken,businessName:biz.businessName},function(m){
+        if(m&&m.ok){bizList=bizList.filter(function(x){return x!==biz});showRemoveList('"'+biz.businessName+'" was removed.');return}
+        yes.disabled=false;yes.textContent='Yes, remove it';
+        var er=$('rmerr');er.style.display='block';
+        er.textContent=!m?'No answer. Please try again.':(m.error==='LOGIN_EXPIRED'?'Your sign-in ran out of time. Sign in again.':'Could not remove it. Please try again.');
+      });
+    });
+  });
+}
 function showBizList(){
   var box=$('bizlist');box.style.display='grid';
   var h='';
