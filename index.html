@@ -851,7 +851,7 @@ function render(){
     if(showArea)h+='<div><div class="sect">'+esc(lbl('Area Served'))+'</div><div class="about area">'+esc(b.area)+'</div></div>';
     /* 4. the rest */
     var aTop=b.aboutTop[0]||'',aRest=b.aboutTop.slice(1).concat(b.about).join('\n\n');
-    if(aTop||aRest)h+='<div><div class="sect">'+esc(lbl('About'))+'</div>'+(aTop?'<div class="about abouttop">'+esc(aTop)+'</div>':'')+(aRest?'<div class="about">'+esc(aRest)+'</div>':'')+'</div>';
+    if(aTop||aRest)h+='<div><div class="sect">'+esc(lbl('About'))+'</div>'+(aTop?'<div class="about area abouttop">'+esc(aTop)+'</div>':'')+(aRest?'<div class="about area">'+esc(aRest)+'</div>':'')+'</div>';
     var rest=[];
     Object.keys(b.extra).forEach(function(x){rest.push([esc(lbl(x)),fmtVal(x,b.extra[x])])});
     if(rest.length)h+='<div><div class="sect">'+esc(lbl('Details'))+'</div>'+rows(rest)+'</div>';
