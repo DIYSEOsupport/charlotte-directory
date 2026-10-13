@@ -587,7 +587,7 @@ function route(r,v){
   return false;
 }
 
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Salons, Beauty & Fitness','Professional & Online Services'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services'];
 var CAT_OLD={neighborhoodfoodanddrinks:'Food & Drinks',mainstreetshopsandretail:'Shops & Retail'};
 function catKey(x){return x.toString().toLowerCase().replace(/^\s*\d+[\.\)\-\s]*/,'').replace(/&/g,'and').replace(/[^a-z]/g,'')}
 function canonCat(v){var k=catKey(v);if(CAT_OLD[k])return CAT_OLD[k];for(var i=0;i<CATS.length;i++){if(catKey(CATS[i])===k)return CATS[i]}return ''}
@@ -626,7 +626,8 @@ function parseGrid(grid){
         case 'address':pushUniq(rec.address,v,addrKey);break;
         case 'phone':if(!addPhones(rec,v)&&!route(rec,v)&&!rec.extra[h])rec.extra[h]=v;break;
         case 'about':case 'describe':case 'share':
-          if(modeLike(v)&&v.length<100){if(!rec.mode)rec.mode=v;break}
+          var vl=v.split(/\r?\n/),v1=vl[0].trim();
+          if(modeLike(v1)&&v1.length<100){if(!rec.mode)rec.mode=v1;v=vl.slice(1).join('\n').trim();if(!v)break}
           if(role==='describe'){var dv=v.slice(0,400).trim();if(dv)pushUniq(rec.aboutTop,dv)}else pushUniq(rec.about,v);break;
         case 'slogan':if(!route(rec,v)&&!rec.slogan)rec.slogan=v;break;
         case 'facebook':if(/facebook|fb\./i.test(v)||isUrl(v)){if(!rec.facebook)rec.facebook=v}else if(!route(rec,v))rec.extra[h]=v;break;
@@ -654,7 +655,6 @@ function parseGrid(grid){
     r.category=r.category||'Local Business';
     r.contact=[r.pubName,r.pubTitle].filter(Boolean).join(', ');
     r.nextdoors=[r.nextdoor,r.nextdoorP].filter(function(x,i,a){return x&&a.indexOf(x)===i});
-    if(r.about.length){var ex2={'About your business':r.about.join('\n\n')};Object.keys(r.extra).forEach(function(h){ex2[h]=r.extra[h]});r.extra=ex2;r.about=[]}
     r.description=r.aboutTop.concat(r.about).join('\n\n');
     r.phone=r.phones[0]||'';r.website=r.websites[0]||'';r.email=r.emails[0]||'';
     r.location=r.area||r.city||'';
