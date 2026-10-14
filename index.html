@@ -532,7 +532,7 @@ function roleOf(h){
   if(/phone|telephone|\bcell\b|contact number/.test(k))return 'phone';
   if(/website|web site|web address|web page|webpage|\burl\b/.test(k)||k==='domain')return 'website';
   if(/e-?mail/.test(k))return 'email';
-  if(k.indexOf('about your business')!==-1)return 'about';
+  if(k==='about'||k.indexOf('about your business')!==-1)return 'about';
   if(/describe your|describe the business/.test(k))return 'describe';
   if(k.indexOf('please share')!==-1)return 'share';
   if(k.indexOf('slogan')!==-1||k.indexOf('additional info')!==-1)return 'slogan';
