@@ -619,6 +619,7 @@ function parseGrid(grid){
         case 'category':var cc=canonCat(v);if(!rec.category&&cc)rec.category=cc;break;
         case 'logo':setLogo(rec,v);break;
         case 'area':addArea(rec,v);break;
+        case 'btype':if(!rec.mode)rec.mode=v;break;
         case 'pubname':if(!rec.pubName)rec.pubName=v;break;
         case 'pubtitle':if(!rec.pubTitle)rec.pubTitle=v;break;
         case 'city':if(!rec.city)rec.city=v;break;
