@@ -1,0 +1,18 @@
+Test Bayside Books	Shops & Retail	Stories for every shelf	"Lee Sample, Owner
+Phone: 941-555-0201
+Email: bayside@example.com
+Website: bayside.example.com"	"=IF(TRIM(F14)="""","""",HYPERLINK(""https://www.google.com/maps/search/?api=1&query=""&ENCODEURL(TRIM(F14)),IFERROR(TRIM(LEFT(F14,FIND("","",F14)-1))&CHAR(10)&TRIM(MID(F14,FIND("","",F14)+1,200)),TRIM(F14))))"	100 Marion Ave Punta Gorda FL 33950		Storefront bookshop. Test listing, not a real business.
+Test Gulf Gutter Pros	Home & Garden Services	Clean gutters, no ladder worries	"Jo Demo, Owner
+Phone: 941-555-0202
+Email: gutters@example.com"	"=IF(TRIM(F15)="""","""",HYPERLINK(""https://www.google.com/maps/search/?api=1&query=""&ENCODEURL(TRIM(F15)),IFERROR(TRIM(LEFT(F15,FIND("","",F15)-1))&CHAR(10)&TRIM(MID(F15,FIND("","",F15)+1,200)),TRIM(F15))))"		Port Charlotte, Punta Gorda	Mobile gutter cleaning. Test listing, not a real business.
+Test Pixel Pals	Professional & Online Services	Logos and sites, all online	"Ray Fake, Founder
+Phone: 941-555-0203
+Email: pixelpals@example.com
+Facebook Business: facebook.com/testpixelpals"	"=IF(TRIM(F16)="""","""",HYPERLINK(""https://www.google.com/maps/search/?api=1&query=""&ENCODEURL(TRIM(F16)),IFERROR(TRIM(LEFT(F16,FIND("","",F16)-1))&CHAR(10)&TRIM(MID(F16,FIND("","",F16)+1,200)),TRIM(F16))))"			Online-only design help. Test listing, not a real business.
+Test Palm Street Pizza	Food & Drinks	Hand-tossed, hot and fast	"Sue Example, Owner
+Phone: 941-555-0204
+Email: palmpizza@example.com
+Website: palmpizza.example.com"	"=IF(TRIM(F17)="""","""",HYPERLINK(""https://www.google.com/maps/search/?api=1&query=""&ENCODEURL(TRIM(F17)),IFERROR(TRIM(LEFT(F17,FIND("","",F17)-1))&CHAR(10)&TRIM(MID(F17,FIND("","",F17)+1,200)),TRIM(F17))))"	200 W Dearborn St Englewood FL 34223		Storefront pizza shop. Test listing, not a real business.
+Test Roving Fix-It	Home & Garden Services	Small repairs at your door	"Tim Demo, Handyman
+Phone: 941-555-0205
+Email: fixit@example.com"	"=IF(TRIM(F18)="""","""",HYPERLINK(""https://www.google.com/maps/search/?api=1&query=""&ENCODEURL(TRIM(F18)),IFERROR(TRIM(LEFT(F18,FIND("","",F18)-1))&CHAR(10)&TRIM(MID(F18,FIND("","",F18)+1,200)),TRIM(F18))))"		Englewood, Port Charlotte	Mobile handyman. Test listing, not a real business.
