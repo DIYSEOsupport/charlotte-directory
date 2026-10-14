@@ -626,8 +626,6 @@ function parseGrid(grid){
         case 'address':pushUniq(rec.address,v,addrKey);break;
         case 'phone':if(!addPhones(rec,v)&&!route(rec,v)&&!rec.extra[h])rec.extra[h]=v;break;
         case 'about':case 'describe':case 'share':
-          var vl=v.split(/\r?\n/),v1=vl[0].trim();
-          if(modeLike(v1)&&v1.length<100){if(!rec.mode)rec.mode=v1;v=vl.slice(1).join('\n').trim();if(!v)break}
           if(role==='describe'){var dv=v.slice(0,400).trim();if(dv)pushUniq(rec.aboutTop,dv)}else pushUniq(rec.about,v);break;
         case 'slogan':if(!route(rec,v)&&!rec.slogan)rec.slogan=v;break;
         case 'facebook':if(/facebook|fb\./i.test(v)||isUrl(v)){if(!rec.facebook)rec.facebook=v}else if(!route(rec,v))rec.extra[h]=v;break;
