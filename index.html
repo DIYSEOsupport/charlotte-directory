@@ -124,6 +124,10 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .fb:hover{background:#1877f2;color:#fff}
 .nd:hover{background:#00b246;color:#fff}
 
+.acct{margin:12px 0 0;padding:8px 12px;background:#fff;border:3px solid var(--ink);border-radius:12px;font-size:13px;font-weight:800;color:var(--ink)}
+.acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;min-height:32px}
+#acctEmail{text-transform:none;word-break:break-all}
+#signOut{font:inherit;font-weight:800;border:3px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:4px 12px;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .totop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
@@ -425,6 +429,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
+  <div id="acct" class="acct"><div id="acctOut"><span>Sign in to keep your saved cards on all your devices.</span><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
   <div class="status"><span id="count">Loading...</span><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add your business</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 </main>
@@ -436,6 +441,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 const CSV_URL='https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
 
@@ -476,6 +482,71 @@ var accOpen={};
 var favs={};
 try{favs=JSON.parse(localStorage.getItem('ccdir-favs')||'{}')}catch(e){}
 function saveFavs(){try{localStorage.setItem('ccdir-favs',JSON.stringify(favs))}catch(e){}}
+
+/* ---------- sign in + synced saves ---------- */
+var GOOGLE_CLIENT_ID='429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
+var acct={email:'',token:'',exp:0},ops={},hasUser='',syncing=false,gTries=0,promptedOnce=false;
+try{ops=JSON.parse(localStorage.getItem('ccdir-ops')||'{}')}catch(e){}
+try{hasUser=localStorage.getItem('ccdir-user')||''}catch(e){}
+function saveOps(){try{localStorage.setItem('ccdir-ops',JSON.stringify(ops))}catch(e){}}
+function jwtInfo(t){try{var b=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(b))))}catch(e){return null}}
+function jsonpCall(params,cb){
+  var n='_sv'+Date.now()+Math.floor(Math.random()*1e4),s=document.createElement('script'),done=false;
+  function clean(){try{delete window[n]}catch(e){window[n]=undefined}if(s.parentNode)s.parentNode.removeChild(s)}
+  window[n]=function(o){if(done)return;done=true;clean();cb(o)};
+  s.onerror=function(){if(done)return;done=true;clean();cb(null)};
+  setTimeout(function(){if(done)return;done=true;clean();cb(null)},15000);
+  s.src=CSV_URL+'?'+params+'&callback='+n;
+  document.head.appendChild(s);
+}
+function syncSaves(){
+  if(!acct.token||syncing||acct.exp<Date.now()+30000)return;
+  syncing=true;
+  var send={};
+  if(hasUser!==acct.email){
+    if(hasUser){favs={};ops={}}
+    Object.keys(favs).forEach(function(k){send[k]=1});
+  }
+  Object.keys(ops).forEach(function(k){send[k]=ops[k]});
+  jsonpCall('saves=sync&token='+encodeURIComponent(acct.token)+'&ops='+encodeURIComponent(JSON.stringify(send)),function(r){
+    syncing=false;
+    if(r&&r.ok){
+      var nf={};(r.keys||[]).forEach(function(k){nf[k]=1});
+      var later={};
+      Object.keys(ops).forEach(function(k){if(!(k in send)||send[k]!==ops[k])later[k]=ops[k]});
+      ops=later;saveOps();
+      Object.keys(later).forEach(function(k){if(later[k])nf[k]=1;else delete nf[k]});
+      favs=nf;saveFavs();
+      hasUser=acct.email;try{localStorage.setItem('ccdir-user',hasUser)}catch(e){}
+      try{apply()}catch(e){}
+      if(Object.keys(later).length)syncSaves();
+    }else if(r&&r.error==='LOGIN_EXPIRED'){acct.token='';acct.exp=0}
+  });
+}
+function setAcct(token){
+  var p=token?jwtInfo(token):null;
+  acct.token=token||'';acct.email=p&&p.email?String(p.email).toLowerCase():'';acct.exp=p&&p.exp?p.exp*1000:0;
+  var out=$('acctOut'),inn=$('acctIn');
+  if(out&&inn){out.style.display=acct.email?'none':'flex';inn.style.display=acct.email?'flex':'none';$('acctEmail').textContent=acct.email}
+  if(acct.token)syncSaves();
+}
+function signOut(){
+  try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect()}catch(e){}
+  favs={};ops={};hasUser='';saveFavs();saveOps();
+  try{localStorage.removeItem('ccdir-user')}catch(e){}
+  setAcct('');
+  try{apply()}catch(e){}
+  toast('Signed out');
+}
+function initAcct(){
+  if(!window.google||!google.accounts||!google.accounts.id){
+    if(++gTries>40){var bx=$('acct');if(bx)bx.style.display='none';return}
+    setTimeout(initAcct,300);return;
+  }
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:function(r){setAcct(r.credential)},auto_select:!!hasUser});
+  google.accounts.id.renderButton($('gbtn'),{theme:'outline',size:'medium',text:'signin_with',shape:'pill'});
+  if(hasUser)google.accounts.id.prompt();
+}
 
 const $=id=>document.getElementById(id);
 function esc(s){return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -888,6 +959,11 @@ function syncToggleAll(){
 function toggleFav(k){
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
+  if(acct.email||hasUser){
+    ops[k]=favs[k]?1:0;saveOps();
+    if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
+    else if(!promptedOnce&&window.google&&google.accounts&&google.accounts.id){promptedOnce=true;try{google.accounts.id.prompt()}catch(e){}}
+  }
   toast(favs[k]?'Saved':'Removed');
   apply();
 }
@@ -1395,6 +1471,8 @@ $('shPdf').onclick=function(){var b=shareB;closeShare();if(b)doPdf([b],(b.name.r
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
 
+$('signOut').addEventListener('click',signOut);
+initAcct();
 load();
 setInterval(load,60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
