@@ -973,13 +973,15 @@ function bizRows(b){
 }
 function sortedAll(){return all.slice().sort(function(a,b){return a.name.localeCompare(b.name)})}
 function doPrint(list){
-  var h='<h1>Small Business Directory</h1>';
-  h+=list.map(function(b){
-    return '<section class="pb"><h2>'+esc(b.name)+'</h2>'+(b.slogan?'<p class="ps">&ldquo;'+esc(b.slogan)+'&rdquo;</p>':'')
-      +bizRows(b).map(function(r){return '<p class="pr"><b>'+esc(r[0])+':</b> '+esc(r[1])+'</p>'}).join('')+'</section>';
-  }).join('');
-  var pa=$('printArea');pa.innerHTML=h;
-  setTimeout(function(){window.print()},100);
+  var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  if(mobile){doPdf(list);return}
+  var w=null;
+  try{w=window.open('','_blank')}catch(e){}
+  toast('Building PDF...');
+  buildPdfCanvas(list).then(function(blob){
+    if(w&&!w.closed){w.location.href=URL.createObjectURL(blob);toast('PDF opened. Click the printer icon (or press Ctrl+P).')}
+    else{saveBlob(blob,'charlotte-county-business-directory.pdf');toast('PDF downloaded. Open it and print.')}
+  }).catch(function(e){console.error(e);if(w)try{w.close()}catch(x){}toast('Could not build the PDF')});
 }
 function saveBlob(blob,name){
   var ua=navigator.userAgent;
@@ -1303,7 +1305,6 @@ function vcard(b){
   b.websites.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b.facebook)v.push('URL:'+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
-  if(b.reviews)v.push('URL:'+fmtUrl(b.reviews));
   if(b._photo){var ph='PHOTO;ENCODING=b;TYPE=JPEG:'+b._photo,fold=[];while(ph.length>72){fold.push(ph.slice(0,72));ph=' '+ph.slice(72)}fold.push(ph);v.push(fold.join('\r\n'))}
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
   var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
@@ -1318,7 +1319,27 @@ function openShare(b){
   $('shareBox').classList.add('show');
 }
 function closeShare(){$('shareBox').classList.remove('show')}
-$('shEmail').onclick=function(){var b=shareB;closeShare();if(b)location.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b))};
+$('shEmail').onclick=async function(){
+  var b=shareB;closeShare();if(!b)return;
+  var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  var fname=(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf';
+  function mailto(extra){location.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent((extra?extra+'\n\n':'')+contactText(b))}
+  toast('Building PDF...');
+  var blob=null;
+  try{blob=await buildPdfCanvas([b])}catch(e){console.error(e)}
+  if(!blob){mailto('');return}
+  if(mobile){
+    try{
+      var f=new File([blob],fname,{type:'application/pdf'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        await navigator.share({files:[f],title:b.name,text:contactText(b)});
+        return;
+      }
+    }catch(e){if(e&&e.name==='AbortError')return}
+  }
+  saveBlob(blob,fname);
+  setTimeout(function(){mailto('The PDF with clickable links ('+fname+') was saved to your Downloads folder. Please attach it to this email.')},600);
+};
 $('shText').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
   var t=contactText(b),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
