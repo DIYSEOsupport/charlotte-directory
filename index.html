@@ -709,7 +709,17 @@ function computeFacets(){
     var extra=Object.keys(cnt).filter(function(k){return CATS.indexOf(k)<0}).sort();
     facetDefs.push({label:'Category',values:CATS.concat(extra),counts:cnt});
   })();
-  add('Area Served',b=>b.location?b.location.split(/\s*[,;]\s*/):[]);
+  (function(){
+    var CO=['Charlotte County','Sarasota County','Lee County'],cnt={};
+    all.forEach(function(b){
+      var v=[];(b.location?b.location.split(/\s*[,;]\s*/):[]).forEach(function(x){
+        x=(x||'').trim();if(!x)return;
+        var m=/^charlotte(\s+county)?$/i.test(x)?CO[0]:/^sarasota(\s+county)?$/i.test(x)?CO[1]:/^lee(\s+county)?$/i.test(x)?CO[2]:'Other';
+        if(v.indexOf(m)<0)v.push(m)});
+      b.fx['Area Served']=v;v.forEach(function(x){cnt[x]=(cnt[x]||0)+1})});
+    var vals=CO.concat(['Other']).filter(function(k){return cnt[k]});
+    if(vals.length)facetDefs.push({label:'Area Served',values:vals,counts:cnt});
+  })();
   add('Contact options',b=>{var a=[];if(b.phone)a.push('Has phone');if(b.email)a.push('Has email');if(b.website)a.push('Has website');if(b.facebook)a.push('Has Facebook');if(b.nextdoor)a.push('Has Nextdoor');return a});
   var hs={};all.forEach(b=>Object.keys(b.extra).forEach(h=>hs[h]=1));
   Object.keys(hs).forEach(h=>add(h,b=>{var v=b.extra[h];if(!v||v.length>60)return [];return v.split(/\s*[,;]\s*/)}));
@@ -974,13 +984,13 @@ function bizRows(b){
 function sortedAll(){return all.slice().sort(function(a,b){return a.name.localeCompare(b.name)})}
 function doPrint(list){
   var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-  if(mobile){doPdf(list);return}
+  if(mobile){if(confirm('Printing needs a PDF download. Download it now?'))doPdf(list);return}
   var w=null;
   try{w=window.open('','_blank')}catch(e){}
   toast('Building PDF...');
   buildPdfCanvas(list).then(function(blob){
     if(w&&!w.closed){w.location.href=URL.createObjectURL(blob);toast('PDF opened. Click the printer icon (or press Ctrl+P).')}
-    else{saveBlob(blob,'charlotte-county-business-directory.pdf');toast('PDF downloaded. Open it and print.')}
+    else{if(confirm('Your browser blocked the print window. Download the PDF instead?')){saveBlob(blob,'charlotte-county-business-directory.pdf');toast('PDF downloaded. Open it and print.')}}
   }).catch(function(e){console.error(e);if(w)try{w.close()}catch(x){}toast('Could not build the PDF')});
 }
 function saveBlob(blob,name){
@@ -1319,26 +1329,9 @@ function openShare(b){
   $('shareBox').classList.add('show');
 }
 function closeShare(){$('shareBox').classList.remove('show')}
-$('shEmail').onclick=async function(){
+$('shEmail').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
-  var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-  var fname=(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf';
-  function mailto(extra){location.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent((extra?extra+'\n\n':'')+contactText(b))}
-  toast('Building PDF...');
-  var blob=null;
-  try{blob=await buildPdfCanvas([b])}catch(e){console.error(e)}
-  if(!blob){mailto('');return}
-  if(mobile){
-    try{
-      var f=new File([blob],fname,{type:'application/pdf'});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){
-        await navigator.share({files:[f],title:b.name,text:contactText(b)});
-        return;
-      }
-    }catch(e){if(e&&e.name==='AbortError')return}
-  }
-  saveBlob(blob,fname);
-  setTimeout(function(){mailto('The PDF with clickable links ('+fname+') was saved to your Downloads folder. Please attach it to this email.')},600);
+  location.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b));
 };
 $('shText').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
