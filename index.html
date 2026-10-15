@@ -431,7 +431,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
 <div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Text message</button><button class="btn" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
-<div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtCsv" type="button">Spreadsheet (Excel / Sheets)</button><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
+<div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
@@ -515,7 +515,6 @@ function digits(v){return v.replace(/\D/g,'').slice(-10)}
 function roleOf(h){
   var k=h.replace(/[\s\u00a0]+/g,' ').trim().toLowerCase();
   if(hdrSkip(k))return null;
-  if(k.indexOf('business type')===0||k.indexOf('type of business')===0)return 'btype';
   if(k==='business name'||k==='company name'||/^name of (your )?(business|company)/.test(k))return 'name';
   if(/public|display|publish/.test(k)&&/name/.test(k))return 'pubname';
   if(/public|display|publish/.test(k)&&/title|role|position/.test(k))return 'pubtitle';
@@ -533,7 +532,7 @@ function roleOf(h){
   if(/phone|telephone|\bcell\b|contact number/.test(k))return 'phone';
   if(/website|web site|web address|web page|webpage|\burl\b/.test(k)||k==='domain')return 'website';
   if(/e-?mail/.test(k))return 'email';
-  if(k==='about'||k.indexOf('about your business')!==-1)return 'about';
+  if(k.indexOf('about your business')!==-1)return 'about';
   if(/describe your|describe the business/.test(k))return 'describe';
   if(k.indexOf('please share')!==-1)return 'share';
   if(k.indexOf('slogan')!==-1||k.indexOf('additional info')!==-1)return 'slogan';
@@ -619,7 +618,6 @@ function parseGrid(grid){
         case 'category':var cc=canonCat(v);if(!rec.category&&cc)rec.category=cc;break;
         case 'logo':setLogo(rec,v);break;
         case 'area':addArea(rec,v);break;
-        case 'btype':if(!rec.mode)rec.mode=v;break;
         case 'pubname':if(!rec.pubName)rec.pubName=v;break;
         case 'pubtitle':if(!rec.pubTitle)rec.pubTitle=v;break;
         case 'city':if(!rec.city)rec.city=v;break;
@@ -628,6 +626,7 @@ function parseGrid(grid){
         case 'address':pushUniq(rec.address,v,addrKey);break;
         case 'phone':if(!addPhones(rec,v)&&!route(rec,v)&&!rec.extra[h])rec.extra[h]=v;break;
         case 'about':case 'describe':case 'share':
+          if(modeLike(v)&&v.length<100){if(!rec.mode)rec.mode=v;break}
           if(role==='describe'){var dv=v.slice(0,400).trim();if(dv)pushUniq(rec.aboutTop,dv)}else pushUniq(rec.about,v);break;
         case 'slogan':if(!route(rec,v)&&!rec.slogan)rec.slogan=v;break;
         case 'facebook':if(/facebook|fb\./i.test(v)||isUrl(v)){if(!rec.facebook)rec.facebook=v}else if(!route(rec,v))rec.extra[h]=v;break;
@@ -977,9 +976,24 @@ function doPrint(list){
   setTimeout(function(){window.print()},100);
 }
 function saveBlob(blob,name){
-  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
-  document.body.appendChild(a);a.click();
-  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
+  var ua=navigator.userAgent;
+  var mobile=/Android|iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+  function viaLink(){
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},60000);
+  }
+  if(mobile){
+    try{
+      var f=new File([blob],name,{type:blob.type||'application/octet-stream'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        navigator.share({files:[f],title:name}).catch(function(e){if(!e||e.name!=='AbortError')location.href=URL.createObjectURL(blob)});
+        return;
+      }
+    }catch(e){}
+    if(/iPhone|iPad|iPod/i.test(ua)||/Macintosh/.test(ua)){location.href=URL.createObjectURL(blob);return}
+  }
+  viaLink();
 }
 /* ---------- spreadsheet (.xlsx) in Oswald ---------- */
 var CRC_T=null;
@@ -1301,8 +1315,7 @@ function askAct(kind){
   $('chooser').classList.add('show');
 }
 $('printBtn').onclick=function(){askAct('print')};
-$('dlBtn').onclick=function(){$('fmtBox').classList.add('show')};
-$('fmtCsv').onclick=function(){$('fmtBox').classList.remove('show');askAct('csv')};
+$('dlBtn').onclick=function(){askAct('pdf')};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');askAct('pdf')};
 $('fmtX').onclick=function(){$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
@@ -1315,29 +1328,38 @@ window.addEventListener('afterprint',function(){$('printArea').innerHTML=''});
 /* ---------- share options ---------- */
 var shareB=null;
 function contactText(b){
-  var L=[b.name];
-  if(b.contact)L.push('Contact: '+b.contact);
-  if(b.slogan)L.push('"'+b.slogan+'"');
-  b.phones.forEach(function(x){L.push('Phone: '+x)});
-  b.websites.forEach(function(x){L.push('Website: '+fmtUrl(x))});
-  b.emails.forEach(function(x){L.push('Email: '+x)});
-  if(b.facebook)L.push('Facebook: '+fmtUrl(b.facebook));
-  b.nextdoors.forEach(function(x){L.push('Nextdoor: '+fmtUrl(x))});
+  var L=[];
+  var cat=(b.category&&b.category!=='Local Business')?b.category:'';
+  L.push(b.name.toUpperCase());
+  if(cat)L.push(cat);
+  if(b.slogan)L.push('\u201C'+b.slogan+'\u201D');
+  L.push('\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014\u2014');
+  if(b.contact)L.push('\uD83D\uDC64 '+b.contact);
+  b.phones.forEach(function(x){L.push('\uD83D\uDCDE '+x)});
+  b.emails.forEach(function(x){L.push('\u2709\uFE0F '+x)});
+  b.websites.forEach(function(x){L.push('\uD83C\uDF10 '+fmtUrl(x))});
+  if(b.facebook)L.push('\uD83D\uDC4D '+fmtUrl(b.facebook));
+  b.nextdoors.forEach(function(x){L.push('\uD83C\uDFE1 '+fmtUrl(x))});
   var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
-  if(addr)L.push('Address: '+addr);
-  if(b.area&&!/online only/i.test(b.mode||''))L.push('Area Served: '+b.area);
+  if(addr)L.push('\uD83D\uDCCD '+addr);
+  if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Serves: '+b.area);
+  L.push('');
+  L.push('Charlotte County Small Business Directory');
+  L.push('https://diyseosupport.github.io/charlotte-directory/');
   return L.join('\n');
 }
 function vEsc(x){return (x||'').toString().replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;')}
 function vcard(b){
-  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'ORG:'+vEsc(b.name)];
+  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;','ORG:'+vEsc(b.name)];
+  if(b.pubTitle)v.push('TITLE:'+vEsc(b.pubTitle));
+  if(b.category&&b.category!=='Local Business')v.push('CATEGORIES:'+vEsc(b.category));
   b.phones.forEach(function(x){v.push('TEL;TYPE=WORK,VOICE:'+x.replace(/\s*ext.*$/i,''))});
   b.emails.forEach(function(x){v.push('EMAIL;TYPE=WORK:'+x)});
   b.websites.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b.facebook)v.push('URL:'+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
-  var note=[b.contact?'Contact: '+b.contact:'',b.slogan,b.area&&!/online only/i.test(b.mode||'')?'Area Served: '+b.area:''].filter(Boolean).join(' - ');
+  var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Serves: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
   if(note)v.push('NOTE:'+vEsc(note));
   v.push('END:VCARD');
   return v.join('\r\n');

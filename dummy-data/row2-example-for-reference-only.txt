@@ -1,0 +1,31 @@
+REFERENCE ONLY. Do not paste this. The form fills the sheet by itself.
+This shows what one finished business row looks like in the new sheet (A to H).
+
+A  Business Name:
+   Test Palm Lawn Care
+   (one blank line)
+   Home & Garden Services          <- category, grey, not bold
+B  Slogan or short description:
+   We make your yard look great
+C  Contact:
+   Sam Test, Owner
+   Phone: 941-555-0100
+   Email: test@example.com
+   Website: testpalmlawn.example.com
+   Facebook Business: facebook.com/testpalmlawn
+   NextDoor Business: nextdoor.com/pages/test-palm-lawn
+   NextDoor Personal: nextdoor.com/u/sam-test
+D  Address:
+   123 Test St, Port Charlotte, FL 33948
+E  Area Served:
+   Charlotte County, Lee County
+F  About:
+   Fake business for testing. Delete this row after the test.
+G  Details:
+   (blank unless the form pick list was "Other")
+H  Logo:
+   (a Google Drive link)
+
+Blue columns, added by the script to the right of Logo:
+I Timestamp | J Name | K Title | L How to contact you with questions about your submission?
+M Owner Key (private) | N Google Account Email (private) | O Hidden (private)
