@@ -526,6 +526,7 @@ function roleOf(h){
   if(/\bcity\b|\btown\b/.test(k))return 'city';
   if(/\bstate\b/.test(k))return 'state';
   if(/\bzip\b|postal/.test(k))return 'zip';
+  if(/review/.test(k))return 'reviews';
   if(k.indexOf('facebook')!==-1)return 'facebook';
   if(k.indexOf('nextdoor')!==-1)return /personal|contact/.test(k)?'nextdoorp':'nextdoor';
   if(/logo/.test(k))return 'logo';
@@ -565,7 +566,7 @@ function addPhones(rec,v){
   if(l.length){l.forEach(function(x){pushUniq(rec.phones,x,digits)});return true}
   return false;
 }
-function newRec(){return {logo:'',name:'',pubName:'',pubTitle:'',category:'',mode:'',about:[],aboutTop:[],phones:[],websites:[],emails:[],facebook:'',nextdoor:'',nextdoorP:'',area:'',city:'',state:'',zip:'',address:[],slogan:'',extra:{}}}
+function newRec(){return {logo:'',name:'',pubName:'',pubTitle:'',category:'',mode:'',about:[],aboutTop:[],phones:[],websites:[],emails:[],facebook:'',nextdoor:'',nextdoorP:'',reviews:'',area:'',city:'',state:'',zip:'',address:[],slogan:'',extra:{}}}
 function pushUniq(arr,v,keyfn){var k=keyfn?keyfn(v):v.toLowerCase();if(!arr.some(function(x){return (keyfn?keyfn(x):x.toLowerCase())===k}))arr.push(v)}
 
 /* puts a value in the right bucket by what it looks like. returns true if placed */
@@ -577,9 +578,11 @@ function setLogo(r,v){
   if(/\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(u)){r.logo=u;return true}
   return false;
 }
+function isReviewUrl(v){return /(g\.page|g\.co\/kgs|goo\.gl\/maps|maps\.app\.goo\.gl|share\.google|search\.google\.com|google\.[a-z.]+\/(maps|search|business)|maps\.google\.)/i.test(v||'')}
 function route(r,v){
   if(/drive\.google\.com\/(open\?id=|file\/d\/|uc\?)/i.test(v)){if(setLogo(r,v))return true}
   if(isEmail(v)&&!/\s/.test(v)){pushUniq(r.emails,v);return true}
+  if(isReviewUrl(v)&&!/\s/.test(v)){if(!r.reviews)r.reviews=v;return true}
   if(/facebook\.com|fb\.com|fb\.me/i.test(v)){if(!r.facebook)r.facebook=v;return true}
   if(/nextdoor\.com/i.test(v)){if(!r.nextdoor)r.nextdoor=v;else if(!r.nextdoorP&&r.nextdoor!==v)r.nextdoorP=v;return true}
   if(isUrl(v)&&!/\s/.test(v)){pushUniq(r.websites,v,normUrl);return true}
@@ -629,6 +632,8 @@ function parseGrid(grid){
           if(modeLike(v)&&v.length<100){if(!rec.mode)rec.mode=v;break}
           if(role==='describe'){var dv=v.slice(0,400).trim();if(dv)pushUniq(rec.aboutTop,dv)}else pushUniq(rec.about,v);break;
         case 'slogan':if(!route(rec,v)&&!rec.slogan)rec.slogan=v;break;
+        case 'reviews':v.split(/\s*[\r\n]+\s*/).forEach(function(p2){p2=p2.trim();if(p2&&!rec.reviews)rec.reviews=p2});break;
+        case 'website':v.split(/\s*[\r\n]+\s*/).forEach(function(p2){p2=p2.trim();if(p2&&!route(rec,p2)&&!rec.extra[h])rec.extra[h]=p2});break;
         case 'facebook':if(/facebook|fb\./i.test(v)||isUrl(v)){if(!rec.facebook)rec.facebook=v}else if(!route(rec,v))rec.extra[h]=v;break;
         case 'nextdoorp':if(/nextdoor/i.test(v)||isUrl(v)){if(!rec.nextdoorP)rec.nextdoorP=v}else if(!route(rec,v))rec.extra[h]=v;break;
         case 'nextdoor':if(/nextdoor/i.test(v)||isUrl(v)){if(!rec.nextdoor)rec.nextdoor=v}else if(!route(rec,v))rec.extra[h]=v;break;
@@ -836,6 +841,7 @@ function render(){
     b.emails.forEach(function(x){lk.push('<a class="ln" href="mailto:'+esc(x)+'"><span class="ico">'+IC.mail+'</span><span>'+esc(x)+'</span></a>')});
     if(b.facebook)lk.push('<a class="ln" href="'+esc(fmtUrl(b.facebook))+'" target="_blank" rel="noopener"><span class="ico">'+SVG_FB+'</span><span>'+esc(linkText(b.facebook))+'</span></a>');
     b.nextdoors.forEach(function(nd){lk.push('<a class="ln" href="'+esc(fmtUrl(nd))+'" target="_blank" rel="noopener"><span class="ico">'+SVG_ND+'</span><span>'+esc(linkText(nd))+'</span></a>')});
+    if(b.reviews)lk.push('<a class="ln" href="'+esc(fmtUrl(b.reviews))+'" target="_blank" rel="noopener"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="#ffb400" stroke="#1a1033" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg></span><span>Google Reviews</span></a>');
     if(lk.length)h+='<div class="links">'+lk.join('')+'</div>';
     /* 3. physical address with map icon link */
     var addrText=[b.addressLine,b.cityStateZip].filter(Boolean).join('\n');
@@ -847,10 +853,10 @@ function render(){
       else h+='<div class="ln addr"><span class="ico">'+IC.pin+'</span><span>'+esc(addrText)+'</span></div>';
       h+='</div>';
     }
-    if(showArea)h+='<div><div class="sect">'+esc(lbl('Area Served'))+'</div><div class="about area">'+esc(b.area)+'</div></div>';
     /* 4. the rest */
     var aTop=b.aboutTop[0]||'',aRest=b.aboutTop.slice(1).concat(b.about).join('\n\n');
     if(aTop||aRest)h+='<div><div class="sect">'+esc(lbl('About'))+'</div>'+(aTop?'<div class="about area abouttop">'+esc(aTop)+'</div>':'')+(aRest?'<div class="about area">'+esc(aRest)+'</div>':'')+'</div>';
+    if(showArea)h+='<div><div class="sect">'+esc(lbl('Area Served'))+'</div><div class="about area">'+esc(b.area)+'</div></div>';
     var rest=[];
     Object.keys(b.extra).forEach(function(x){rest.push([esc(lbl(x)),fmtVal(x,b.extra[x])])});
     if(rest.length)h+='<div><div class="sect">'+esc(lbl('Details'))+'</div>'+rows(rest)+'</div>';
@@ -1028,12 +1034,45 @@ function cvWrap(ctx,text,maxW){
   return out;
 }
 function cvSet(ctx,font,ls){ctx.font=font;try{ctx.letterSpacing=ls||'0px'}catch(e){}}
+
+/* ---------- business logos (for PDF + contact photo) ---------- */
+var logoCache={};
+function logoId(u){var m=/[?&]id=([\w-]+)/.exec(u||'');return m?m[1]:''}
+function fetchLogoData(b){
+  if(!b||!b.logo)return Promise.resolve(null);
+  if(logoCache[b.logo])return logoCache[b.logo];
+  var p=new Promise(function(res){
+    var done=false;
+    function fin(v){if(!done){done=true;res(v)}}
+    setTimeout(function(){fin(null)},9000);
+    function fromUrl(u,cors){var im=new Image();if(cors)im.crossOrigin='anonymous';im.onload=function(){fin(im)};im.onerror=function(){fin(null)};im.src=u}
+    var id=logoId(b.logo);
+    if(id&&/drive\.google\.com/i.test(b.logo)){
+      var cb='lg'+Math.random().toString(36).slice(2),s=document.createElement('script');
+      window[cb]=function(o){try{delete window[cb]}catch(e){window[cb]=null}try{s.remove()}catch(e){}if(o&&o.data)fromUrl(o.data,false);else fin(null)};
+      s.onerror=function(){fin(null)};
+      s.src=CSV_URL+'?logo='+encodeURIComponent(id)+'&callback='+cb;
+      document.head.appendChild(s);
+    }else fromUrl(b.logo,true);
+  });
+  logoCache[b.logo]=p;
+  return p;
+}
+function logoJpeg(im,size){
+  try{
+    var sc=Math.min(size/im.width,size/im.height,1),w=Math.max(1,Math.round(im.width*sc)),h=Math.max(1,Math.round(im.height*sc));
+    var cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    var c=cv.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,w,h);c.drawImage(im,0,0,w,h);
+    return cv.toDataURL('image/jpeg',0.85).split(',')[1];
+  }catch(e){return ''}
+}
 async function buildPdfCanvas(list){
   try{
     await document.fonts.load('600 18px Oswald');await document.fonts.load('400 12px Oswald');
     await document.fonts.load('700 10px Oswald');
     await document.fonts.ready;
   }catch(e){}
+  try{await Promise.all(list.map(function(b){return fetchLogoData(b).then(function(im){b._img=im})}))}catch(e){}
   var S=2,PW=612,PH=792,M=44,CW=PW-2*M,COLW=236,COL2=M+CW-COLW,FOOT=752,LIM=FOOT-14;
   var mc=document.createElement('canvas').getContext('2d');
   var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
@@ -1046,12 +1085,16 @@ async function buildPdfCanvas(list){
     cvSet(mc,'600 8.5px '+BF_B,'1px');
     var cw=cat?mc.measureText(cat.toUpperCase()).width:0;
     cvSet(mc,'600 17px '+BF_H,'0.3px');
-    var nl=cvWrap(mc,b.name,CW-cw-14);
+    var im=b._img,lw=im?46:0;
+    var nl=cvWrap(mc,b.name,CW-cw-14-lw);
     L.push({h:6,rule:true,draw:function(){}});
     nl.forEach(function(t,i){
-      L.push({h:23,keep:i===0,draw:function(c,y){
-        cvSet(c,'600 17px '+BF_H,'0.3px');c.fillStyle=BC.ink;c.fillText(t,M,y+17);
-        if(i===0&&cat){cvSet(c,'600 8.5px '+BF_B,'1px');c.fillStyle=BC.orange;c.fillText(cat.toUpperCase(),M+CW-cw,y+16)}
+      var big=(i===0&&im);
+      L.push({h:big?42:23,keep:i===0,draw:function(c,y){
+        var dy=big?10:0;
+        if(big){var bx=36,sc=Math.min(bx/im.width,bx/im.height),iw=im.width*sc,ih=im.height*sc;c.fillStyle='#fff';c.fillRect(M,y,bx,bx);c.drawImage(im,M+(bx-iw)/2,y+(bx-ih)/2,iw,ih);c.strokeStyle=BC.rule;c.lineWidth=0.8;c.strokeRect(M,y,bx,bx)}
+        cvSet(c,'600 17px '+BF_H,'0.3px');c.fillStyle=BC.ink;c.fillText(t,M+lw,y+17+dy);
+        if(i===0&&cat){cvSet(c,'600 8.5px '+BF_B,'1px');c.fillStyle=BC.orange;c.fillText(cat.toUpperCase(),M+CW-cw,y+16+dy)}
       }});
     });
     if(b.slogan){
@@ -1073,6 +1116,7 @@ async function buildPdfCanvas(list){
     if(b.emails.length)left.push(field('EMAIL',b.emails.map(function(x){return {t:x,u:'mailto:'+x}})));
     if(b.facebook)left.push(field('FACEBOOK',[{t:linkText(b.facebook),u:fmtUrl(b.facebook)}]));
     if(b.nextdoors.length)left.push(field('NEXTDOOR',b.nextdoors.map(function(x){return {t:linkText(x),u:fmtUrl(x)}})));
+    if(b.reviews)left.push(field('GOOGLE REVIEWS',[{t:'Read our Google reviews',u:fmtUrl(b.reviews)}]));
     if(b.contact)right.push(field('CONTACT',[{t:b.contact}]));
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join('\n');
     if(addr)right.push(field('ADDRESS',[{t:addr,u:mapUrl(b)}]));
@@ -1240,6 +1284,7 @@ function contactText(b){
   b.websites.forEach(function(x){L.push('\uD83C\uDF10 '+fmtUrl(x))});
   if(b.facebook)L.push('\uD83D\uDC4D '+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){L.push('\uD83C\uDFE1 '+fmtUrl(x))});
+  if(b.reviews)L.push('\u2B50 Google reviews: '+fmtUrl(b.reviews));
   var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
   if(addr){L.push('\uD83D\uDCCD '+addr);var mu2=mapUrl(b);if(mu2)L.push('\uD83D\uDDFA\uFE0F Map: '+mu2)}
   if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Mobile service area: '+b.area);
@@ -1258,6 +1303,8 @@ function vcard(b){
   b.websites.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b.facebook)v.push('URL:'+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
+  if(b.reviews)v.push('URL:'+fmtUrl(b.reviews));
+  if(b._photo){var ph='PHOTO;ENCODING=b;TYPE=JPEG:'+b._photo,fold=[];while(ph.length>72){fold.push(ph.slice(0,72));ph=' '+ph.slice(72)}fold.push(ph);v.push(fold.join('\r\n'))}
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
   var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
   if(note)v.push('NOTE:'+vEsc(note));
@@ -1284,8 +1331,9 @@ $('shText').onclick=function(){
     }
   },1500);
 };
-$('shCard').onclick=function(){
+$('shCard').onclick=async function(){
   var b=shareB;closeShare();if(!b)return;
+  try{var im=await fetchLogoData(b);b._photo=im?logoJpeg(im,256):''}catch(e){b._photo=''}
   var blob=new Blob([vcard(b)],{type:'text/vcard;charset=utf-8'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(b.name.replace(/[^\w\- ]+/g,'').trim()||'contact')+'.vcf';

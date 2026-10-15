@@ -188,6 +188,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld"><label class="l" for="fb">Facebook Business Facebook Page</label><input type="text" id="fb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
       <div class="fld"><label class="l" for="ndb">NextDoor Business Page</label><input type="text" id="ndb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
       <div class="fld"><label class="l" for="ndp">NextDoor Contact Personal Page</label><input type="text" id="ndp" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
+      <div class="fld"><label class="l" for="grv">Google Reviews Link</label><div class="help">Optional. The link customers use to leave you a Google review. It shows on your card as a Google Reviews link.</div><input type="text" id="grv" data-url inputmode="url"><div class="err">Enter a web address like g.page/r/yourbusiness/review.</div></div>
       <div class="fld"><label class="l" for="slogan">Slogan</label><input type="text" id="slogan" maxlength="120"></div>
       <div class="fld"><span class="l">Upload Logo</span><div class="help">A square picture works best. It shows on your card.</div>
         <div class="logo-row"><img id="logoprev" alt="Business Logo"><input type="file" id="logo" accept="image/*"></div><div class="err" id="logoerr" style="display:none">That file is too big. Try a smaller picture.</div>
@@ -439,7 +440,7 @@ function setRadio(name,value){
   if(any)any.dispatchEvent(new Event('change',{bubbles:true}));
 }
 function clearBiz(){
-  ['biz','pubname','pubtitle','other','desc','phone','web','email','street','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
+  ['biz','pubname','pubtitle','other','desc','phone','web','email','street','city','state','zip','areatext','fb','ndb','ndp','grv','slogan'].forEach(function(id){$(id).value=''});
   qa('input[name="cat"],input[name="btype"],input[name="area"]').forEach(function(i){i.checked=false});
   ['cats','types','areas'].forEach(function(g){var b=$(g);b.dispatchEvent(new Event('change',{bubbles:true}))});
   $('dcnt').textContent='0';
@@ -467,7 +468,7 @@ function fillBiz(b){
   $('other').value=b.other||'';
   $('phone').value=maskPhone(b.phone||'');$('web').value=b.website||'';$('email').value=b.email||'';
   $('street').value=b.street||'';$('city').value=b.city||'';$('state').value=b.state||'';$('zip').value=b.zip||'';
-  $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('slogan').value=b.slogan||'';
+  $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('grv').value=b.reviews||'';$('slogan').value=b.slogan||'';
   origLogoId=b.logoId||'';
   if(origLogoId){$('oldlogoimg').src='https://drive.google.com/thumbnail?id='+encodeURIComponent(origLogoId)+'&sz=w200';$('oldlogo').style.display='flex'}
   qa('.bad').forEach(function(x){x.classList.remove('bad')});
@@ -486,7 +487,7 @@ function renderReview(){
     ['1. About you',row('Name (private)',$('name').value.trim())+row('Title (private)',$('title').value.trim())+row('How to contact you (private)',$('how').value.trim())],
     ['2. Business',row('Business name',$('biz').value.trim())+row('Public contact name',$('pubname').value.trim())+row('Public contact title',$('pubtitle').value.trim())+row('Category',val('cat'))+($('otherfld').style.display==='none'?'':row('Other details',$('other').value.trim()))+row('About your business',t)+row('Describe your business',$('desc').value.trim())],
     ['3. Contact',row('Business phone',maskPhone($('phone').value))+row('Website',fixUrl($('web').value))+row('Email for customers',$('email').value.trim())+(phys?row('Street',$('street').value.trim())+row('City',$('city').value.trim())+row('State',$('state').value.trim())+row('Zip',$('zip').value.trim()):'')+(mob?row('Area served',a):'')],
-    ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Slogan',$('slogan').value.trim())+row('Logo',logo)]
+    ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Google Reviews link',fixUrl($('grv').value))+row('Slogan',$('slogan').value.trim())+row('Logo',logo)]
   ];
   $('review').innerHTML=sec.map(function(x){return '<div class="rv"><div class="rv-h"><h2>'+esc(x[0])+'</h2><button type="button" class="b alt" data-edit>Edit</button></div><dl>'+x[1]+'</dl></div>'}).join('');
   qa('[data-edit]',$('review')).forEach(function(b,i){b.addEventListener('click',function(){show(i)})});
@@ -528,7 +529,7 @@ $('f').addEventListener('submit',function(e){
     describe:t==='Other'?$('desc').value.trim().slice(0,400):t+'\n\n'+$('desc').value.trim().slice(0,400),
     street:'',city:'',state:'',zip:'',area:'',
     phone:maskPhone($('phone').value),website:fixUrl($('web').value),email:$('email').value.trim().toLowerCase(),
-    facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),slogan:$('slogan').value.trim(),
+    facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),reviews:fixUrl($('grv').value),slogan:$('slogan').value.trim(),
     logoData:logoData,logoName:logoName,
     originalName:mode==='update'?origName:'',
     logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none'))
