@@ -437,7 +437,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script>
-const CSV_URL='https://script.google.com/macros/s/AKfycbwGw2V1QUWKvgE8CEbRJ1cALv8vne_6MlQE0bbq6eVwPLYSYfliHyEI2_UEYn_UjO_lmw/exec';
+const CSV_URL='https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
 
 /* Column headings to hide (exact match, any capitalization). Add more inside the brackets. */
 const HIDE_COLUMNS=['email address'];
@@ -982,16 +982,30 @@ function bizRows(b){
   return r;
 }
 function sortedAll(){return all.slice().sort(function(a,b){return a.name.localeCompare(b.name)})}
+function printPages(urls){
+  var old=document.getElementById('printFrame');if(old)old.remove();
+  var f=document.createElement('iframe');f.id='printFrame';
+  f.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(f);
+  var d=f.contentWindow.document;
+  d.open();
+  d.write('<!doctype html><html><head><meta charset="utf-8"><title>Charlotte County Small Business Directory</title><style>@page{size:letter;margin:0}html,body{margin:0;padding:0}img{display:block;width:8.5in;height:10.99in;page-break-after:always}img:last-child{page-break-after:auto}</style></head><body>'+urls.map(function(u){return '<img src="'+u+'">'}).join('')+'</body></html>');
+  d.close();
+  var imgs=[].slice.call(d.images),left=imgs.length,fired=false;
+  function go(){
+    if(fired)return;fired=true;
+    try{f.contentWindow.focus();f.contentWindow.print()}catch(e){window.print()}
+  }
+  imgs.forEach(function(im){
+    if(im.complete){left--}
+    else{im.onload=im.onerror=function(){left--;if(left<=0)go()}}
+  });
+  if(left<=0)go();
+  setTimeout(go,4000);
+}
 function doPrint(list){
-  var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-  if(mobile){if(confirm('Printing needs a PDF download. Download it now?'))doPdf(list);return}
-  var w=null;
-  try{w=window.open('','_blank')}catch(e){}
-  toast('Building PDF...');
-  buildPdfCanvas(list).then(function(blob){
-    if(w&&!w.closed){w.location.href=URL.createObjectURL(blob);toast('PDF opened. Click the printer icon (or press Ctrl+P).')}
-    else{if(confirm('Your browser blocked the print window. Download the PDF instead?')){saveBlob(blob,'charlotte-county-business-directory.pdf');toast('PDF downloaded. Open it and print.')}}
-  }).catch(function(e){console.error(e);if(w)try{w.close()}catch(x){}toast('Could not build the PDF')});
+  toast('Getting ready to print...');
+  buildPdfCanvas(list).then(function(){printPages(window._pdfPages||[])}).catch(function(e){console.error(e);toast('Could not get the print page ready')});
 }
 function saveBlob(blob,name){
   var ua=navigator.userAgent;
@@ -1248,6 +1262,7 @@ async function buildPdfCanvas(list){
   pdf+='trailer\n<< /Size '+objs.length+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF';
   var u8=new Uint8Array(pdf.length);
   for(var q=0;q<pdf.length;q++)u8[q]=pdf.charCodeAt(q)&255;
+  window._pdfPages=out.map(function(p){return 'data:image/jpeg;base64,'+btoa(p.bin)});
   return new Blob([u8],{type:'application/pdf'});
 }
 function doPdf(list,fname){
@@ -1331,7 +1346,9 @@ function openShare(b){
 function closeShare(){$('shareBox').classList.remove('show')}
 $('shEmail').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
-  location.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b));
+  var a=document.createElement('a');
+  a.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b).replace(/\n/g,'\r\n'));
+  document.body.appendChild(a);a.click();a.remove();
 };
 $('shText').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
@@ -1347,13 +1364,33 @@ $('shText').onclick=function(){
 };
 $('shCard').onclick=async function(){
   var b=shareB;closeShare();if(!b)return;
+  var ua=navigator.userAgent;
+  if(/Android/i.test(ua)){
+    /* Android: open the Contacts app "new contact" screen, filled in */
+    var P=function(k,v){return v?';S.'+k+'='+encodeURIComponent(v):''};
+    var ph=b.phones.map(function(x){return x.replace(/\s*ext.*$/i,'')});
+    var note=[b.slogan||'',b.websites.map(fmtUrl).join('\n'),b.facebook?fmtUrl(b.facebook):'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
+    var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
+    var u='intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact'
+      +P('name',b.name)+P('company',b.name)+P('job_title',b.pubTitle)
+      +P('phone',ph[0])+P('secondary_phone',ph[1])+P('email',b.emails[0])+P('secondary_email',b.emails[1])
+      +P('postal',addr)+P('notes',note)+';end';
+    var t0=Date.now();
+    location.href=u;
+    setTimeout(function(){if(!document.hidden&&Date.now()-t0<2500)dlCard(b)},1800);
+    return;
+  }
+  dlCard(b,/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1));
+};
+async function dlCard(b,ios){
   try{var im=await fetchLogoData(b);b._photo=im?logoJpeg(im,256):''}catch(e){b._photo=''}
   var blob=new Blob([vcard(b)],{type:'text/vcard;charset=utf-8'});
+  if(ios){location.href=URL.createObjectURL(blob);return}
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(b.name.replace(/[^\w\- ]+/g,'').trim()||'contact')+'.vcf';
   document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
-};
+}
 $('shPdf').onclick=function(){var b=shareB;closeShare();if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf')};
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
