@@ -55,6 +55,7 @@ input:focus,textarea:focus{border-color:var(--magenta);box-shadow:3px 3px 0 var(
 .opts{display:grid;gap:10px}
 .sub{margin:12px 0 0;padding:12px;border:3px dashed var(--ink);border-radius:12px;background:rgba(255,255,255,.55);display:none}
 .sub.show{display:block}
+.sub.optional .req{display:none}
 .cnt{font-size:12px;font-weight:800;text-align:right;color:#6a5a85;margin-top:4px}
 .row2{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
 @media(max-width:560px){.row2{grid-template-columns:1fr 1fr}.row2 .fld:first-child{grid-column:1/-1}}
@@ -150,11 +151,11 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       </div>
       <div class="fld" data-req id="catfld"><span class="l">Category <span class="req">*</span></span><div class="help">Choose your primary category.</div>
         <div class="tiles" id="cats"></div><div class="err">Pick one category.</div></div>
-      <div class="fld" id="otherfld" style="display:none"><label class="l" for="other">Other details</label><textarea id="other" style="min-height:76px"></textarea></div>
       <div class="fld" data-req id="typefld"><span class="l">About your business <span class="req">*</span></span>
         <div class="opts" id="types"></div>
         <div class="sub" id="typeother" style="display:none!important"></div>
         <div class="err">Choose one.</div></div>
+      <div class="fld" id="otherfld" style="display:none"><label class="l" for="other">Other details</label><textarea id="other" style="min-height:76px"></textarea></div>
       <div class="fld" data-req id="descfld"><label class="l" for="desc">Describe your business <span class="req">*</span></label><div class="help">A few sentences. Shown in the directory.</div><textarea id="desc" maxlength="400"></textarea><div class="cnt"><span id="dcnt">0</span>/400</div><div class="err">Describe your business.</div></div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Next</button></div>
     </div>
@@ -164,7 +165,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" data-req><label class="l" for="phone">Business Phone <span class="req">*</span></label><input type="tel" id="phone" autocomplete="tel"><div class="err">Enter exactly 10 digits, like 941-555-1234.</div></div>
       <div class="fld"><label class="l" for="web">Business Website</label><input type="text" id="web" data-url inputmode="url" autocomplete="url"><div class="err">Enter a web address like mybusiness.com.</div></div>
       <div class="fld" id="emfld"><label class="l" for="email">Email for Customers to Contact You</label><input type="email" id="email" autocomplete="email"><div class="err">Enter a valid email like name@example.com.</div></div>
-      <div class="sub" id="physical"><h2 style="font-size:22px">Physical address</h2>
+      <div class="sub" id="physical"><h2 style="font-size:22px" id="physhead">Physical address</h2>
         <div class="fld" data-req data-phys><label class="l" for="street">Business Street Address <span class="req">*</span></label><input type="text" id="street" autocomplete="address-line1"><div class="err">Enter your street address.</div></div>
         <div class="row2">
           <div class="fld" data-req data-phys><label class="l" for="city">Business City <span class="req">*</span></label><input type="text" id="city" autocomplete="address-level2"><div class="err">Enter your city.</div></div>
@@ -274,7 +275,7 @@ function show(n){
 function syncType(t){
   var isOther=t==='Other',phys=t==='Physical Location',mob=/^Mobile/.test(t);
   $('typeother').classList.toggle('show',isOther);syncOther();
-  $('physical').classList.toggle('show',phys);
+  $('physical').classList.toggle('show',phys||isOther);$('physical').classList.toggle('optional',isOther);$('physhead').textContent=isOther?'Physical address (optional)':'Physical address';
   $('mobile').classList.toggle('show',mob);
 }
 pick('cats','cat',CATS);
@@ -314,7 +315,7 @@ function checkStep(n){
     if(f.hasAttribute('data-phys')&&!$('physical').classList.contains('show'))return;
     var el=f.querySelector('input,textarea');if(!el)return;
     var v=el.value.trim();
-    if(!v){bad(f);return}
+    if(!v){if(f.hasAttribute('data-phys')&&$('physical').classList.contains('optional'))return;bad(f);return}
     if(el.id==='phone'&&v.replace(/\D/g,'').length!==10)bad(f);
     if(el.id==='how'){
       if(v.indexOf('@')!==-1){if(!EMAIL_RE.test(v))bad(f)}
@@ -475,7 +476,7 @@ function fillBiz(b){
 /* ---------- Review page ---------- */
 function renderReview(){
   function row(l,v){return '<dt>'+esc(l)+'</dt><dd>'+(v?esc(v):'<span style="color:#8a7aa5">(blank)</span>')+'</dd>'}
-  var t=val('btype'),phys=t==='Physical Location',mob=/^Mobile/.test(t);
+  var t=val('btype'),phys=t==='Physical Location'||(t==='Other'&&!!($('street').value.trim()||$('city').value.trim()||$('state').value.trim()||$('zip').value.trim())),mob=/^Mobile/.test(t);
   var a=areaVals().map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ');
   var logo='No logo';
   if(logoData)logo='New logo picked'+(logoName?': '+logoName:'');
@@ -532,7 +533,7 @@ $('f').addEventListener('submit',function(e){
     originalName:mode==='update'?origName:'',
     logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none'))
   };
-  if(t==='Physical Location'){d.street=$('street').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
+  if(t==='Physical Location'||t==='Other'){d.street=$('street').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
   if(/^Mobile/.test(t)){d.area=a.map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ')}
   var go=$('go');go.disabled=true;go.textContent='Sending... wait a few seconds';$('fail').style.display='none';
   if(!/^https:\/\//.test(ENDPOINT)){go.disabled=false;go.textContent='Submit my business';$('fail').textContent='This form is not connected to the directory yet. Tell the site owner.';$('fail').style.display='block';return}

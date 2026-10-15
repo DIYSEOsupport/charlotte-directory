@@ -453,7 +453,7 @@ const LABELS={
   'Location':'Location',
   'Address':'Address',
   'City, State, Zip':'City, State, Zip',
-  'Area Served':'Area Served',
+  'Area Served':'Mobile Service Area',
   'Business type':'Business type',
   'Phone':'Phone',
   'Email':'Email',
@@ -995,106 +995,6 @@ function saveBlob(blob,name){
   }
   viaLink();
 }
-/* ---------- spreadsheet (.xlsx) in Oswald ---------- */
-var CRC_T=null;
-function crc32(u8){
-  if(!CRC_T){CRC_T=[];for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1);CRC_T[n]=c>>>0}}
-  var crc=0xFFFFFFFF;for(var i=0;i<u8.length;i++)crc=CRC_T[(crc^u8[i])&255]^(crc>>>8);
-  return (crc^0xFFFFFFFF)>>>0;
-}
-function zipStore(files){
-  var enc=new TextEncoder(),parts=[],central=[],offset=0;
-  files.forEach(function(f){
-    var nm=enc.encode(f.name),data=enc.encode(f.text),crc=crc32(data);
-    var lh=new DataView(new ArrayBuffer(30));
-    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(8,0,true);
-    lh.setUint16(10,0,true);lh.setUint16(12,0x0021,true);lh.setUint32(14,crc,true);lh.setUint32(18,data.length,true);
-    lh.setUint32(22,data.length,true);lh.setUint16(26,nm.length,true);lh.setUint16(28,0,true);
-    parts.push(new Uint8Array(lh.buffer),nm,data);
-    var ch=new DataView(new ArrayBuffer(46));
-    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);
-    ch.setUint16(10,0,true);ch.setUint16(12,0,true);ch.setUint16(14,0x0021,true);ch.setUint32(16,crc,true);
-    ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,nm.length,true);
-    ch.setUint32(42,offset,true);
-    central.push(new Uint8Array(ch.buffer),nm);
-    offset+=30+nm.length+data.length;
-  });
-  var csize=central.reduce(function(s,p){return s+p.length},0);
-  var end=new DataView(new ArrayBuffer(22));
-  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);
-  end.setUint32(12,csize,true);end.setUint32(16,offset,true);
-  return new Blob(parts.concat(central,[new Uint8Array(end.buffer)]),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-}
-function xmlEsc(t){return String(t==null?'':t).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-function colName(i){var s='';i++;while(i>0){var m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
-function doXlsx(list){
-  var head=['Business Name','Category','Slogan','Contact','Phone','Website','Email','Facebook','NextDoor','Address','Area Served','About','Details','Logo'];
-  var widths=[30,26,28,22,16,28,30,30,30,34,22,60,44,34];
-  function details(b){return Object.keys(b.extra).map(function(h){return lbl(h).replace(/:\s*$/,'')+': '+b.extra[h]}).join('\n')}
-  var rows=list.map(function(b){
-    var cat=(b.category&&b.category!=='Local Business')?b.category:'';
-    return [
-      {t:b.name,st:'name'},{t:cat},{t:b.slogan},{t:b.contact},
-      {t:b.phones.join('\n')},
-      b.websites.length===1?{t:linkText(b.websites[0]),u:fmtUrl(b.websites[0])}:{t:b.websites.map(linkText).join('\n')},
-      b.emails.length===1?{t:b.emails[0],u:'mailto:'+b.emails[0]}:{t:b.emails.join('\n')},
-      b.facebook?{t:linkText(b.facebook),u:fmtUrl(b.facebook)}:{t:''},
-      b.nextdoors.length===1?{t:linkText(b.nextdoors[0]),u:fmtUrl(b.nextdoors[0])}:{t:b.nextdoors.map(linkText).join('\n')},
-      {t:[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ')},
-      {t:(b.area&&!/online only/i.test(b.mode||''))?b.area:''},
-      {t:b.description},{t:details(b)},
-      b.logo?{t:'Logo',u:b.logo}:{t:''}
-    ];
-  });
-  /* styles: 0 default, 1 header, 2 body, 3 body alt, 4 name, 5 name alt, 6 link, 7 link alt */
-  var styles='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-   +'<fonts count="5">'
-   +'<font><sz val="10"/><name val="Oswald"/></font>'
-   +'<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Oswald"/></font>'
-   +'<font><sz val="10"/><color rgb="FF2B2B36"/><name val="Oswald"/></font>'
-   +'<font><b/><sz val="11"/><color rgb="FF1A1033"/><name val="Oswald"/></font>'
-   +'<font><u/><sz val="10"/><color rgb="FF124080"/><name val="Oswald"/></font>'
-   +'</fonts>'
-   +'<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>'
-   +'<fill><patternFill patternType="solid"><fgColor rgb="FF5B2A86"/></patternFill></fill>'
-   +'<fill><patternFill patternType="solid"><fgColor rgb="FFF6F3FB"/></patternFill></fill></fills>'
-   +'<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>'
-   +'<border><left/><right/><top/><bottom style="thin"><color rgb="FFDCD9E3"/></bottom><diagonal/></border></borders>'
-   +'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
-   +'<cellXfs count="8">'
-   +'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
-   +'<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>'
-   +'<xf numFmtId="49" fontId="2" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'<xf numFmtId="49" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'<xf numFmtId="49" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'<xf numFmtId="49" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'<xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'<xf numFmtId="0" fontId="4" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>'
-   +'</cellXfs></styleSheet>';
-  var sheet='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
-   +'<sheetViews><sheetView workbookViewId="0" showGridLines="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>'
-   +'<cols>'+widths.map(function(w,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>'}).join('')+'</cols><sheetData>';
-  sheet+='<row r="1" ht="26" customHeight="1">'+head.map(function(h,i){return '<c r="'+colName(i)+'1" s="1" t="inlineStr"><is><t>'+xmlEsc(h)+'</t></is></c>'}).join('')+'</row>';
-  rows.forEach(function(r,ri){
-    var rn=ri+2,alt=ri%2===1;
-    sheet+='<row r="'+rn+'">'+r.map(function(cell,ci){
-      var ref=colName(ci)+rn,txt=xmlEsc(cell.t),st=cell.u?(alt?7:6):(cell.st==='name'?(alt?5:4):(alt?3:2));
-      if(cell.u&&cell.t)return '<c r="'+ref+'" s="'+st+'" t="str"><f>HYPERLINK("'+xmlEsc(cell.u).replace(/"/g,'""')+'","'+txt.replace(/"/g,'""')+'")</f><v>'+txt+'</v></c>';
-      return '<c r="'+ref+'" s="'+st+'" t="inlineStr"><is><t xml:space="preserve">'+txt+'</t></is></c>';
-    }).join('')+'</row>';
-  });
-  sheet+='</sheetData><autoFilter ref="A1:'+colName(head.length-1)+(rows.length+1)+'"/></worksheet>';
-  var files=[
-    {name:'[Content_Types].xml',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
-    {name:'_rels/.rels',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
-    {name:'xl/workbook.xml',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Directory" sheetId="1" r:id="rId1"/></sheets><definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">Directory!$A$1:$'+colName(head.length-1)+'$'+(rows.length+1)+'</definedName></definedNames></workbook>'},
-    {name:'xl/_rels/workbook.xml.rels',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
-    {name:'xl/styles.xml',text:styles},
-    {name:'xl/worksheets/sheet1.xml',text:sheet}
-  ];
-  saveBlob(zipStore(files),'charlotte-county-business-directory.xlsx');
-  toast('Downloaded');
-}
 function pdfClean(t){
   return String(t==null?'':t).replace(/[\ud800-\udbff][\udc00-\udfff]/g,'').replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"').replace(/[\u2013\u2014]/g,'-').replace(/\u2026/g,'...').replace(/[\u00a0\t]/g,' ').replace(/[^\x20-\x7e\xa1-\xff]/g,'');
 }
@@ -1176,7 +1076,7 @@ async function buildPdfCanvas(list){
     if(b.contact)right.push(field('CONTACT',[{t:b.contact}]));
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join('\n');
     if(addr)right.push(field('ADDRESS',[{t:addr,u:mapUrl(b)}]));
-    if(b.area&&!/online only/i.test(b.mode||''))right.push(field('AREA SERVED',[{t:b.area}]));
+    if(b.area&&!/online only/i.test(b.mode||''))right.push(field('MOBILE SERVICE AREA',[{t:b.area}]));
     function colH(c){return c.reduce(function(s,f){return s+f.h},0)}
     var gh=Math.max(colH(left),colH(right));
     if(gh){
@@ -1302,13 +1202,13 @@ var pendingAct='';
 function runAct(list){
   $('chooser').classList.remove('show');
   if(!list.length){toast('Nothing to '+(pendingAct==='print'?'print':'download'));return}
-  if(pendingAct==='print')doPrint(list);else if(pendingAct==='csv')doXlsx(list);else doPdf(list);
+  if(pendingAct==='print')doPrint(list);else doPdf(list);
 }
 function askAct(kind){
   pendingAct=kind;
   if(!all.length)return;
   if(view.length===all.length){runAct(view);return}
-  $('chT').textContent={print:'Print',csv:'Download Spreadsheet',pdf:'Download PDF'}[kind];
+  $('chT').textContent={print:'Print',pdf:'Download PDF'}[kind];
   $('chRes').textContent='Current results ('+view.length+')';
   $('chRes').disabled=!view.length;
   $('chAll').textContent='All businesses ('+all.length+')';
@@ -1341,8 +1241,8 @@ function contactText(b){
   if(b.facebook)L.push('\uD83D\uDC4D '+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){L.push('\uD83C\uDFE1 '+fmtUrl(x))});
   var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
-  if(addr)L.push('\uD83D\uDCCD '+addr);
-  if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Serves: '+b.area);
+  if(addr){L.push('\uD83D\uDCCD '+addr);var mu2=mapUrl(b);if(mu2)L.push('\uD83D\uDDFA\uFE0F Map: '+mu2)}
+  if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Mobile service area: '+b.area);
   L.push('');
   L.push('Charlotte County Small Business Directory');
   L.push('https://diyseosupport.github.io/charlotte-directory/');
@@ -1359,7 +1259,7 @@ function vcard(b){
   if(b.facebook)v.push('URL:'+fmtUrl(b.facebook));
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
-  var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Serves: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
+  var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
   if(note)v.push('NOTE:'+vEsc(note));
   v.push('END:VCARD');
   return v.join('\r\n');
