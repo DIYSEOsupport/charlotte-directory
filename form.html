@@ -223,6 +223,7 @@ var bizList=null,mode='',origName='',origLogoId='';
 function jwtInfo(t){try{return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))))}catch(e){return null}}
 function setSignedIn(t){
   idToken=t;var p=t?jwtInfo(t):null;
+  try{if(t)localStorage.setItem('ccdir-token',t);else localStorage.removeItem('ccdir-token')}catch(e){}
   $('gbtn').style.display=t?'none':'block';
   $('whoBox').style.display=t?'block':'none';
   $('who').textContent=p&&p.email?p.email:'';
@@ -513,7 +514,7 @@ $('f').addEventListener('submit',function(e){
       BAD_URL:'One of the web addresses does not look right.',
       BAD_PHONE:'The phone number needs 10 digits.',
       NAME_TAKEN:'Another business in the directory already uses that name. Pick a different name.'
-    }[code]||'Something went wrong. Please try again.';
+    }[code]||('Something went wrong. Please try again.'+(code?' ('+String(code).slice(0,200)+')':''));
     $('fail').textContent=msg;$('fail').style.display='block';
   }
   var timer=null;
@@ -540,6 +541,7 @@ function showDone(flag){
 $('again').addEventListener('click',function(){location.reload()});
 renderSteps();
 initLogin();
+try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setSignedIn(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
 </script>
 </body>
 </html>

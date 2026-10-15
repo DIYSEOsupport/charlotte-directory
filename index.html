@@ -520,12 +520,13 @@ function syncSaves(){
       hasUser=acct.email;try{localStorage.setItem('ccdir-user',hasUser)}catch(e){}
       try{apply()}catch(e){}
       if(Object.keys(later).length)syncSaves();
-    }else if(r&&r.error==='LOGIN_EXPIRED'){acct.token='';acct.exp=0}
+    }else if(r&&r.error==='LOGIN_EXPIRED'){acct.token='';acct.exp=0;try{localStorage.removeItem('ccdir-token')}catch(e){}}
   });
 }
 function setAcct(token){
   var p=token?jwtInfo(token):null;
   acct.token=token||'';acct.email=p&&p.email?String(p.email).toLowerCase():'';acct.exp=p&&p.exp?p.exp*1000:0;
+  try{if(token)localStorage.setItem('ccdir-token',token);else localStorage.removeItem('ccdir-token')}catch(e){}
   var out=$('acctOut'),inn=$('acctIn');
   if(out&&inn){out.style.display=acct.email?'none':'flex';inn.style.display=acct.email?'flex':'none';$('acctEmail').textContent=acct.email}
   if(acct.token)syncSaves();
@@ -1422,6 +1423,10 @@ function openShare(b){
 function closeShare(){$('shareBox').classList.remove('show')}
 $('shEmail').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
+  if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+    window.open('https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b)),'_blank','noopener');
+    return;
+  }
   var a=document.createElement('a');
   a.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b).replace(/\n/g,'\r\n'));
   document.body.appendChild(a);a.click();a.remove();
@@ -1472,6 +1477,7 @@ $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
 
 $('signOut').addEventListener('click',signOut);
+try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setAcct(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
 initAcct();
 load();
 setInterval(load,60000);
