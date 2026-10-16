@@ -83,6 +83,31 @@ function runChecksSoon() {
   runChecks();
 }
 
+// Submitting the form should feel instant. Mail (owner email + boss ping) is queued here and
+// sent a second later by a one-off trigger, so doPost does not make the browser wait on GmailApp.
+function queueMail_(job) {
+  try {
+    var id = 'MAILQ_' + Utilities.getUuid();
+    PropertiesService.getScriptProperties().setProperty(id, JSON.stringify(job));
+    ScriptApp.newTrigger('sendQueuedMail_').timeBased().after(1000).create();
+  } catch (e) { Logger.log('queueMail_ failed: ' + e); }
+}
+function sendQueuedMail_() {
+  try { ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'sendQueuedMail_') ScriptApp.deleteTrigger(t); }); } catch (e) { }
+  var props = PropertiesService.getScriptProperties();
+  var all = props.getProperties();
+  Object.keys(all).forEach(function (k) {
+    if (k.indexOf('MAILQ_') !== 0) return;
+    try {
+      var job = JSON.parse(all[k]);
+      if (job.kind === 'confirm') sendConfirm_(job.to, job.name, job.token);
+      else if (job.kind === 'pending') sendPending_(job.to, job.name);
+      else if (job.kind === 'boss') notifyBoss_(job.name, job.d, job.label);
+    } catch (e2) { Logger.log('sendQueuedMail_ job failed: ' + e2); }
+    props.deleteProperty(k);
+  });
+}
+
 // Adds a "Directory" menu in the sheet
 function onOpen() {
   try {
@@ -152,7 +177,7 @@ function doPost(e) {
 
     // "Which businesses do I own?"
     if (data.action === 'mine') {
-      return reply_({ ok: true, kind: 'mine', businesses: getMine_(sheet, key, isAdmin, ownerCol, pend) });
+      return reply_({ ok: true, kind: 'mine', businesses: getMine_(sheet, key, isAdmin, ownerCol, pend, email) });
     }
 
     // "Remove my business" (hides the row, stamps column P, recoverable)
@@ -243,11 +268,8 @@ function doPost(e) {
     hideRows_(pend, staleOld);
     CacheService.getScriptCache().remove('directory_csv');
 
-    try {
-      if (status === 'Unconfirmed') sendConfirm_(sendTo, newName, token);
-      else sendPending_(sendTo, newName);
-    } catch (mailErr) { /* mail failing never blocks a save */ }
-    notifyBoss_(newName, data, status === 'Pending' ? 'NEW PENDING' : 'NEW SUBMISSION (not confirmed yet)');
+    queueMail_({ kind: status === 'Unconfirmed' ? 'confirm' : 'pending', to: sendTo, name: newName, token: token });
+    queueMail_({ kind: 'boss', name: newName, d: data, label: status === 'Pending' ? 'NEW PENDING' : 'NEW SUBMISSION (not confirmed yet)' });
     return reply_({ ok: true, status: status, emailTo: sendTo });
   } catch (err) {
     return reply_({ ok: false, error: String(err) });
@@ -503,10 +525,12 @@ function sendPending_(to, businessName) {
   var html = noticeHtml_('YOU\'RE PENDING!', businessName, [
     'Thank you! Your email is confirmed.',
     'Your listing is <b>Pending</b>. We are checking it now. It goes live <b>within 12 hours</b>, and we will email you as soon as it is live.',
+    'We check every new listing to make sure it is a real local business. This keeps the directory trusted. Most go live within a few hours, and no more than 12.',
     'Need to change something? <a href="' + htmlEsc_(FORM_URL) + '" style="color:#7b3ff2;font-weight:bold">Open the form</a>, sign in with the same Google account, and pick &ldquo;Update my business&rdquo;.'
   ], 'SEE THE DIRECTORY', DIRECTORY_URL);
   var text = 'Thank you! Your email is confirmed.\n\n"' + businessName + '" is Pending. We are checking it now. ' +
       'It goes live within 12 hours, and we will email you as soon as it is live.\n\n' +
+      'We check every new listing to make sure it is a real local business. This keeps the directory trusted. Most go live within a few hours, and no more than 12.\n\n' +
       'Need to change something? Open the form (' + FORM_URL + '), sign in with the same Google account, and pick "Update my business".\n\nNeed help? DIYSEO.support@gmail.com';
   sendMail_(to, 'Your listing is pending: ' + businessName, text, html);
 }
@@ -530,7 +554,7 @@ function confirmPageHtml_(title, lines, good) {
       '<link href="https://fonts.googleapis.com/css2?family=Walter+Turncoat&family=Bangers&display=swap" rel="stylesheet">' +
       '<style>body{margin:0;background:' + PURPLE + ';font-family:"Walter Turncoat","Comic Sans MS",Arial,sans-serif;color:' + INK + ';padding:20px 12px}' +
       '.c{max-width:520px;margin:0 auto;background:' + CREAM + ';border:4px solid ' + INK + ';border-radius:18px;box-shadow:6px 6px 0 ' + INK + ';padding:22px;text-align:center}' +
-      'h1{font-family:Bangers,Impact,sans-serif;font-weight:400;letter-spacing:1.5px;font-size:30px;margin:0 0 10px;background:' + (good ? YELLOW : '#fff') + ';display:inline-block;border:3px solid ' + INK + ';border-radius:8px;padding:6px 16px}' +
+      'h1{font-family:Bangers,Impact,sans-serif;font-weight:400;letter-spacing:1.5px;font-size:30px;margin:0 0 10px;color:' + (good ? PURPLE : INK) + ';border-bottom:4px dotted ' + (good ? YELLOW : '#d9c9a0') + ';padding-bottom:8px;display:inline-block}' +
       'p{font-size:17px;line-height:1.5;margin:12px 0}a.b{display:inline-block;background:' + ORANGE + ';color:#fff;text-decoration:none;font-family:Bangers,Impact,sans-serif;letter-spacing:1.5px;font-size:20px;padding:12px 26px;border:3px solid ' + INK + ';border-radius:12px;box-shadow:3px 3px 0 ' + INK + '}</style></head><body><div class="c">' +
       '<h1>' + htmlEsc_(title) + '</h1>' + body +
       '<p><a class="b" href="' + htmlEsc_(DIRECTORY_URL) + '">SEE THE DIRECTORY</a></p>' +
@@ -571,12 +595,13 @@ function confirmPage_(token) {
       checkSoon_();
       out = confirmPageHtml_("YOU'RE PENDING!", [
         'Thank you! Your email is confirmed.',
-        '<b>' + htmlEsc_(bizName) + '</b> is <b>Pending</b>. It goes live within 12 hours, and we will email you when it is live.'
+        '<b>' + htmlEsc_(bizName) + '</b> is <b>Pending</b>. It goes live within 12 hours, and we will email you when it is live.',
+        'We check every new listing to make sure it is a real local business. This keeps the directory trusted. Most go live within a few hours, and no more than 12.'
       ], true);
     } else {
       out = confirmPageHtml_('ALL SET', [
         'This link was already used, or it is no longer valid.',
-        'If you added a business, it is already confirmed. Check your email for updates.'
+        'If you added a business, your email is already confirmed and your listing is Pending. We check every new listing to make sure it is a real local business, so it is not live yet &mdash; it goes live within 12 hours, and we will email you when it is.'
       ], false);
     }
   } catch (err) {
@@ -707,10 +732,10 @@ function checkListing_(d, name, ownerKeyVal, rowNo, allRows, headers, ownerCol) 
   // rowNo is a unique id like 'p12' (pending tab) or 'd12' (directory tab)
   var notes = [], fail = false;
 
-  // 1. Website loads and shows the business
+  // 1. Website loads and shows the owner's phone number (digits only). Business name is not required.
   var site = String(d.website || '').trim();
   if (!site) {
-    notes.push('No website to check');
+    notes.push('No website');
     fail = true;
   } else {
     try {
@@ -718,23 +743,16 @@ function checkListing_(d, name, ownerKeyVal, rowNo, allRows, headers, ownerCol) 
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DirectoryCheck/1.0)' } });
       var code = resp.getResponseCode();
       if (code >= 400) {
-        notes.push('Website did not load (error ' + code + ')');
+        notes.push('Site will not load (error ' + code + ')');
         fail = true;
       } else {
-        var page = resp.getContentText().toLowerCase();
-        var alnum = page.replace(/[^a-z0-9]/g, '');
-        var pageDigits = page.replace(/\D/g, '');
-        var nk = nameKey_(name);
-        var ph = digits10_(d.phone), em = String(d.email || '').trim().toLowerCase();
-        var hit = [];
-        if (nk && alnum.indexOf(nk) !== -1) hit.push('name');
-        if (ph && pageDigits.indexOf(ph) !== -1) hit.push('phone');
-        if (em && page.indexOf(em) !== -1) hit.push('email');
-        if (hit.length) notes.push('Website loads and shows the ' + hit.join(', '));
-        else { notes.push('Website loads but does not show the business name, phone or email'); fail = true; }
+        var pageDigits = resp.getContentText().replace(/\D/g, '');
+        var ph = digits10_(d.phone);
+        if (ph && pageDigits.indexOf(ph) !== -1) notes.push('Website loads and shows the phone number');
+        else { notes.push('Phone not found on website'); fail = true; }
       }
     } catch (fe) {
-      notes.push('Website could not be reached');
+      notes.push('Site will not load');
       fail = true;
     }
   }
@@ -1188,7 +1206,7 @@ function hideRows_(sheet, rows) {
 
 // Businesses owned by this account (everyone, admin too, sees only their own). Newest row per name only.
 // Gives the form back its separate boxes (name/title, street/city/state/zip, type/describe).
-function getMine_(sheet, key, isAdmin, ownerCol, pend) {
+function getMine_(sheet, key, isAdmin, ownerCol, pend, loginEmail) {
   var headers = getHeaders_(sheet);
   var latest = {};
   liveRows_(sheet).forEach(function (r) { latest[nameKey_(r.name)] = r; });
@@ -1197,8 +1215,10 @@ function getMine_(sheet, key, isAdmin, ownerCol, pend) {
   Object.keys(latest).forEach(function (k) {
     var r = latest[k];
     var stored = String(r.vals[ownerCol - 1] || '');
-    if (stored !== key) return;
     var o = rowObj_(headers, r);
+    var mine = isAdmin || stored === key ||
+        (!stored && String(o.email || '').trim().toLowerCase() === loginEmail);
+    if (!mine) return;
     var si = colOf_(headers, function (t) { return t === STATUS_HEADER; });
     var st = si >= 0 ? String(r.vals[si] || '').trim() : '';
     o.status = st || 'Approved';
@@ -1398,7 +1418,7 @@ function publicCsv_() {
   }
 
   var csv = lines.join('\n');
-  try { cache.put('directory_csv', csv, 21600); } catch (tooBig) { }
+  try { cache.put('directory_csv', csv, 21600); } catch (tooBig) { Logger.log('directory_csv too big to cache (' + csv.length + ' bytes) - every open is rebuilding from the sheet: ' + tooBig); }
   return csv;
 }
 
@@ -1660,8 +1680,9 @@ function valueFor_(header, d, logoUrl) {
   if (key === 'contact') return clean_(buildContact_(d));
   if (key === 'address') {
     var stateZip = [String(d.state || '').trim(), String(d.zip || '').trim()].filter(Boolean).join(' ');
-    return clean_([String(d.street || '').trim(), String(d.city || '').trim(), stateZip]
-        .filter(Boolean).join(', '));
+    var line1 = [String(d.street || '').trim(), String(d.street2 || '').trim()].filter(Boolean).join(', ');
+    var line2 = [String(d.city || '').trim(), stateZip].filter(Boolean).join(', ');
+    return clean_([line1, line2].filter(Boolean).join('\n'));
   }
   return clean_(d[key]);
 }
