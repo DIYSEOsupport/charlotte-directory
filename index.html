@@ -402,17 +402,30 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 body{text-transform:uppercase}
 input,textarea,select,option,#printArea{text-transform:none}
 
-/* v24 phone cards: name gets full width, category pill drops under it */
+/* v26 phone cards, stacked: logo + name on top, category pill and arrow in a row below */
 @media(max-width:640px){
-  .grid .bar{flex-wrap:wrap;row-gap:6px;align-items:center}
-  .grid .bt{flex:1 1 0;min-width:0}
-  .grid .chev{order:2}
-  .grid .bar .catpill{order:3;flex:0 1 100%;max-width:max-content!important;margin:0 0 0 0!important;text-align:left;font-size:12px!important;padding:4px 10px}
-  .grid .card.saved .bar .catpill{margin-right:0!important}
-  .grid .title{font-size:20px;overflow-wrap:anywhere;word-break:normal}
+  .grid .card .bar{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo bt bt" "cat cat chev";align-items:center;column-gap:0;row-gap:8px;padding:12px!important}
+  .grid .card .bar .blogo{grid-area:logo;width:50px;height:50px;margin-right:10px;align-self:start}
+  .grid .card .bar .bt{grid-area:bt;min-width:0;flex:none;padding-right:42px!important;align-self:center}
+  .grid .card .bar .catpill{grid-area:cat;justify-self:start;align-self:center;margin:0!important;max-width:100%!important;white-space:normal;text-align:left;font-size:12px!important;padding:4px 11px!important;line-height:1.2}
+  .grid .card .bar .chev{grid-area:chev;justify-self:end;order:0}
+  .grid .card.nocat .bar{grid-template-areas:"logo bt chev"}
+  .grid .card.nocat .bar .bt{padding-right:12px!important}
+  .grid .card .star{top:14px;right:12px}
+  .grid .card.nocat .star{right:58px}
+  .grid .card.nocat .bar .bt{padding-right:46px!important}
+  .grid .title{font-size:20px;overflow-wrap:anywhere;word-break:normal;line-height:1.1}
   .grid .bt .slogan{overflow-wrap:anywhere}
-  .grid .card.saved .bt,.grid .card .bt{padding-right:34px}
 }
+/* v26 login pop-up */
+#loginPop{position:fixed;inset:0;z-index:99998;background:rgba(26,16,51,.7);display:none;align-items:center;justify-content:center;padding:20px}
+#loginPop.show{display:flex}
+#loginPop .bx{background:#fff6dc;border:4px solid #1a1033;border-radius:18px;box-shadow:6px 6px 0 #1a1033;padding:22px 20px;max-width:340px;width:100%;text-align:center;animation:lpIn .35s cubic-bezier(.3,1.6,.5,1)}
+#loginPop .hd{display:inline-block;background:#ffd23f;border:3px solid #1a1033;border-radius:10px;padding:4px 16px;font-family:var(--fh);font-weight:400;font-size:28px;letter-spacing:1.5px;color:#1a1033;margin:0 0 10px;transform:rotate(-2deg)}
+#loginPop p{margin:0 0 14px;font-size:16px;line-height:1.4;color:#1a1033}
+#loginPop .go{display:block;box-sizing:border-box;width:100%;margin:8px 0 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:3px 3px 0 #1a1033}
+#loginPop .go.alt{background:#fff;color:#1a1033}
+@keyframes lpIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 #pdfReady{position:fixed;inset:0;z-index:99999;background:rgba(26,16,51,.7);display:flex;align-items:center;justify-content:center;padding:20px}
 #pdfReady .bx{background:#fff6dc;border:4px solid #1a1033;border-radius:16px;box-shadow:6px 6px 0 #1a1033;padding:20px;max-width:340px;width:100%;text-align:center}
 #pdfReady h3{font-family:var(--fh);font-weight:400;font-size:26px;margin:0 0 6px;color:#5b2a86}
@@ -457,6 +470,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
+<div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in with Google to save your favorites.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -985,9 +999,45 @@ function syncToggleAll(){
   t.style.display=view.length?'':'none';
 }
 
+var honkCtx=null;
+function honk(){
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    if(!honkCtx)honkCtx=new AC();
+    var c=honkCtx;if(c.state==='suspended')c.resume();
+    function one(t,f0,f1,dur){
+      var o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+      o.type='sawtooth';o2.type='square';
+      o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+      o2.frequency.setValueAtTime(f0*1.01,t);o2.frequency.exponentialRampToValueAtTime(f1*1.01,t+dur);
+      lp.type='lowpass';lp.frequency.value=1400;lp.Q.value=4;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.32,t+0.025);
+      g.gain.setValueAtTime(0.32,t+dur-0.05);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(c.destination);
+      o.start(t);o2.start(t);o.stop(t+dur+0.02);o2.stop(t+dur+0.02);
+    }
+    var t0=c.currentTime+0.02;
+    one(t0,420,360,0.16);          /* ba- */
+    one(t0+0.22,330,250,0.34);     /* -HONK */
+  }catch(e){}
+}
+var loginShown=false;
+function showLoginPop(){
+  if(loginShown)return;loginShown=true;
+  $('loginPop').classList.add('show');honk();
+}
+function closeLoginPop(){$('loginPop').classList.remove('show')}
+$('lpNo').onclick=closeLoginPop;
+$('loginPop').addEventListener('click',function(e){if(e.target===this)closeLoginPop()});
+$('lpGo').onclick=function(){
+  closeLoginPop();
+  var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
+  try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
+};
 function toggleFav(k){
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
+  if(favs[k]&&!acct.email&&!hasUser)showLoginPop();
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
@@ -1465,8 +1515,8 @@ function personName(b){
 }
 function vcard(b){
   var pn=personName(b);
-  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(pn.full),'N:'+(b.contact?vEsc(pn.family)+';'+vEsc(pn.given)+';;;':vEsc(b.name)+';;;;'),'ORG:'+vEsc(b.name)];
-  if(b.pubTitle)v.push('TITLE:'+vEsc(b.pubTitle));
+  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;','ORG:'+vEsc(b.name),'X-ABShowAs:COMPANY'];
+  if(b.contact){v.push('item1.X-ABRELATEDNAMES:'+vEsc(b.contact.split(',')[0].trim()));v.push('item1.X-ABLabel:Contact')}
   if(b.category&&b.category!=='Local Business')v.push('CATEGORIES:'+vEsc(b.category));
   b.phones.forEach(function(x){v.push('TEL;TYPE=WORK,VOICE:'+x.replace(/\s*ext.*$/i,''))});
   b.emails.forEach(function(x){v.push('EMAIL;TYPE=WORK:'+x)});
@@ -1475,8 +1525,6 @@ function vcard(b){
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b._photo){var ph='PHOTO;ENCODING=b;TYPE=JPEG:'+b._photo,fold=[];while(ph.length>72){fold.push(ph.slice(0,72));ph=' '+ph.slice(72)}fold.push(ph);v.push(fold.join('\r\n'))}
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
-  var note=[b.slogan?'\u201C'+b.slogan+'\u201D':'',b.contact?'Contact: '+b.contact:'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
-  if(note)v.push('NOTE:'+vEsc(note));
   v.push('END:VCARD');
   return v.join('\r\n');
 }
@@ -1519,7 +1567,7 @@ $('shCard').onclick=async function(){
     var note=[b.slogan||'',b.websites.map(fmtUrl).join('\n'),b.facebook?fmtUrl(b.facebook):'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
     var u='intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact'
-      +P('name',personName(b).full)+P('company',b.name)+P('job_title',b.pubTitle)
+      +P('name',b.name)+P('company',(b.contact||'').split(',')[0].trim())
       +P('phone',ph[0])+P('secondary_phone',ph[1])+P('email',b.emails[0])+P('secondary_email',b.emails[1])
       +P('postal',addr)+P('notes',note)+';end';
     var t0=Date.now();
