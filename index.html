@@ -401,6 +401,25 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 @media(max-width:430px){#searchBtn .lbl{display:none}}
 body{text-transform:uppercase}
 input,textarea,select,option,#printArea{text-transform:none}
+
+/* v24 phone cards: name gets full width, category pill drops under it */
+@media(max-width:640px){
+  .grid .bar{flex-wrap:wrap;row-gap:6px;align-items:center}
+  .grid .bt{flex:1 1 0;min-width:0}
+  .grid .chev{order:2}
+  .grid .bar .catpill{order:3;flex:0 1 100%;max-width:max-content!important;margin:0 0 0 0!important;text-align:left;font-size:12px!important;padding:4px 10px}
+  .grid .card.saved .bar .catpill{margin-right:0!important}
+  .grid .title{font-size:20px;overflow-wrap:anywhere;word-break:normal}
+  .grid .bt .slogan{overflow-wrap:anywhere}
+  .grid .card.saved .bt,.grid .card .bt{padding-right:34px}
+}
+#pdfReady{position:fixed;inset:0;z-index:99999;background:rgba(26,16,51,.7);display:flex;align-items:center;justify-content:center;padding:20px}
+#pdfReady .bx{background:#fff6dc;border:4px solid #1a1033;border-radius:16px;box-shadow:6px 6px 0 #1a1033;padding:20px;max-width:340px;width:100%;text-align:center}
+#pdfReady h3{font-family:var(--fh);font-weight:400;font-size:26px;margin:0 0 6px;color:#5b2a86}
+#pdfReady p{margin:0 0 14px;font-size:15px}
+#pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
+#pdfReady .go.alt{background:#fff;color:#1a1033}
+@media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
 </style>
 </head>
 <body>
@@ -435,7 +454,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 </main>
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
-<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Text message</button><button class="btn" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
+<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
 <div class="toast" id="toast"></div>
@@ -560,7 +579,15 @@ document.addEventListener('click',function(e){
   var num=a.textContent.trim();
   if(navigator.clipboard)navigator.clipboard.writeText(num).then(function(){toast('Number copied: '+num)},function(){toast(num)});else toast(num);
 });
-document.addEventListener('error',function(e){if(e.target&&e.target.classList&&e.target.classList.contains('blogo'))e.target.style.display='none'},true);
+document.addEventListener('error',function(e){
+  var t=e.target;if(!t||!t.classList||!t.classList.contains('blogo'))return;
+  if(!t.getAttribute('data-tried')&&/drive\.google\.com/i.test(t.src)){
+    t.setAttribute('data-tried','1');
+    fetchLogoData({logo:t.src}).then(function(im){if(im&&im.src){t.style.display='';t.src=im.src}else t.style.display='none'}).catch(function(){t.style.display='none'});
+    return;
+  }
+  t.style.display='none';
+},true);
 function keyOf(b){return b.name.toLowerCase().trim()}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),1800)}
 
@@ -1083,7 +1110,32 @@ function printPages(urls){
 }
 function doPrint(list){
   toast('Getting ready to print...');
-  buildPdfCanvas(list).then(function(){printPages(window._pdfPages||[])}).catch(function(e){console.error(e);toast('Could not get the print page ready')});
+  var mob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  buildPdfCanvas(list).then(function(){
+    if(!mob){printPages(window._pdfPages||[]);return}
+    var pa=$('printArea');pa.innerHTML=(window._pdfPages||[]).map(function(u){return '<img class="pp" src="'+u+'">'}).join('');
+    var im=[].slice.call(pa.querySelectorAll('img')),n=im.length,fired=false;
+    function go(){if(fired)return;fired=true;try{window.print()}catch(e){toast('Printing is not available here')}}
+    im.forEach(function(x){if(x.complete)n--;else x.onload=x.onerror=function(){if(--n<=0)go()}});
+    if(n<=0)go();setTimeout(go,3000);
+  }).catch(function(e){console.error(e);toast('Could not get the print page ready')});
+}
+function showPdfReady(blob,name){
+  var old=document.getElementById('pdfReady');if(old)old.remove();
+  var url=URL.createObjectURL(blob),d=document.createElement('div');d.id='pdfReady';
+  var f=null,canShare=false;
+  try{f=new File([blob],name,{type:'application/pdf'});canShare=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
+  d.innerHTML='<div class="bx"><h3>Your PDF is ready</h3><p>Tap to save it to your phone.</p>'
+    +'<a class="go" id="pdfSave" href="'+url+'" download="'+name.replace(/"/g,'')+'">Save PDF</a>'
+    +(canShare?'<button class="go alt" id="pdfShare" type="button">Share / Save to Files</button>':'')
+    +'<a class="go alt" href="'+url+'" target="_blank" rel="noopener">Open PDF</a>'
+    +'<button class="go alt" id="pdfClose" type="button">Close</button></div>';
+  document.body.appendChild(d);
+  function close(){d.remove();setTimeout(function(){URL.revokeObjectURL(url)},60000)}
+  d.querySelector('#pdfClose').onclick=close;
+  var sh=d.querySelector('#pdfShare');
+  if(sh)sh.onclick=function(){navigator.share({files:[f],title:name}).then(close).catch(function(){})};
+  d.querySelector('#pdfSave').addEventListener('click',function(){setTimeout(close,1500)});
 }
 function saveBlob(blob,name){
   var ua=navigator.userAgent;
@@ -1094,6 +1146,7 @@ function saveBlob(blob,name){
     setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},60000);
   }
   if(mobile){
+    showPdfReady(blob,name);return;
     try{
       var f=new File([blob],name,{type:blob.type||'application/octet-stream'});
       if(navigator.canShare&&navigator.canShare({files:[f]})){
@@ -1444,17 +1497,17 @@ $('shEmail').onclick=function(){
   a.href='mailto:?subject='+encodeURIComponent(b.name)+'&body='+encodeURIComponent(contactText(b).replace(/\n/g,'\r\n'));
   document.body.appendChild(a);a.click();a.remove();
 };
-$('shText').onclick=function(){
+$('shText').onclick=async function(){
   var b=shareB;closeShare();if(!b)return;
   var t=contactText(b),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  try{
+    try{var im=await fetchLogoData(b);b._photo=im?logoJpeg(im,256):''}catch(e){b._photo=''}
+    var fn=(b.name.replace(/[^\w\- ]+/g,'').trim()||'contact')+'.vcf';
+    var f=new File([vcard(b)],fn,{type:'text/vcard'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:b.name});return}
+  }catch(e){if(e&&e.name==='AbortError')return}
   var a=document.createElement('a');a.href='sms:'+(ios?'&':'?')+'body='+encodeURIComponent(t);
   document.body.appendChild(a);a.click();a.remove();
-  setTimeout(function(){
-    if(!document.hidden){
-      if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){toast('No text app opened. Details copied - paste into a message.')},function(){toast('No text app opened on this device')});
-      else toast('No text app opened on this device');
-    }
-  },1500);
 };
 $('shCard').onclick=async function(){
   var b=shareB;closeShare();if(!b)return;

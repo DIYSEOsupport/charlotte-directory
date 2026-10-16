@@ -201,9 +201,9 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   </form>
 
   <div class="card done-card" id="done">
-    <h1>You're in!</h1>
+    <h1 id="doneH">You're in!</h1>
     <p style="text-align:center;font-weight:700;margin:6px 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
-    <p>Thank you! Your business will appear in the directory.</p>
+    <p id="doneP">Thank you! Your business will appear in the directory.</p>
     <p class="note" id="doneExtra">Need to update your info later? Sign in with the same Google account and choose "Update my business". Your newest entry will replace the old one.</p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
@@ -523,7 +523,7 @@ $('f').addEventListener('submit',function(e){
     if(!/(googleusercontent|google)\.com$/.test(host))return;
     var m=ev.data;if(!m||!m.dirForm||m.kind==='mine')return;
     window.removeEventListener('message',onMsg);clearTimeout(timer);
-    if(m.ok)showDone();else fail(m.error);
+    if(m.ok)showDone(m.status,m.emailTo);else fail(m.error);
   }
   window.addEventListener('message',onMsg);
   timer=setTimeout(function(){window.removeEventListener('message',onMsg);showDone('unconfirmed')},12000);
@@ -532,8 +532,17 @@ $('f').addEventListener('submit',function(e){
   var ta=document.createElement('textarea');ta.name='payload';ta.value=JSON.stringify(d);
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
 });
-function showDone(flag){
-  if(flag==='unconfirmed')$('doneExtra').textContent='Check the directory in a minute. '+$('doneExtra').textContent;
+function showDone(flag,emailTo){
+  if(flag==='Unconfirmed'){
+    $('doneH').textContent='One more step!';
+    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Open that email and tap <b>Confirm my listing</b>. Your business is not listed until you do. Check your spam folder if you do not see it.';
+    $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
+    $('doneExtra').textContent='After you confirm, your listing is Pending and goes live within 12 hours. We will email you when it is live.';
+  }else if(flag==='Pending'){
+    $('doneH').textContent="You're pending!";
+    $('doneP').textContent='Thank you! Your listing is Pending. It goes live within 12 hours after a quick check, and we will email you when it is live.';
+    $('doneExtra').textContent='Need to update your info later? Sign in with the same Google account and choose "Update my business". Your current listing stays live until the new one is approved.';
+  }else if(flag==='unconfirmed')$('doneExtra').textContent='Check the directory in a minute. '+$('doneExtra').textContent;
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';$('intro').style.display='none';
   $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
