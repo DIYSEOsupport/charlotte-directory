@@ -616,13 +616,13 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   if(flag==='Unconfirmed'){
     $('doneH').textContent='One more step!';
-    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Open that email and tap <b>Confirm my listing</b>. Your business is not listed until you do. Check your spam folder if you do not see it.';
+    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it to confirm.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
-    $('doneExtra').textContent='After you confirm, your listing is Pending and goes live within 12 hours. We will email you when it is live. We check every new listing to make sure it is a real local business. This keeps the directory trusted. Most go live within a few hours, and no more than 12.';
+    $('doneExtra').textContent='Not listed until you confirm. Goes live within 12 hours after.';
   }else if(flag==='Pending'){
     $('doneH').textContent="You're pending!";
-    $('doneP').textContent='Thank you! Your listing is Pending. It goes live within 12 hours after a quick check, and we will email you when it is live.';
-    $('doneExtra').textContent='Need to update your info later? Sign in with the same Google account and choose "Update my business". Your current listing stays live until the new one is approved. We check every new listing to make sure it is a real local business. This keeps the directory trusted. Most go live within a few hours, and no more than 12.';
+    $('doneP').textContent='Goes live within 12 hours. We will email you when it is.';
+    $('doneExtra').textContent='Need to update it later? Sign in and choose "Update my business".';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';
     $('doneP').textContent='Your submission went through. Check your email for a confirm link, or check spam.';

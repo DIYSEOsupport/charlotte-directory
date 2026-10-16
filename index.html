@@ -206,7 +206,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .ico>img,.ico>svg{display:block;width:40px;height:40px;border-radius:11px}
 .ln:active .ico{transform:translate(2px,2px);filter:none}
 
-.hero-img{width:100%;max-width:640px;margin:0 auto;height:clamp(72px,20vw,130px);object-fit:cover;object-position:50% 20%}
+.hero-img{width:100%;max-width:640px;margin:0 auto;height:auto}
 .hero{padding-bottom:2px}
 .panel.open{display:block}
 .panel{padding:10px 2px 0;max-height:60vh}
@@ -362,7 +362,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 /* ---- full width, responsive ---- */
 .wrap{max-width:1400px;padding:0 clamp(10px,2vw,28px)}
 .hero{padding-left:clamp(10px,2vw,28px);padding-right:clamp(10px,2vw,28px)}
-.hero-img{max-width:960px;width:100%;margin:0 auto;height:auto;aspect-ratio:5.2/1;object-fit:cover}
+.hero-img{max-width:960px;width:100%;margin:0 auto;height:auto}
 .grid{border-radius:14px}
 .grid .card{border-bottom:3px solid var(--ink)}
 .grid .card:nth-child(odd){background:#fff6dc}
@@ -1521,6 +1521,8 @@ async function buildPdfCanvas(list,keepPages){
   var plan=[{y:headH,items:[]}],py=headH;
   list.forEach(function(b){
     var its=items(b);
+    var totalH=its.reduce(function(s,it){return s+it.h},0);
+    if(totalH<=(LIM-runH)&&py+totalH>LIM&&plan[plan.length-1].items.length){plan.push({y:runH,items:[]});py=runH}
     its.forEach(function(it,k){
       var need=it.h+(it.keep&&its[k+1]?its[k+1].h:0);
       if(it.rule&&its[k+1]){need=it.h+its[k+1].h+its[k+2].h}
