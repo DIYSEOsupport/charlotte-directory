@@ -418,6 +418,8 @@ input,textarea,select,option,#printArea{text-transform:none}
   .grid .bt .slogan{overflow-wrap:anywhere}
 }
 /* v26 login pop-up */
+#muteRow{display:flex;justify-content:flex-end;margin:8px 0 0}
+#muteRow #muteBtn{position:static;width:36px;height:36px;font-size:18px}
 #muteBtn{position:fixed;left:10px;bottom:10px;z-index:99990;width:40px;height:40px;border-radius:50%;border:3px solid #1a1033;background:#ffd23f;box-shadow:2px 2px 0 #1a1033;font-size:20px;line-height:1;cursor:pointer;padding:0}
 #muteBtn.off{background:#ddd}
 @media print{#muteBtn{display:none}}
@@ -466,6 +468,7 @@ input,textarea,select,option,#printArea{text-transform:none}
       <button class="icon-btn" id="searchBtn" type="button" aria-label="Search" style="background:var(--orange)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
       <button class="icon-btn" id="filterBtn" aria-label="Filters" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
     </div>
+    <div id="muteRow"></div>
     <div class="panel" id="panel"></div>
     <div class="pills" id="pills"></div>
   </div>
@@ -474,7 +477,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
   <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
-  <div class="status"><span id="count">Loading...</span><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add your business</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
+  <div class="status"><span id="count">Loading...</span><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 </main>
 
@@ -812,20 +815,31 @@ function parseGrid(grid){
   return {list:out,heads:heads,roles:roles,log:log,rows:Math.max(0,grid.length-hi-1)};
 }
 
+var lastRaw='';
+function showData(data){
+  var out=parseGrid(data||[]);
+  all=out.list;
+  if(/[?&]debug/.test(location.search)){
+    var d=$('dbg');d.style.display='block';
+    d.innerHTML='<b>Rows read:</b> '+out.rows+' &nbsp; <b>Businesses kept:</b> '+all.length+'<br><b>Columns (heading &rarr; how the app uses it):</b><br>'+out.heads.map(function(h,i){return (i+1)+'. '+esc(h||'(blank)')+' &rarr; '+(out.roles[i]||'hidden')}).join('<br>')+'<br><br><b>Each row:</b><br>'+out.log.map(esc).join('<br>');
+  }
+  computeFacets();
+  buildFilters();
+  apply();
+  if(!window._cardDone){window._cardDone=1;try{var cm=/[?&]card=([^&]+)/.exec(location.search);if(cm){var cn=decodeURIComponent(cm[1].replace(/\+/g,' ')).toLowerCase();var cb=all.filter(function(x){return x.name.toLowerCase()===cn})[0];if(cb)openShare(cb)}}catch(e){}}
+}
 function load(){
+  if(!all.length){
+    try{var c=localStorage.getItem('ccdir-data');if(c){lastRaw=c;showData(JSON.parse(c))}}catch(e){}
+  }
   Papa.parse(CSV_URL+(CSV_URL.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{
     download:true,header:false,skipEmptyLines:true,
     complete:function(res){
-      var out=parseGrid(res.data||[]);
-      all=out.list;
-      if(/[?&]debug/.test(location.search)){
-        var d=$('dbg');d.style.display='block';
-        d.innerHTML='<b>Rows read:</b> '+out.rows+' &nbsp; <b>Businesses kept:</b> '+all.length+'<br><b>Columns (heading &rarr; how the app uses it):</b><br>'+out.heads.map(function(h,i){return (i+1)+'. '+esc(h||'(blank)')+' &rarr; '+(out.roles[i]||'hidden')}).join('<br>')+'<br><br><b>Each row:</b><br>'+out.log.map(esc).join('<br>');
-      }
-      computeFacets();
-      buildFilters();
-      apply();
-      if(!window._cardDone){window._cardDone=1;try{var cm=/[?&]card=([^&]+)/.exec(location.search);if(cm){var cn=decodeURIComponent(cm[1].replace(/\+/g,' ')).toLowerCase();var cb=all.filter(function(x){return x.name.toLowerCase()===cn})[0];if(cb)openShare(cb)}}catch(e){}}
+      var raw='';try{raw=JSON.stringify(res.data||[])}catch(e){}
+      if(raw&&raw===lastRaw&&all.length)return;
+      lastRaw=raw;
+      showData(res.data||[]);
+      try{if(raw)localStorage.setItem('ccdir-data',raw)}catch(e){}
     },
     error:function(){
       if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
@@ -882,7 +896,7 @@ function buildFilters(){
     p+='<div class="acc c'+(order.indexOf(o)%3)+(open?' open':'')+'" data-l="'+esc(d.label)+'"><button type="button" class="acch" aria-expanded="'+open+'"><span>'+esc(lbl(d.label))+'</span><span class="selcnt'+(sel.length?' on':'')+'">'+sel.length+'</span>'+CHEV+'</button><div class="accb">'
       +d.values.map(function(v,vi){return '<label class="opt"><input type="checkbox" data-fi="'+fi+'" data-vi="'+vi+'"'+(sel.indexOf(v)!==-1?' checked':'')+'><span>'+esc(v)+'</span><span class="oc">'+d.counts[v]+'</span></label>'}).join('')+'</div></div>';
   });
-  var nsv=all.filter(function(b){return favs[keyOf(b)]}).length;
+  var nsv=all.filter(function(b){return favs[keyOf(b)]||isDiy(b)}).length;
   p+='<label class="savedrow"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
   $('panel').innerHTML=p;
@@ -912,11 +926,13 @@ function apply(){
     }
     if(st.cat!=='ALL'&&b.category!==st.cat)return false;
     for(var l in st.f){var sel=st.f[l];if(sel&&sel.length&&!(b.fx[l]||[]).some(v=>sel.indexOf(v)!==-1))return false}
-    if(st.fav&&!favs[keyOf(b)])return false;
+    if(st.fav&&!favs[keyOf(b)]&&!isDiy(b))return false;
     return true;
   });
   var s=st.sort;
+  var _n=st.fav?1:0;for(var _l in st.f)_n+=(st.f[_l]||[]).length;
   view.sort((a,b)=>s==='name-desc'?b.name.localeCompare(a.name):s==='cat-asc'?catCmp(a,b):s==='loc-asc'?a.location.localeCompare(b.location)||a.name.localeCompare(b.name):a.name.localeCompare(b.name));
+  if(!st.q.trim()&&!st.fav&&_n===0&&st.cat==='ALL'){var _i=-1;for(var _k=0;_k<view.length;_k++){if(/diyseo/i.test(view[_k].name)){_i=_k;break}}if(_i>0){view.unshift(view.splice(_i,1)[0])}}
   render();
   var n=st.fav?1:0;for(var l in st.f)n+=(st.f[l]||[]).length;
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
@@ -971,14 +987,14 @@ function orderedExtras(b){
 function render(){
   var g=$('grid');
   if(!view.length){
-    var noSaved=st.fav&&!Object.keys(favs).length;
+    var noSaved=st.fav&&!Object.keys(favs).length&&!all.some(isDiy);
     g.innerHTML='<div class="empty"><h3>'+(noSaved?'No saved businesses yet':'No matches')+'</h3><p>'+(noSaved?'Open a business and tap Save.':'Try a different word or clear your filters.')+'</p><button class="btn main" onclick="resetAll()">Clear filters</button></div>';
     syncToggleAll();return;
   }
   g.innerHTML=view.map(function(b,i){
     var key=keyOf(b),k=esc(key),open=!!openSet[key],id='d'+i;
-    var h='<article class="card'+(open?' open':'')+(favs[key]?' saved':'')+((b.category&&b.category!=='Local Business')?'':' nocat')+'" data-k="'+k+'">'
-      +'<button class="star" type="button" data-act="save" aria-pressed="'+(favs[key]?'true':'false')+'" aria-label="'+(favs[key]?'Remove from saved':'Save')+'" title="'+(favs[key]?'Saved':'Save')+'"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" stroke-linejoin="round"/></svg></button>'
+    var h='<article class="card'+(open?' open':'')+((favs[key]||isDiy(b))?' saved':'')+((b.category&&b.category!=='Local Business')?'':' nocat')+'" data-k="'+k+'">'
+      +'<button class="star" type="button" data-act="save" aria-pressed="'+((favs[key]||isDiy(b))?'true':'false')+'" aria-label="'+((favs[key]||isDiy(b))?'Remove from saved':'Save')+'" title="'+((favs[key]||isDiy(b))?'Saved':'Save')+'"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" stroke-linejoin="round"/></svg></button>'
       +'<button class="bar" type="button" aria-expanded="'+open+'" aria-controls="'+id+'">'
       +(b.logo?'<img class="blogo" src="'+esc(b.logo)+'" alt="Business Logo" loading="lazy" referrerpolicy="no-referrer">':'')+'<span class="bt"><span class="title">'+hl(b.name)+'</span>'+(b.slogan?'<span class="slogan">&ldquo;'+hl(b.slogan)+'&rdquo;</span>':'')+'</span>'
       +((b.category&&b.category!=='Local Business')?'<span class="catpill">'+esc(b.category)+'</span>':'')+'<span class="chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg></span></button>'
@@ -1035,7 +1051,7 @@ var honkMuted=false;try{honkMuted=localStorage.getItem('ccdir-mute')==='1'}catch
   function paint(){b.textContent=honkMuted?'\uD83D\uDD07':'\uD83D\uDD0A';b.className=honkMuted?'off':'';b.setAttribute('aria-label',honkMuted?'Turn honk sound on':'Turn honk sound off');b.title=b.getAttribute('aria-label')}
   paint();
   b.onclick=function(){honkMuted=!honkMuted;try{localStorage.setItem('ccdir-mute',honkMuted?'1':'0')}catch(e){}paint();if(!honkMuted)honk()};
-  document.body.appendChild(b);
+  var row=document.getElementById('muteRow');(row||document.body).appendChild(b);
 })();
 
 function honk(){
@@ -1081,7 +1097,9 @@ $('lpGo').onclick=function(){
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
 };
+function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 function toggleFav(k){
+  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Contact for help!');return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
@@ -1209,7 +1227,7 @@ function printPages(urls){
 function doPrint(list){
   toast('Getting ready to print...');
   var mob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-  buildPdfCanvas(list).then(function(){
+  buildPdfCanvas(list,true).then(function(){
     if(!mob){printPages(window._pdfPages||[]);return}
     var pa=$('printArea');pa.innerHTML=(window._pdfPages||[]).map(function(u){return '<img class="pp" src="'+u+'">'}).join('');
     var im=[].slice.call(pa.querySelectorAll('img')),n=im.length,fired=false;
@@ -1325,14 +1343,15 @@ function logoJpeg(im,size){
     return cv.toDataURL('image/jpeg',0.85).split(',')[1];
   }catch(e){return ''}
 }
-async function buildPdfCanvas(list){
+async function buildPdfCanvas(list,keepPages){
   try{
     await document.fonts.load('600 18px Oswald');await document.fonts.load('400 12px Oswald');
     await document.fonts.load('700 10px Oswald');
     await document.fonts.ready;
   }catch(e){}
-  try{await Promise.all(list.map(function(b){return fetchLogoData(b).then(function(im){b._img=im})}))}catch(e){}
-  var S=2,PW=612,PH=792,M=44,CW=PW-2*M,COLW=236,COL2=M+CW-COLW,FOOT=752,LIM=FOOT-14;
+  var _mob=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  try{await Promise.race([Promise.all(list.map(function(b){return fetchLogoData(b).then(function(im){if(!window._stopLogos)b._img=im})})),new Promise(function(r){setTimeout(r,_mob?10000:20000)})])}catch(e){}
+  var S=_mob?1.4:2,PW=612,PH=792,M=44,CW=PW-2*M,COLW=236,COL2=M+CW-COLW,FOOT=752,LIM=FOOT-14;
   var mc=document.createElement('canvas').getContext('2d');
   var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
 
@@ -1468,9 +1487,11 @@ async function buildPdfCanvas(list){
     c.fillText('Charlotte County Small Business Directory',M,FOOT+14);
     var pg='Page '+(pi+1)+' of '+plan.length,pw=c.measureText(pg).width;
     c.fillText(pg,M+CW-pw,FOOT+14);
-    var data=cv.toDataURL('image/jpeg',0.9);
+    var data=cv.toDataURL('image/jpeg',_mob?0.8:0.9);
     out.push({bin:atob(data.split(',')[1]),w:cv.width,h:cv.height,links:links});
     cv.width=1;cv.height=1;
+    if(plan.length>3){toast('Building PDF... page '+(pi+1)+' of '+plan.length)}
+    await new Promise(function(r){setTimeout(r,0)});
   }
   /* ----- pack into a PDF ----- */
   var objs=[null];
@@ -1489,20 +1510,23 @@ async function buildPdfCanvas(list){
   });
   objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
   objs[2]='<< /Type /Pages /Kids ['+pn.map(function(n){return n+' 0 R'}).join(' ')+'] /Count '+pn.length+' >>';
-  var pdf='%PDF-1.4\n',offs=[];
-  for(var n=1;n<objs.length;n++){offs[n]=pdf.length;pdf+=n+' 0 obj\n'+objs[n]+'\nendobj\n'}
-  var xr=pdf.length;
-  pdf+='xref\n0 '+objs.length+'\n0000000000 65535 f \n';
-  for(var m=1;m<objs.length;m++)pdf+=('0000000000'+offs[m]).slice(-10)+' 00000 n \n';
-  pdf+='trailer\n<< /Size '+objs.length+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF';
-  var u8=new Uint8Array(pdf.length);
-  for(var q=0;q<pdf.length;q++)u8[q]=pdf.charCodeAt(q)&255;
-  window._pdfPages=out.map(function(p){return 'data:image/jpeg;base64,'+btoa(p.bin)});
-  return new Blob([u8],{type:'application/pdf'});
+  var parts=[],offs=[],pos=0;
+  function put(str){var u=new Uint8Array(str.length);for(var q=0;q<str.length;q++)u[q]=str.charCodeAt(q)&255;parts.push(u);pos+=u.length}
+  put('%PDF-1.4\n');
+  for(var n=1;n<objs.length;n++){offs[n]=pos;put(n+' 0 obj\n'+objs[n]+'\nendobj\n')}
+  var xr=pos;
+  var xs='xref\n0 '+objs.length+'\n0000000000 65535 f \n';
+  for(var m=1;m<objs.length;m++)xs+=('0000000000'+offs[m]).slice(-10)+' 00000 n \n';
+  xs+='trailer\n<< /Size '+objs.length+' /Root 1 0 R >>\nstartxref\n'+xr+'\n%%EOF';
+  put(xs);
+  if(keepPages)window._pdfPages=out.map(function(p){return 'data:image/jpeg;base64,'+btoa(p.bin)});else window._pdfPages=null;
+  out=null;objs=null;
+  return new Blob(parts,{type:'application/pdf'});
 }
 function doPdf(list,fname){
   toast('Building PDF...');
-  buildPdfCanvas(list).then(function(blob){saveBlob(blob,fname||'charlotte-county-business-directory.pdf');toast('Downloaded')}).catch(function(e){console.error(e);errPop('PDF trouble, neighbor!','Could not build the PDF. Try again in a moment.')});
+  var timer=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},120000)});
+  Promise.race([buildPdfCanvas(list,false),timer]).then(function(blob){saveBlob(blob,fname||'charlotte-county-business-directory.pdf');toast('PDF ready')}).catch(function(e){console.error(e);errPop('PDF trouble, neighbor!',(e&&e.message==='timeout')?'That took too long. Try fewer businesses: search or filter first, then Download PDF.':'Could not build the PDF. Try again, or filter to fewer businesses first.')});
 }
 var pendingAct='';
 function runAct(list){
@@ -1568,7 +1592,7 @@ function vcard(b){
   var pn=personName(b);
   var cn=(b.contact||'').split(',')[0].trim(),ct=(b.contact||'').split(',').slice(1).join(',').trim();
   var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;'];
-  if(cn){v.push('ORG:'+vEsc(cn));if(ct)v.push('TITLE:'+vEsc(ct))}  /* big line = business, small line under it = contact name */
+  if(cn){if(ct){v.push('ORG:'+vEsc(ct));v.push('TITLE:'+vEsc(cn))}else v.push('ORG:'+vEsc(cn))}  /* big line = business, small line under it = contact name */
   else{v.push('ORG:'+vEsc(b.name));v.push('X-ABShowAs:COMPANY')}
   if(b.category&&b.category!=='Local Business')v.push('CATEGORIES:'+vEsc(b.category));
   b.phones.forEach(function(x){v.push('TEL;TYPE=WORK,VOICE:'+x.replace(/\s*ext.*$/i,''))});
