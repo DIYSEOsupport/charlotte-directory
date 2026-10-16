@@ -799,9 +799,21 @@ function parseGrid(grid){
 }
 
 function load(){
+  var cached=null;
+  try{cached=JSON.parse(localStorage.getItem('ccdir-cache')||'null')}catch(e){}
+  if(cached&&cached.length&&!all.length&&!window._cacheShown){window._cacheShown=1;try{paint({data:cached})}catch(e){}}
   Papa.parse(CSV_URL+(CSV_URL.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{
     download:true,header:false,skipEmptyLines:true,
     complete:function(res){
+      try{if(res.data&&res.data.length>1)localStorage.setItem('ccdir-cache',JSON.stringify(res.data))}catch(e){}
+      paint(res);
+    },
+    error:function(){
+      if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
+    }
+  });
+  function paint(res){
+    {
       var out=parseGrid(res.data||[]);
       all=out.list;
       if(/[?&]debug/.test(location.search)){
@@ -812,11 +824,8 @@ function load(){
       buildFilters();
       apply();
       if(!window._cardDone){window._cardDone=1;try{var cm=/[?&]card=([^&]+)/.exec(location.search);if(cm){var cn=decodeURIComponent(cm[1].replace(/\+/g,' ')).toLowerCase();var cb=all.filter(function(x){return x.name.toLowerCase()===cn})[0];if(cb)openShare(cb)}}catch(e){}}
-    },
-    error:function(){
-      if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
     }
-  });
+  }
 }
 
 /* ---------- facets: every useful column becomes a filter ---------- */
