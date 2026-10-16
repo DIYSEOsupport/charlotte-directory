@@ -394,7 +394,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .btn{font-size:17px}
 .about.area{font-family:var(--fh);font-weight:400;font-size:19px;letter-spacing:.6px;color:var(--ink)}
 .card.saved .star svg path{fill:#2a6fdb!important;stroke:#1a1033!important}
-.blogo{width:44px;height:44px;flex:none;object-fit:contain;background:#fff;border:2px solid var(--ink);border-radius:10px}
+.blogo{width:44px;height:44px;flex:none;object-fit:cover;background:#fff;border:2px solid var(--ink);border-radius:10px}
 .icon-btn .lbl,.chip .n,.chip .lbl{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
@@ -452,9 +452,10 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
-.builtby{display:flex;align-items:center;justify-content:center;gap:8px;padding:24px 16px 32px;font-size:13px;color:#6b5f8a}
-.builtby img{width:28px;height:28px;border-radius:6px;object-fit:cover}
-.builtby a{color:#6b5f8a;text-decoration:underline}
+.builtby{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 16px 32px;font-size:14px;color:#6b5f8a}
+.builtby a{display:flex;align-items:center;gap:10px;color:#6b5f8a;text-decoration:none}
+.builtby a:hover{text-decoration:underline}
+.builtby img{width:48px;height:48px;border-radius:9px;object-fit:cover}
 </style>
 </head>
 <body>
@@ -495,7 +496,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div id="printArea"></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
-<div class="builtby"><img src="diyseo-logo.png" alt="DIYSEO logo"><span>Built by DIYSEO</span></div>
+<div class="builtby"><a href="https://diyseo.support.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
