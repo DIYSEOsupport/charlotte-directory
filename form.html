@@ -177,6 +177,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" id="emfld"><label class="l" for="email">Email for Customers to Contact You</label><input type="email" id="email" autocomplete="email"><div class="err">Enter a valid email like name@example.com.</div></div>
       <div class="sub" id="physical"><h2 style="font-size:22px">Physical address</h2>
         <div class="fld" data-req data-phys><label class="l" for="street">Business Street Address <span class="req">*</span></label><input type="text" id="street" autocomplete="address-line1"><div class="err">Enter your street address.</div></div>
+        <div class="fld" data-phys><label class="l" for="street2">Suite / Unit (optional)</label><input type="text" id="street2" autocomplete="address-line2"></div>
         <div class="row2">
           <div class="fld" data-req data-phys><label class="l" for="city">Business City <span class="req">*</span></label><input type="text" id="city" autocomplete="address-level2"><div class="err">Enter your city.</div></div>
           <div class="fld" data-req data-phys><label class="l" for="state">State <span class="req">*</span></label><div class="help">US state 2 letter abbreviation</div><input type="text" id="state" maxlength="2" autocomplete="address-level1"><div class="err">Two letters.</div></div>
@@ -228,11 +229,13 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 <script>
 var GOOGLE_CLIENT_ID='429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
 var ENDPOINT='https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services','Other'];
 var TYPES=['Physical Location','Online Only','Mobile Service (landscaping, housecleaner etc)','Other'];
 var AREAS=['Charlotte County','Lee County','Sarasota County','Other'];
 var NAMES=['About you','Business','Contact','Optional','Review'];
-function syncOther(){var t=$('typeother'),a=$('areaother'),sh=(t&&t.classList.contains('show'))||(a&&a.classList.contains('show')&&$('areafld').closest('.sub')&&$('areafld').closest('.sub').classList.contains('show'));$('otherfld').style.display=sh?'':'none'}
+var catOther=false;
+function syncOther(){var t=$('typeother'),a=$('areaother'),sh=catOther||(t&&t.classList.contains('show'))||(a&&a.classList.contains('show')&&$('areafld').closest('.sub')&&$('areafld').closest('.sub').classList.contains('show'));$('otherfld').style.display=sh?'':'none'}
+function syncCat(c){catOther=c==='Other';syncOther()}
 var step=0,logoData='',logoName='',idToken='';
 var bizList=null,mode='',origName='',origLogoId='';
 function jwtInfo(t){try{return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))))}catch(e){return null}}
@@ -290,7 +293,7 @@ function syncType(t){
   $('physical').classList.toggle('show',phys);
   $('mobile').classList.toggle('show',mob);
 }
-pick('cats','cat',CATS);
+pick('cats','cat',CATS,syncCat);
 pick('types','btype',TYPES,syncType);
 (function(){
   var box=$('areas');
@@ -480,7 +483,7 @@ function setRadio(name,value){
   if(any)any.dispatchEvent(new Event('change',{bubbles:true}));
 }
 function clearBiz(){
-  ['biz','pubname','pubtitle','other','desc','phone','web','email','street','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
+  ['biz','pubname','pubtitle','other','desc','phone','web','email','street','street2','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
   qa('input[name="cat"],input[name="btype"],input[name="area"]').forEach(function(i){i.checked=false});
   ['cats','types','areas'].forEach(function(g){var b=$(g);b.dispatchEvent(new Event('change',{bubbles:true}))});
   $('dcnt').textContent='0';
@@ -526,7 +529,7 @@ function renderReview(){
   var sec=[
     ['1. About you',row('Name (private)',$('name').value.trim())+row('Title (private)',$('title').value.trim())+row('How to contact you (private)',$('how').value.trim())],
     ['2. Business',row('Business name',$('biz').value.trim())+row('Public contact name',$('pubname').value.trim())+row('Public contact title',$('pubtitle').value.trim())+row('Category',val('cat'))+($('otherfld').style.display==='none'?'':row('Other details',$('other').value.trim()))+row('About your business',t)+row('Describe your business',$('desc').value.trim())],
-    ['3. Contact',row('Business phone',maskPhone($('phone').value))+row('Website',fixUrl($('web').value))+row('Email for customers',$('email').value.trim())+(phys?row('Street',$('street').value.trim())+row('City',$('city').value.trim())+row('State',$('state').value.trim())+row('Zip',$('zip').value.trim()):'')+(mob?row('Area served',a):'')],
+    ['3. Contact',row('Business phone',maskPhone($('phone').value))+row('Website',fixUrl($('web').value))+row('Email for customers',$('email').value.trim())+(phys?row('Street',$('street').value.trim())+row('Suite / Unit',$('street2').value.trim())+row('City',$('city').value.trim())+row('State',$('state').value.trim())+row('Zip',$('zip').value.trim()):'')+(mob?row('Area served',a):'')],
     ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Slogan',$('slogan').value.trim())+row('Logo',logo)]
   ];
   $('review').innerHTML=sec.map(function(x,i){return '<div class="rv"><div class="rv-h"><h2>'+esc(x[0])+'</h2><button type="button" class="b alt" data-edit="'+i+'">Edit</button></div><dl>'+x[1]+'</dl></div>'}).join('');
@@ -567,14 +570,14 @@ $('f').addEventListener('submit',function(e){
     businessName:$('biz').value.trim(),pubName:$('pubname').value.trim(),pubTitle:$('pubtitle').value.trim(),
     category:val('cat'),about:'',other:($('otherfld').style.display==='none'?'':$('other').value.trim()),
     describe:t==='Other'?$('desc').value.trim().slice(0,400):t+'\n\n'+$('desc').value.trim().slice(0,400),
-    street:'',city:'',state:'',zip:'',area:'',
+    street:'',street2:'',city:'',state:'',zip:'',area:'',
     phone:maskPhone($('phone').value),website:fixUrl($('web').value),email:$('email').value.trim().toLowerCase(),
     facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),slogan:$('slogan').value.trim(),
     logoData:logoData,logoName:logoName,
     originalName:mode==='update'?origName:'',
     logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none'))
   };
-  if(t==='Physical Location'){d.street=$('street').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
+  if(t==='Physical Location'){d.street=$('street').value.trim();d.street2=$('street2').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
   if(/^Mobile/.test(t)){d.area=a.map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ')}
   var go=$('go');go.disabled=true;go.textContent='Sending... wait a few seconds';$('fail').style.display='none';
   if(!/^https:\/\//.test(ENDPOINT)){go.disabled=false;go.textContent='Submit my business';$('fail').textContent='This form is not connected to the directory yet. Tell the site owner.';$('fail').style.display='block';return}

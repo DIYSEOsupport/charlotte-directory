@@ -129,7 +129,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60}
-.toast.big{bottom:auto;top:calc(90px + env(safe-area-inset-top));font-size:17px;padding:14px 24px;z-index:99995;max-width:86vw;text-align:center}
+.toast.anchored{z-index:99995}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .totop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
 .totop.show{opacity:1;pointer-events:auto}
@@ -540,12 +540,12 @@ try{ops=JSON.parse(localStorage.getItem('ccdir-ops')||'{}')}catch(e){}
 try{hasUser=localStorage.getItem('ccdir-user')||''}catch(e){}
 function saveOps(){try{localStorage.setItem('ccdir-ops',JSON.stringify(ops))}catch(e){}}
 function jwtInfo(t){try{var b=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(b))))}catch(e){return null}}
-function jsonpCall(params,cb){
+function jsonpCall(params,cb,timeoutMs){
   var n='_sv'+Date.now()+Math.floor(Math.random()*1e4),s=document.createElement('script'),done=false;
   function clean(){try{delete window[n]}catch(e){window[n]=undefined}if(s.parentNode)s.parentNode.removeChild(s)}
   window[n]=function(o){if(done)return;done=true;clean();cb(o)};
   s.onerror=function(){if(done)return;done=true;clean();cb(null)};
-  setTimeout(function(){if(done)return;done=true;clean();cb(null)},15000);
+  setTimeout(function(){if(done)return;done=true;clean();cb(null)},timeoutMs||15000);
   s.src=CSV_URL+'?'+params+'&callback='+n;
   document.head.appendChild(s);
 }
@@ -563,7 +563,7 @@ function checkAdminPending(){
     errPop('Boss alert, neighbor!',L);
   });
 }
-var syncWarned=false;
+var syncWarned=false,syncRetried=false;
 function syncSaves(){
   if(!acct.token||syncing||acct.exp<Date.now()+30000)return;
   syncing=true;
@@ -576,6 +576,7 @@ function syncSaves(){
   jsonpCall('saves=sync&token='+encodeURIComponent(acct.token)+'&ops='+encodeURIComponent(JSON.stringify(send)),function(r){
     syncing=false;
     if(r&&r.ok){
+      syncRetried=false;
       var nf={};(r.keys||[]).forEach(function(k){nf[k]=1});
       var later={};
       Object.keys(ops).forEach(function(k){if(!(k in send)||send[k]!==ops[k])later[k]=ops[k]});
@@ -586,8 +587,9 @@ function syncSaves(){
       try{apply()}catch(e){}
       if(Object.keys(later).length)syncSaves();
     }else if(r&&r.error==='LOGIN_EXPIRED'){acct.token='';acct.exp=0;try{localStorage.removeItem('ccdir-token')}catch(e){}if(!syncWarned){syncWarned=true;errPop('Sign in again, neighbor!','Your login timed out. Log in again to keep favorites on all your devices.')}}
-    else if(!syncWarned){syncWarned=true;errPop('Whoa there, neighbor!','Could not save favorites online. They are still saved on this device. Try again later.')}
-  });
+    else if(!syncRetried){syncRetried=true;setTimeout(syncSaves,3000)}
+    else if(!syncWarned){syncWarned=true;errPop('Whoa there, neighbor!','The server was too slow to save favorites online just now. They are still saved on this device, and we\'ll keep trying in the background.')}
+  },21000);
 }
 function setAcct(token){
   var p=token?jwtInfo(token):null;
@@ -636,7 +638,17 @@ document.addEventListener('error',function(e){
   t.style.display='none';
 },true);
 function keyOf(b){return b.name.toLowerCase().trim()}
-function toast(m,big){var t=$('toast');t.textContent=m;t.classList.toggle('big',!!big);t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),big?3200:1800)}
+function toast(m,anchorEl){
+  var t=$('toast');t.textContent=m;
+  if(anchorEl&&anchorEl.getBoundingClientRect){
+    var r=anchorEl.getBoundingClientRect();
+    t.style.left=Math.min(Math.max(r.left+r.width/2,80),window.innerWidth-80)+'px';
+    t.style.top=(r.bottom+8)+'px';t.style.bottom='auto';t.classList.add('anchored');
+  }else{
+    t.style.left='';t.style.top='';t.style.bottom='';t.classList.remove('anchored');
+  }
+  t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),anchorEl?3200:1800)
+}
 
 /* ---------- data ---------- */
 function isEmail(s){return !!s&&/^[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}$/.test(s.toString().trim())}
@@ -1077,6 +1089,23 @@ function honk(){
     one(t0+0.22,330,250,0.34);     /* -HONK */
   }catch(e){}
 }
+function beepBeep(){
+  if(honkMuted)return;
+  try{
+    var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    if(!honkCtx)honkCtx=new AC();
+    var c=honkCtx;if(c.state==='suspended')c.resume();
+    function beep(t,f){
+      var o=c.createOscillator(),g=c.createGain();
+      o.type='sine';o.frequency.setValueAtTime(f,t);
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.28,t+0.02);
+      g.gain.setValueAtTime(0.28,t+0.1);g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
+      o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.16);
+    }
+    var t0=c.currentTime+0.02;
+    beep(t0,880);beep(t0+0.18,880);
+  }catch(e){}
+}
 var loginShown=false;
 function showLoginPop(){
   if(loginShown)return;loginShown=true;
@@ -1099,8 +1128,8 @@ $('lpGo').onclick=function(){
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
-function toggleFav(k){
-  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Contact for help!',true);honk();return}
+function toggleFav(k,el){
+  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Contact for help!',el);beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
@@ -1161,7 +1190,7 @@ $('grid').addEventListener('click',function(e){
   var k=card.dataset.k;
   var act=e.target.closest('[data-act]');
   if(act){
-    if(act.dataset.act==='save'){toggleFav(k)}
+    if(act.dataset.act==='save'){toggleFav(k,card)}
     else{
       var b=all.find(function(x){return keyOf(x)===k});if(!b)return;
       openShare(b);
