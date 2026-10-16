@@ -545,6 +545,20 @@ function jsonpCall(params,cb){
   s.src=CSV_URL+'?'+params+'&callback='+n;
   document.head.appendChild(s);
 }
+var adminChecked=false;
+function checkAdminPending(){
+  if(adminChecked||!acct.token)return;adminChecked=true;
+  jsonpCall('pending=1&token='+encodeURIComponent(acct.token),function(r){
+    if(!r||!r.ok||!r.admin)return;
+    var n=(r.pending||0)+(r.flagged||0)+(r.unconfirmed||0);
+    if(!n)return;
+    var L=[];
+    if(r.flagged)L.push(r.flagged+' flagged, waiting for your OK.');
+    if(r.pending)L.push(r.pending+' pending, being checked.');
+    if(r.unconfirmed)L.push(r.unconfirmed+' not confirmed yet.');
+    errPop('Boss alert, neighbor!',L);
+  });
+}
 var syncWarned=false;
 function syncSaves(){
   if(!acct.token||syncing||acct.exp<Date.now()+30000)return;
@@ -577,7 +591,7 @@ function setAcct(token){
   try{if(token)localStorage.setItem('ccdir-token',token);else localStorage.removeItem('ccdir-token')}catch(e){}
   var out=$('acctOut'),inn=$('acctIn');
   if(out&&inn){out.style.display=acct.email?'none':'flex';inn.style.display=acct.email?'flex':'none';$('acctEmail').textContent=acct.email}
-  if(acct.token)syncSaves();
+  if(acct.token){syncSaves();checkAdminPending()}
 }
 function signOut(){
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.disableAutoSelect()}catch(e){}
@@ -799,21 +813,9 @@ function parseGrid(grid){
 }
 
 function load(){
-  var cached=null;
-  try{cached=JSON.parse(localStorage.getItem('ccdir-cache')||'null')}catch(e){}
-  if(cached&&cached.length&&!all.length&&!window._cacheShown){window._cacheShown=1;try{paint({data:cached})}catch(e){}}
   Papa.parse(CSV_URL+(CSV_URL.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{
     download:true,header:false,skipEmptyLines:true,
     complete:function(res){
-      try{if(res.data&&res.data.length>1)localStorage.setItem('ccdir-cache',JSON.stringify(res.data))}catch(e){}
-      paint(res);
-    },
-    error:function(){
-      if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
-    }
-  });
-  function paint(res){
-    {
       var out=parseGrid(res.data||[]);
       all=out.list;
       if(/[?&]debug/.test(location.search)){
@@ -824,8 +826,11 @@ function load(){
       buildFilters();
       apply();
       if(!window._cardDone){window._cardDone=1;try{var cm=/[?&]card=([^&]+)/.exec(location.search);if(cm){var cn=decodeURIComponent(cm[1].replace(/\+/g,' ')).toLowerCase();var cb=all.filter(function(x){return x.name.toLowerCase()===cn})[0];if(cb)openShare(cb)}}catch(e){}}
+    },
+    error:function(){
+      if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
     }
-  }
+  });
 }
 
 /* ---------- facets: every useful column becomes a filter ---------- */
@@ -1077,6 +1082,7 @@ $('lpGo').onclick=function(){
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
 };
 function toggleFav(k){
+  if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
   if(favs[k]&&!acct.email&&!hasUser)showLoginPop();
@@ -1214,20 +1220,22 @@ function doPrint(list){
 }
 function showPdfReady(blob,name){
   var old=document.getElementById('pdfReady');if(old)old.remove();
+  var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
   var url=URL.createObjectURL(blob),d=document.createElement('div');d.id='pdfReady';
   var f=null,canShare=false;
   try{f=new File([blob],name,{type:'application/pdf'});canShare=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
-  d.innerHTML='<div class="bx"><h3>Your PDF is ready</h3><p>Tap to save it to your phone.</p>'
-    +'<a class="go" id="pdfSave" href="'+url+'" download="'+name.replace(/"/g,'')+'">Save PDF</a>'
-    +(canShare?'<button class="go alt" id="pdfShare" type="button">Share / Save to Files</button>':'')
-    +'<a class="go alt" href="'+url+'" target="_blank" rel="noopener">Open PDF</a>'
+  d.innerHTML='<div class="bx"><h3>Your PDF is ready</h3><p>'+(ios?'Tap Share, then Save to Files.':'Tap to save it to your phone.')+'</p>'
+    +(canShare?'<button class="go" id="pdfShare" type="button">Share / Save to Files</button>':'')
+    +(ios?'':'<a class="go" id="pdfSave" href="'+url+'" download="'+name.replace(/"/g,'')+'">Save PDF</a>')
+    +'<button class="go alt" id="pdfOpen" type="button">Open PDF</button>'
     +'<button class="go alt" id="pdfClose" type="button">Close</button></div>';
   document.body.appendChild(d);
   function close(){d.remove();setTimeout(function(){URL.revokeObjectURL(url)},60000)}
   d.querySelector('#pdfClose').onclick=close;
   var sh=d.querySelector('#pdfShare');
-  if(sh)sh.onclick=function(){navigator.share({files:[f],title:name}).then(close).catch(function(){})};
-  d.querySelector('#pdfSave').addEventListener('click',function(){setTimeout(close,1500)});
+  if(sh)sh.onclick=function(){navigator.share({files:[f],title:name}).then(close).catch(function(e){if(e&&e.name!=='AbortError')errPop('Save trouble, neighbor!','Could not open the share sheet. Tap Open PDF instead.')})};
+  d.querySelector('#pdfOpen').onclick=function(){if(ios){location.href=url}else{var w=window.open(url,'_blank');if(!w)location.href=url}};
+  var sv=d.querySelector('#pdfSave');if(sv)sv.addEventListener('click',function(){setTimeout(close,1500)});
 }
 function saveBlob(blob,name){
   var ua=navigator.userAgent;
@@ -1294,7 +1302,7 @@ function fetchLogoData(b){
   var p=new Promise(function(res){
     var done=false;
     function fin(v){if(!done){done=true;res(v)}}
-    setTimeout(function(){fin(null)},9000);
+    setTimeout(function(){fin(null)},15000);
     function fromUrl(u,cors){var im=new Image();if(cors)im.crossOrigin='anonymous';im.onload=function(){fin(im)};im.onerror=function(){fin(null)};im.src=u}
     var id=logoId(b.logo);
     if(id&&/drive\.google\.com/i.test(b.logo)){
@@ -1306,6 +1314,7 @@ function fetchLogoData(b){
     }else fromUrl(b.logo,true);
   });
   logoCache[b.logo]=p;
+  p.then(function(v){if(!v)delete logoCache[b.logo]});
   return p;
 }
 function logoJpeg(im,size){
@@ -1557,8 +1566,10 @@ function personName(b){
 }
 function vcard(b){
   var pn=personName(b);
-  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;','ORG:'+vEsc(b.name),'X-ABShowAs:COMPANY'];
-  if(b.contact){v.push('item1.X-ABRELATEDNAMES:'+vEsc(b.contact.split(',')[0].trim()));v.push('item1.X-ABLabel:Contact')}
+  var cn=(b.contact||'').split(',')[0].trim(),ct=(b.contact||'').split(',').slice(1).join(',').trim();
+  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;'];
+  if(cn){v.push('ORG:'+vEsc(cn));if(ct)v.push('TITLE:'+vEsc(ct))}  /* big line = business, small line under it = contact name */
+  else{v.push('ORG:'+vEsc(b.name));v.push('X-ABShowAs:COMPANY')}
   if(b.category&&b.category!=='Local Business')v.push('CATEGORIES:'+vEsc(b.category));
   b.phones.forEach(function(x){v.push('TEL;TYPE=WORK,VOICE:'+x.replace(/\s*ext.*$/i,''))});
   b.emails.forEach(function(x){v.push('EMAIL;TYPE=WORK:'+x)});
@@ -1576,7 +1587,8 @@ function openShare(b){
   $('shText').style.display=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)?'':'none';
   $('shareBox').classList.add('show');
 }
-function closeShare(){$('shareBox').classList.remove('show')}
+var shareClosedAt=0;
+function closeShare(){$('shareBox').classList.remove('show');shareClosedAt=Date.now()}
 $('shEmail').onclick=function(){
   var b=shareB;closeShare();if(!b)return;
   if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
