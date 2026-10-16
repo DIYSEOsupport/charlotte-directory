@@ -36,7 +36,11 @@ a{color:inherit}
 .tagline{display:block;width:fit-content;max-width:100%;margin:-14px auto 0;position:relative;font-family:var(--fh);letter-spacing:1.5px;font-size:clamp(18px,4.6vw,26px);background:var(--yellow);color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:4px 18px;box-shadow:3px 3px 0 var(--ink);transform:rotate(-1.5deg);text-align:center}
 
 /* sticky controls */
-.controls{position:sticky;top:0;z-index:20;background:var(--cream);border-bottom:4px solid var(--ink);padding:10px 0 8px;padding-top:calc(10px + env(safe-area-inset-top));margin-top:18px}
+.controls{position:sticky;top:0;z-index:20;background:var(--cream);border-bottom:4px solid var(--ink);padding:10px 0 8px;padding-top:calc(10px + env(safe-area-inset-top));margin-top:18px;transition:.2s}
+.controls.mini{padding-bottom:0}
+.controls.mini .pills,.controls.mini #muteRow{display:none}
+.controls.mini .row{margin-bottom:0}
+.controls.mini .row .lbl{display:none}
 .row{display:flex;gap:8px;align-items:center}
 .search{position:relative;flex:1}
 .search>svg{pointer-events:none;position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--magenta)}
@@ -448,6 +452,9 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
+.builtby{display:flex;align-items:center;justify-content:center;gap:8px;padding:24px 16px 32px;font-size:13px;color:#6b5f8a}
+.builtby img{width:28px;height:28px;border-radius:6px;object-fit:cover}
+.builtby a{color:#6b5f8a;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -488,6 +495,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div id="printArea"></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
+<div class="builtby"><img src="diyseo-logo.png" alt="DIYSEO logo"><span>Built by DIYSEO</span></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -909,6 +917,7 @@ function buildFilters(){
     p+='<div class="acc c'+(order.indexOf(o)%3)+(open?' open':'')+'" data-l="'+esc(d.label)+'"><button type="button" class="acch" aria-expanded="'+open+'"><span>'+esc(lbl(d.label))+'</span><span class="selcnt'+(sel.length?' on':'')+'">'+sel.length+'</span>'+CHEV+'</button><div class="accb">'
       +d.values.map(function(v,vi){return '<label class="opt"><input type="checkbox" data-fi="'+fi+'" data-vi="'+vi+'"'+(sel.indexOf(v)!==-1?' checked':'')+'><span>'+esc(v)+'</span><span class="oc">'+d.counts[v]+'</span></label>'}).join('')+'</div></div>';
   });
+  if(loginSkipped&&!acct.email&&!hasUser)p+='<div class="note" style="margin:6px 2px 10px">Log in to save across devices.</div>';
   var nsv=all.filter(function(b){return favs[keyOf(b)]||isDiy(b)}).length;
   p+='<label class="savedrow"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
@@ -1059,6 +1068,7 @@ function syncToggleAll(){
 
 var honkCtx=null;
 var honkMuted=false;try{honkMuted=localStorage.getItem('ccdir-mute')==='1'}catch(e){}
+var loginSkipped=false;try{loginSkipped=localStorage.getItem('ccdir-login-skip')==='1'}catch(e){}
 (function(){
   var b=document.createElement('button');b.id='muteBtn';b.type='button';
   function paint(){b.textContent=honkMuted?'\uD83D\uDD07':'\uD83D\uDD0A';b.className=honkMuted?'off':'';b.setAttribute('aria-label',honkMuted?'Turn honk sound on':'Turn honk sound off');b.title=b.getAttribute('aria-label')}
@@ -1095,15 +1105,16 @@ function beepBeep(){
     var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     if(!honkCtx)honkCtx=new AC();
     var c=honkCtx;if(c.state==='suspended')c.resume();
-    function beep(t,f){
+    function squeeze(t){
       var o=c.createOscillator(),g=c.createGain();
-      o.type='sine';o.frequency.setValueAtTime(f,t);
-      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.28,t+0.02);
-      g.gain.setValueAtTime(0.28,t+0.1);g.gain.exponentialRampToValueAtTime(0.0001,t+0.14);
-      o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.16);
+      o.type='triangle';
+      o.frequency.setValueAtTime(520,t);o.frequency.linearRampToValueAtTime(760,t+0.045);o.frequency.linearRampToValueAtTime(420,t+0.1);
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.3,t+0.015);
+      g.gain.setValueAtTime(0.3,t+0.07);g.gain.exponentialRampToValueAtTime(0.0001,t+0.1);
+      o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.12);
     }
     var t0=c.currentTime+0.02;
-    beep(t0,880);beep(t0+0.18,880);
+    squeeze(t0);squeeze(t0+0.16);
   }catch(e){}
 }
 var loginShown=false;
@@ -1120,7 +1131,7 @@ function errPop(title,lines){
 $('epGo').onclick=function(){$('errPop').classList.remove('show')};
 $('errPop').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
 function closeLoginPop(){$('loginPop').classList.remove('show')}
-$('lpNo').onclick=closeLoginPop;
+$('lpNo').onclick=function(){loginSkipped=true;try{localStorage.setItem('ccdir-login-skip','1')}catch(e){}closeLoginPop();try{buildFilters()}catch(e){}};
 $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLoginPop()});
 $('lpGo').onclick=function(){
   closeLoginPop();
@@ -1139,7 +1150,7 @@ function toggleFav(k,el){
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
     else if(!promptedOnce&&window.google&&google.accounts&&google.accounts.id){promptedOnce=true;try{google.accounts.id.prompt()}catch(e){}}
   }
-  toast(favs[k]?'Saved':'Removed');
+  toast(favs[k]?((acct.email||hasUser)?'Saved':'Saved on this device'):'Removed');
   apply();
 }
 
