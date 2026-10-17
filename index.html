@@ -39,9 +39,8 @@ a{color:inherit}
 .menu-toggle:active{transform:translate(2px,2px);box-shadow:none}
 .navmenu{display:none}
 .navmenu.show{display:flex;flex-direction:column;gap:4px;margin:0 0 8px;padding:6px;max-width:280px;background:var(--cream);border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink)}
-.navbtn.full{width:100%}
-#muteRow{grid-column:1/-1}
-#muteRow #muteBtn{background:var(--teal)}
+.navbtn.full{width:100%;grid-column:1/-1}
+#muteRow #muteBtn{background:var(--teal);width:30px;padding:0!important;justify-content:center}
 #searchBtn{background:var(--magenta)}
 #filterBtn{background:var(--orange)}
 .navmenu .pills{display:flex;flex-direction:column;padding:0;overflow:visible;gap:4px}
@@ -424,7 +423,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .btn{font-size:17px}
 .about.area{font-family:var(--fh);font-weight:400;font-size:19px;letter-spacing:.6px;color:var(--ink)}
 .card.saved .star svg path{fill:#2a6fdb!important;stroke:#1a1033!important}
-.blogo{height:44px;width:auto;max-width:44px;flex:none;object-fit:contain;background:#fff;border:2px solid var(--ink);border-radius:10px}
+.blogo{height:44px;width:44px;flex:none;object-fit:contain;background:#fff;border:2px solid var(--ink);border-radius:10px}
 .icon-btn .lbl,.chip .n,.chip .lbl{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
@@ -432,14 +431,12 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 .addbiz,#printBtn,#dlBtn,#toggleAll,#emailBtn,#muteBtn,#searchBtn,#filterBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
-#printBtn{background:var(--teal)!important}
-#printBtn:hover{box-shadow:0 0 0 4px rgba(31,181,201,.35),2px 2px 0 var(--ink)}
-#dlBtn{background:var(--magenta)!important}
-#dlBtn:hover{box-shadow:0 0 0 4px rgba(194,48,122,.35),2px 2px 0 var(--ink)}
+#dlBtn{background:var(--teal)!important}
+#dlBtn:hover{box-shadow:0 0 0 4px rgba(31,181,201,.35),2px 2px 0 var(--ink)}
 #toggleAll{background:var(--green)!important}
 #toggleAll:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
-#emailBtn{background:var(--purple)!important}
-#emailBtn:hover{box-shadow:0 0 0 4px rgba(91,42,134,.35),2px 2px 0 var(--ink)}
+.builtby #emailBtn{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:50px;padding:6px 18px;box-shadow:3px 3px 0 var(--ink)}
+.builtby #emailBtn:hover{background:#fff6dc}
 /* Bangers headings + Walter Turncoat text */
 .title,.sect,.mt,.ptitle,.savedrow .svl,.chip,.catpill,.grid .acts .btn,.btn,.icon-btn .lbl{font-weight:500!important}
 .title{letter-spacing:.3px}
@@ -450,7 +447,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 /* v26 phone cards, stacked: logo + name on top, category pill and arrow in a row below */
 @media(max-width:640px){
   .grid .card .bar{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo bt bt" "cat cat chev";align-items:center;column-gap:0;row-gap:8px;padding:12px!important}
-  .grid .card .bar .blogo{grid-area:logo;height:50px;width:auto;max-width:50px;margin-right:10px;align-self:start}
+  .grid .card .bar .blogo{grid-area:logo;height:50px;width:50px;margin-right:10px;align-self:start}
   .grid .card .bar .bt{grid-area:bt;min-width:0;flex:none;padding-right:42px!important;align-self:center}
   .grid .card .bar .catpill{grid-area:cat;justify-self:start;align-self:center;margin:0!important;max-width:100%!important;white-space:normal;text-align:left;font-size:12px!important;padding:4px 11px!important;line-height:1.2}
   .grid .card .bar .chev{grid-area:chev;justify-self:end;order:0}
@@ -494,7 +491,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
-.builtby{display:flex;align-items:center;justify-content:center;padding:24px 16px 32px}
+.builtby{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 16px 32px}
 .builtby a{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:50px;padding:6px 18px 6px 6px;box-shadow:3px 3px 0 var(--ink)}
 .builtby a:hover{background:#fff6dc}
 .builtby img{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
@@ -517,10 +514,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div class="navgrid">
 <button class="navbtn" id="searchBtn" type="button" aria-label="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
 <button class="navbtn" id="filterBtn" type="button" aria-label="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
-<button class="navbtn" id="printBtn" type="button" aria-label="Print"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V3h10v5"/><rect x="2" y="8" width="20" height="8" rx="1.5"/><rect x="7" y="13" width="10" height="7"/></svg><span class="lbl">Print</span></button>
-<button class="navbtn" id="dlBtn" type="button" aria-label="Download"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg><span class="lbl">Download</span></button>
+<button class="navbtn" id="dlBtn" type="button" aria-label="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg><span class="lbl">Download PDF</span></button>
 <button class="navbtn" id="toggleAll" type="button" aria-label="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
-<a class="navbtn" id="emailBtn" href="mailto:DIYSEO.support@gmail.com" aria-label="Help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span class="lbl">Help</span></a>
 <div id="muteRow"></div>
 </div>
 <div class="pills" id="pills"></div>
@@ -547,7 +542,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div id="printArea"></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
-<div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
+<div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a><a id="emailBtn" href="mailto:DIYSEO.support@gmail.com" aria-label="Help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Help</a></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -1139,7 +1134,7 @@ var loginSkipped=false;try{loginSkipped=localStorage.getItem('ccdir-login-skip')
   var b=document.createElement('button');b.id='muteBtn';b.type='button';
   var svgOn='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6a8 8 0 0 1 0 12"/></svg>';
   var svgOff='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9l5 5M21 9l-5 5"/></svg>';
-  function paint(){b.innerHTML=(honkMuted?svgOff:svgOn)+'<span class="lbl">'+(honkMuted?'Sound off':'Sound on')+'</span>';b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Turn honk sound on':'Turn honk sound off');b.title=b.getAttribute('aria-label')}
+  function paint(){b.innerHTML=honkMuted?svgOff:svgOn;b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Turn honk sound on':'Turn honk sound off');b.title=b.getAttribute('aria-label')}
   paint();
   b.onclick=function(){honkMuted=!honkMuted;try{localStorage.setItem('ccdir-mute',honkMuted?'1':'0')}catch(e){}paint();if(!honkMuted)honk()};
   var row=document.getElementById('muteRow');(row||document.body).appendChild(b);
@@ -1150,7 +1145,7 @@ function honk(){
   try{
     var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     if(!honkCtx)honkCtx=new AC();
-    var c=honkCtx;if(c.state==='suspended')c.resume();
+    var c=honkCtx;if(c.state==='suspended'){c.resume().then(honk);return}
     function one(t,f0,f1,dur){
       var o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
       o.type='sawtooth';o2.type='square';
@@ -1172,7 +1167,7 @@ function beepBeep(){
   try{
     var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
     if(!honkCtx)honkCtx=new AC();
-    var c=honkCtx;if(c.state==='suspended')c.resume();
+    var c=honkCtx;if(c.state==='suspended'){c.resume().then(beepBeep);return}
     function squeeze(t){
       var o=c.createOscillator(),g=c.createGain();
       o.type='triangle';
@@ -1664,7 +1659,6 @@ function askAct(kind){
   $('chAll').textContent='All businesses ('+all.length+')';
   $('chooser').classList.add('show');
 }
-$('printBtn').onclick=function(){askAct('print')};
 $('dlBtn').onclick=function(){askAct('pdf')};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');askAct('pdf')};
 $('fmtX').onclick=function(){$('fmtBox').classList.remove('show')};
