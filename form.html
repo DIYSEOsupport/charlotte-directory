@@ -74,6 +74,9 @@ input[type=file]{font:700 14px var(--fb);max-width:100%}
 .done-card h1{font-size:clamp(34px,9vw,52px);color:var(--magenta);transform:rotate(-2deg)}
 .fail{display:none;margin-top:12px;padding:10px 12px;background:#fff;border:3px solid var(--err);border-radius:12px;color:var(--err);font-weight:800;font-size:14px}
 a.lnk{color:#124080;font-weight:800}
+.navtabs{display:flex;gap:10px;justify-content:center;padding:10px 16px 0;flex-wrap:wrap}
+.navtabs a{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:50px;border:3px solid #1a1033;font-weight:800;font-size:14px;text-decoration:none;color:#1a1033;background:#fff;box-shadow:2px 2px 0 #1a1033;transition:.15s}
+.navtabs a:hover{transform:translateY(-1px);box-shadow:3px 4px 0 #1a1033}
 h1,h2,.l,.dot,.tile,.opt,button.b,.sticker,.boom{font-weight:500}
 body{text-transform:uppercase}
 input,textarea,select,option,#printArea{text-transform:none}
@@ -116,11 +119,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   <div class="card" id="intro">
     <h1>Small Business Owners of Charlotte County - Directory Intake Form</h1>
     <div class="boom">💥 BOOMING BUSINESSES! 💥</div>
-    <p style="text-align:center;font-weight:700;margin:6px 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
-    <p>Get listed in the Charlotte County Small Business Directory.</p>
-    <p class="note">Already listed? Sign in and choose "Update my business" to edit it.</p>
+    <p>Get listed free. Already listed? Sign in and choose "Update my business".</p>
     <p class="note"><span style="color:var(--magenta)">*</span> Indicates a required field.</p>
-    <p style="text-align:center"><a class="lnk" href="index.html">See the directory</a></p>
   </div>
 
   <div class="steps" id="steps"></div>
@@ -209,6 +209,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld"><label class="l" for="ndb">NextDoor Business Page</label><input type="text" id="ndb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
       <div class="fld"><label class="l" for="ndp">NextDoor Contact Personal Page</label><input type="text" id="ndp" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
       <div class="fld"><label class="l" for="slogan">Slogan</label><input type="text" id="slogan" maxlength="120"></div>
+      <div class="fld"><label class="opt" style="display:inline-flex"><input type="checkbox" id="licensed"><span class="bx" style="border-radius:6px"></span><span>Licensed &amp; Insured</span></label><div class="help">Not required. Shown on your listing only if checked.</div></div>
       <div class="fld"><span class="l">Upload Logo</span><div class="help">A square picture works best. It shows on your card.</div>
         <div class="logo-row"><img id="logoprev" alt="Business Logo"><input type="file" id="logo" accept="image/*"></div><div class="err" id="logoerr" style="display:none">That file is too big. Try a smaller picture.</div>
         <div class="oldlogo" id="oldlogo"><img id="oldlogoimg" alt="Current logo"><div><div class="note" style="margin:0 0 4px">This is your current logo. It stays unless you pick a new one or delete it.</div><label><input type="checkbox" id="dellogo"> Delete my logo</label></div></div></div>
@@ -232,6 +233,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
 </div>
+<div class="navtabs"><a href="mailto:DIYSEO.support@gmail.com">✉️ Email us</a><a href="index.html">📋 Directory</a></div>
 <div class="builtby"><img src="diyseo-logo.png" alt="DIYSEO logo"><span>Built by DIYSEO</span></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
@@ -239,7 +241,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 <script>
 var GOOGLE_CLIENT_ID='429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
 var ENDPOINT='https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services','Other'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty, Salons & Fitness','Professional & Online Services','Other'];
 var TYPES=['Physical Location','Online Only','Mobile Service (landscaping, housecleaner etc)','Other'];
 var AREAS=['Charlotte County','Lee County','Sarasota County','Other'];
 var NAMES=['About you','Business','Contact','Optional','Review'];
@@ -495,6 +497,7 @@ function setRadio(name,value){
 }
 function clearBiz(){
   ['biz','pubname','pubtitle','other','typeOtherTxt','desc','phone','web','email','street','street2','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
+  $('licensed').checked=false;
   qa('input[name="cat"],input[name="btype"],input[name="area"]').forEach(function(i){i.checked=false});
   ['cats','types','areas'].forEach(function(g){var b=$(g);b.dispatchEvent(new Event('change',{bubbles:true}))});
   $('dcnt').textContent='0';
@@ -523,6 +526,7 @@ function fillBiz(b){
   $('phone').value=maskPhone(b.phone||'');$('web').value=b.website||'';$('email').value=b.email||'';
   $('street').value=b.street||'';$('city').value=b.city||'';$('state').value=b.state||'';$('zip').value=b.zip||'';
   $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('slogan').value=b.slogan||'';
+  $('licensed').checked=!!b.licensed;
   origLogoId=b.logoId||'';
   if(origLogoId){$('oldlogoimg').src='https://drive.google.com/thumbnail?id='+encodeURIComponent(origLogoId)+'&sz=w200';$('oldlogo').style.display='flex'}
   qa('.bad').forEach(function(x){x.classList.remove('bad')});
@@ -586,7 +590,8 @@ $('f').addEventListener('submit',function(e){
     facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),slogan:$('slogan').value.trim(),
     logoData:logoData,logoName:logoName,
     originalName:mode==='update'?origName:'',
-    logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none'))
+    logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none')),
+    licensed:$('licensed').checked?'Yes':''
   };
   if(t==='Physical Location'){d.street=$('street').value.trim();d.street2=$('street2').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
   if(/^Mobile/.test(t)){d.area=a.map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ')}

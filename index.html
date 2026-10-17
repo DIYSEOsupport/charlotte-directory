@@ -34,11 +34,11 @@ a{color:inherit}
 .hero{padding:calc(8px + env(safe-area-inset-top)) 14px 4px}
 .hero-row{display:flex;align-items:stretch;gap:8px}
 .hero-row .hero-img{flex:1;min-width:0}
-.hero-ctrls{display:flex;flex-direction:column;gap:6px;flex:none;justify-content:center}
-.hero-ctrls .icon-btn{height:auto;min-width:40px;padding:6px 10px;transition:.15s}
+.hero-ctrls{display:flex;flex-direction:column;align-items:stretch;gap:5px;flex:none;width:76px;justify-content:center;margin-left:auto}
+.hero-ctrls .icon-btn{height:auto;width:100%;padding:5px 6px;transition:.15s}
 .hero-ctrls .icon-btn .lbl{display:none}
-.hero-ctrls #muteRow{order:99}
-.hero-ctrls #muteRow #muteBtn{width:40px;height:34px;transition:.15s}
+.hero-ctrls #muteRow{order:99;width:100%}
+.hero-ctrls #muteRow #muteBtn{width:100%;height:32px;transition:.15s}
 .hero-ctrls #searchBtn{background:var(--magenta)}
 .hero-ctrls #searchBtn:hover{box-shadow:0 0 0 4px rgba(194,48,122,.35),var(--shadow)}
 .hero-ctrls #filterBtn{background:var(--orange)}
@@ -524,7 +524,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 </main>
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
-<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
+<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
@@ -793,7 +793,7 @@ function route(r,v){
   return false;
 }
 
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty Salons & Fitness','Professional & Online Services'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty, Salons & Fitness','Professional & Online Services'];
 var CAT_OLD={neighborhoodfoodanddrinks:'Food & Drinks',mainstreetshopsandretail:'Shops & Retail'};
 function catKey(x){return x.toString().toLowerCase().replace(/^\s*\d+[\.\)\-\s]*/,'').replace(/&/g,'and').replace(/[^a-z]/g,'')}
 function canonCat(v){var k=catKey(v);if(CAT_OLD[k])return CAT_OLD[k];for(var i=0;i<CATS.length;i++){if(catKey(CATS[i])===k)return CATS[i]}return ''}
@@ -1002,7 +1002,7 @@ function apply(){
   render();
   var n=(st.fav?1:0)+(st.showHidden?1:0);for(var l in st.f)n+=(st.f[l]||[]).length;
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
-  var allN=document.querySelector('#allBtn .n');if(allN)allN.textContent=view.length===all.length?all.length:(view.length+' of '+all.length);
+  var allN=document.querySelector('#allBtn .n');if(allN)allN.textContent=all.length;
   $('clear').classList.toggle('show',!!st.q);
 }
 
@@ -1547,6 +1547,7 @@ async function buildPdfCanvas(list,keepPages){
 
   /* ----- draw ----- */
   var QRI=await loadQr();
+  var DIYI=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='diyseo-logo.png'});
   var out=[];
   for(var pi=0;pi<plan.length;pi++){
     var cv=document.createElement('canvas');cv.width=PW*S;cv.height=PH*S;
@@ -1557,15 +1558,15 @@ async function buildPdfCanvas(list,keepPages){
     if(pi===0){
       var heroEl=document.querySelector('.hero-img'),titleX=M;
       if(heroEl&&heroEl.complete&&heroEl.naturalWidth){
-        var hw=150,hh=50;c.drawImage(heroEl,M,14,hw,hh);
-        c.strokeStyle=BC.rule;c.lineWidth=1;c.strokeRect(M,14,hw,hh);
-        titleX=M+hw+14;
+        var hw=90,hh=30;c.drawImage(heroEl,M,16,hw,hh);
+        c.strokeStyle=BC.rule;c.lineWidth=1;c.strokeRect(M,16,hw,hh);
+        titleX=M+hw+12;
       }
-      cvSet(c,'400 10px '+BF_H,'3px');c.fillStyle=BC.orange;c.fillText('CHARLOTTE COUNTY',titleX,56);
-      cvSet(c,'600 32px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.fillText('Small Business Directory',titleX,90);
-      c.fillStyle=BC.orange;c.fillRect(M,100,44,3);
+      cvSet(c,'600 24px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.fillText('CHARLOTTE COUNTY',titleX,32);
+      cvSet(c,'400 12px '+BF_H,'1px');c.fillStyle=BC.orange;c.fillText('Small Business Directory',titleX,48);
+      c.fillStyle=BC.orange;c.fillRect(M,58,44,3);
       cvSet(c,'400 9px '+BF_B,'0px');c.fillStyle=BC.gray;
-      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M,120);
+      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M,76);
     }else{
       cvSet(c,'500 9px '+BF_H,'2px');c.fillStyle=BC.gray;c.fillText('SMALL BUSINESS DIRECTORY',M,40);
       c.fillStyle=BC.rule;c.fillRect(M,48,CW,0.8);
@@ -1577,8 +1578,10 @@ async function buildPdfCanvas(list,keepPages){
     c.fillStyle=BC.rule;c.fillRect(M,FOOT,CW,0.8);
     cvSet(c,'400 8px '+BF_B,'0px');c.fillStyle=BC.gray;
     c.fillText('Charlotte County Small Business Directory',M,FOOT+14);
+    var logoW=DIYI?16:0;
     var pg='Page '+(pi+1)+' of '+plan.length,pw=c.measureText(pg).width;
-    c.fillText(pg,M+CW-pw,FOOT+14);
+    c.fillText(pg,M+CW-pw-(logoW?logoW+6:0),FOOT+14);
+    if(DIYI)c.drawImage(DIYI,M+CW-logoW,FOOT+4,logoW,logoW);
     var data=cv.toDataURL('image/jpeg',_mob?0.8:0.9);
     out.push({bin:atob(data.split(',')[1]),w:cv.width,h:cv.height,links:links});
     cv.width=1;cv.height=1;
