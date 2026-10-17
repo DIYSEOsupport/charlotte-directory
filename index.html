@@ -328,6 +328,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .navbtn .lbl{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .15s,opacity .15s}
 .navbtn:hover,.navbtn:focus-visible{width:100%}
 .navbtn:hover .lbl,.navbtn:focus-visible .lbl{max-width:160px;opacity:1}
+@media(hover:none){.navbtn{width:100%}.navbtn .lbl{max-width:160px;opacity:1}}
 .modal{position:fixed;inset:0;background:rgba(26,16,51,.6);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
 .modal.show{display:flex}
 .mbox{background:var(--cream);border:4px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:18px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
