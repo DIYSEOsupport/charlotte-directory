@@ -220,7 +220,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   <div class="card done-card" id="done">
     <h1 id="doneH">Confirm your email</h1>
     <p id="doneP">We emailed a confirm link to <b></b>.</p>
-    <p class="note" id="doneExtra">Not listed until you confirm. Check spam if you don't see it.</p>
+    <p class="note" id="doneExtra">Not listed until you confirm. Check email to confirm.</p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
 </div>
@@ -622,11 +622,11 @@ function showDone(flag,emailTo){
     $('doneH').textContent='Confirm your email';
     $('doneP').innerHTML='We emailed a confirm link to <b></b>.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
-    $('doneExtra').textContent='Not listed until you confirm.';
+    $('doneExtra').textContent='Not listed until you confirm. Check email to confirm.';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';
     $('doneP').textContent='Your submission went through.';
-    $('doneExtra').textContent='Check your email for a confirm link. Not there? Check spam.';
+    $('doneExtra').textContent='Not listed until you confirm. Check email to confirm.';
   }
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';

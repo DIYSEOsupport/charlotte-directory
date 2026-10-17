@@ -1364,7 +1364,7 @@ function showPdfReady(blob,name){
   var url=URL.createObjectURL(blob),d=document.createElement('div');d.id='pdfReady';
   var f=null,canShare=false;
   try{f=new File([blob],name,{type:'application/pdf'});canShare=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
-  d.innerHTML='<div class="bx"><h3>Your PDF is ready</h3><p>'+(ios?'Tap Share, then Save to Files.':'Tap to save it to your phone.')+'</p>'
+  d.innerHTML='<div class="bx"><h3>Your PDF is ready</h3>'
     +(canShare?'<button class="go" id="pdfShare" type="button">Share / Save to Files</button>':'')
     +(ios?'':'<a class="go" id="pdfSave" href="'+url+'" download="'+name.replace(/"/g,'')+'">Save PDF</a>')
     +'<button class="go alt" id="pdfOpen" type="button">Open PDF</button>'
