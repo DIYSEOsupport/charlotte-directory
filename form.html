@@ -624,10 +624,6 @@ function showDone(flag,emailTo){
     $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it to confirm.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
     $('doneExtra').textContent='Not listed until you confirm.';
-  }else if(flag==='Pending'){
-    $('doneH').textContent="You're pending!";
-    $('doneP').textContent='Your email is confirmed. We now verify your listing: your website (if any) must load and show your info, and your logo must be clean. This usually takes a few hours and can take up to 12. We will email you the result.';
-    $('doneExtra').textContent='';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';
     $('doneP').textContent='Your submission went through.';
