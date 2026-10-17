@@ -35,11 +35,7 @@ a{color:inherit}
 .hero-row{display:flex;align-items:stretch;gap:8px}
 .hero-row .hero-img{flex:1;min-width:0}
 .menubar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 0 8px;flex-wrap:wrap}
-.menu-toggle{display:flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;border:3px solid var(--ink);border-radius:12px;background:var(--yellow);color:var(--ink);box-shadow:2px 2px 0 var(--ink);cursor:pointer}
-.menu-toggle:active{transform:translate(2px,2px);box-shadow:none}
-.navmenu{display:none}
-.navmenu.show{display:flex;flex-direction:column;gap:4px;margin:0 0 8px;padding:6px;max-width:280px;background:var(--cream);border:3px solid var(--ink);border-radius:12px;box-shadow:4px 4px 0 var(--ink)}
-.navbtn.full{width:100%;grid-column:1/-1}
+.navbtn.icon{width:30px;padding:0!important;justify-content:center}
 #muteRow #muteBtn{background:var(--teal);width:30px;padding:0!important;justify-content:center}
 #searchBtn{background:var(--magenta)}
 #filterBtn{background:var(--orange)}
@@ -317,11 +313,11 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .grid .star{top:14px;right:54px}
 .grid .hidebtn{top:50px;right:54px}
 .grid .pad{padding:8px 14px 16px}
-.navbtn{display:flex;align-items:center;gap:6px;width:100%;height:30px;padding:0 8px!important;border:3px solid var(--ink);border-radius:10px!important;box-shadow:2px 2px 0 var(--ink);font-family:var(--fh)!important;font-weight:400!important;font-size:12px!important;letter-spacing:.5px!important;text-decoration:none;cursor:pointer;position:relative}
+.navbtn{display:flex;align-items:center;gap:6px;width:auto;height:30px;padding:0 8px!important;border:3px solid var(--ink);border-radius:10px!important;box-shadow:2px 2px 0 var(--ink);font-family:var(--fh)!important;font-weight:400!important;font-size:12px!important;letter-spacing:.5px!important;text-decoration:none;cursor:pointer;position:relative}
 .navbtn:active{transform:translate(2px,2px);box-shadow:none}
 .navbtn svg{flex:none}
 .navbtn .lbl{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:1;text-align:left}
-.navgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.navgrid{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .modal{position:fixed;inset:0;background:rgba(26,16,51,.6);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
 .modal.show{display:flex}
 .mbox{background:var(--cream);border:4px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:18px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
@@ -428,15 +424,13 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
 span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
-.addbiz,#printBtn,#dlBtn,#toggleAll,#emailBtn,#muteBtn,#searchBtn,#filterBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
+.addbiz,#dlBtn,#toggleAll,#muteBtn,#searchBtn,#filterBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--teal)!important}
 #dlBtn:hover{box-shadow:0 0 0 4px rgba(31,181,201,.35),2px 2px 0 var(--ink)}
 #toggleAll{background:var(--green)!important}
 #toggleAll:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
-.builtby #emailBtn{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:50px;padding:6px 18px;box-shadow:3px 3px 0 var(--ink)}
-.builtby #emailBtn:hover{background:#fff6dc}
 /* Bangers headings + Walter Turncoat text */
 .title,.sect,.mt,.ptitle,.savedrow .svl,.chip,.catpill,.grid .acts .btn,.btn,.icon-btn .lbl{font-weight:500!important}
 .title{letter-spacing:.3px}
@@ -492,9 +486,9 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
 .builtby{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 16px 32px}
-.builtby a{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:50px;padding:6px 18px 6px 6px;box-shadow:3px 3px 0 var(--ink)}
-.builtby a:hover{background:#fff6dc}
-.builtby img{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
+.builtby a{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800}
+.builtby a:hover{text-decoration:underline}
+.builtby img{width:32px;height:32px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
 </style>
 </head>
 <body>
@@ -508,14 +502,13 @@ input,textarea,select,option,#printArea{text-transform:none}
 </header>
 <div class="controls" id="controls">
   <div class="wrap">
-<div class="menubar"><div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div><button class="menu-toggle" id="menuToggle" type="button" aria-label="Menu" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></div>
-<div class="navmenu" id="navMenu">
-<a class="navbtn addbiz full" href="form.html" aria-label="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add or Update Your Biz</span></a>
+<div class="menubar"><div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
 <div class="navgrid">
-<button class="navbtn" id="searchBtn" type="button" aria-label="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
-<button class="navbtn" id="filterBtn" type="button" aria-label="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
-<button class="navbtn" id="dlBtn" type="button" aria-label="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg><span class="lbl">Download PDF</span></button>
-<button class="navbtn" id="toggleAll" type="button" aria-label="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
+<a class="navbtn icon addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a>
+<button class="navbtn obvious" id="searchBtn" type="button" aria-label="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
+<button class="navbtn obvious" id="filterBtn" type="button" aria-label="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
+<button class="navbtn icon" id="dlBtn" type="button" aria-label="Download PDF" title="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg></button>
+<button class="navbtn icon" id="toggleAll" type="button" aria-label="Expand all" title="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg></button>
 <div id="muteRow"></div>
 </div>
 <div class="pills" id="pills"></div>
@@ -1180,9 +1173,7 @@ function beepBeep(){
     squeeze(t0);squeeze(t0+0.16);
   }catch(e){}
 }
-var loginShown=false;
 function showLoginPop(){
-  if(loginShown)return;loginShown=true;
   $('loginPop').classList.add('show');honk();
 }
 function escH(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -1207,7 +1198,7 @@ function toggleFav(k,el){
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
-  if(favs[k]&&!acct.email&&!hasUser){if(loginShown)honk();else showLoginPop()}
+  if(favs[k]&&!acct.email&&!hasUser){if(loginSkipped)honk();else showLoginPop()}
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
@@ -1778,9 +1769,7 @@ $('shPdf').onclick=function(){var b=shareB;closeShare();if(b)doPdf([b],(b.name.r
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
 
-$('signOut').addEventListener('click',signOut);
-$('menuToggle').addEventListener('click',function(){var show=!$('navMenu').classList.contains('show');$('navMenu').classList.toggle('show',show);this.setAttribute('aria-expanded',show)});
-try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setAcct(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
+$('signOut').addEventListener('click',signOut);try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setAcct(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
 initAcct();
 load();
 setInterval(load,60000);
