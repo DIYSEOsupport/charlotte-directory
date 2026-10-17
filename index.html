@@ -423,7 +423,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .btn{font-size:17px}
 .about.area{font-family:var(--fh);font-weight:400;font-size:19px;letter-spacing:.6px;color:var(--ink)}
 .card.saved .star svg path{fill:#2a6fdb!important;stroke:#1a1033!important}
-.blogo{width:44px;height:44px;flex:none;object-fit:contain;background:#fff;border:2px solid var(--ink);border-radius:10px}
+.blogo{height:44px;width:auto;max-width:44px;flex:none;object-fit:contain;background:#fff;border:2px solid var(--ink);border-radius:10px}
 .icon-btn .lbl,.chip .n,.chip .lbl{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
@@ -450,7 +450,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 /* v26 phone cards, stacked: logo + name on top, category pill and arrow in a row below */
 @media(max-width:640px){
   .grid .card .bar{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo bt bt" "cat cat chev";align-items:center;column-gap:0;row-gap:8px;padding:12px!important}
-  .grid .card .bar .blogo{grid-area:logo;width:50px;height:50px;margin-right:10px;align-self:start}
+  .grid .card .bar .blogo{grid-area:logo;height:50px;width:auto;max-width:50px;margin-right:10px;align-self:start}
   .grid .card .bar .bt{grid-area:bt;min-width:0;flex:none;padding-right:42px!important;align-self:center}
   .grid .card .bar .catpill{grid-area:cat;justify-self:start;align-self:center;margin:0!important;max-width:100%!important;white-space:normal;text-align:left;font-size:12px!important;padding:4px 11px!important;line-height:1.2}
   .grid .card .bar .chev{grid-area:chev;justify-self:end;order:0}

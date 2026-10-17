@@ -67,7 +67,7 @@ button.b:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 button.b.alt{background:#fff;color:var(--ink);text-shadow:none}
 button.b:disabled{opacity:.6;cursor:wait}
 .logo-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.logo-row img{width:64px;height:64px;object-fit:contain;background:#fff;border:3px solid var(--ink);border-radius:12px;display:none}
+.logo-row img{height:64px;width:auto;max-width:64px;object-fit:contain;background:#fff;border:3px solid var(--ink);border-radius:12px;display:none}
 input[type=file]{font:700 14px var(--fb);max-width:100%}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .done-card{text-align:center;display:none}
@@ -92,7 +92,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 .rv dt{font-family:var(--fh);letter-spacing:.6px;font-size:15px;color:var(--purple);margin:6px 0 0}
 .rv dd{margin:0;font-weight:700;font-size:15px;word-break:break-word;text-transform:none}
 .oldlogo{display:none;margin:8px 0 0;align-items:center;gap:12px;flex-wrap:wrap}
-.oldlogo img{width:64px;height:64px;object-fit:contain;background:#fff;border:3px solid var(--ink);border-radius:12px}
+.oldlogo img{height:64px;width:auto;max-width:64px;object-fit:contain;background:#fff;border:3px solid var(--ink);border-radius:12px}
 .oldlogo label{font-weight:800;font-size:14px;cursor:pointer}
 
 /* v27 honk pop-up for form errors */
@@ -226,9 +226,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 
   <div class="card done-card" id="done">
     <h1 id="doneH">You're in!</h1>
-    <p style="text-align:center;font-weight:700;margin:6px 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
     <p id="doneP">Thank you! Your business will appear in the directory.</p>
-    <p class="note" id="doneExtra">Need to update your info later? Sign in with the same Google account and choose "Update my business". Your newest entry will replace the old one.</p>
+    <p class="note" id="doneExtra"></p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
 </div>
@@ -632,8 +631,8 @@ function showDone(flag,emailTo){
     $('doneExtra').textContent='Not listed until you confirm.';
   }else if(flag==='Pending'){
     $('doneH').textContent="You're pending!";
-    $('doneP').textContent='Usually goes live within a few hours. We will email you when it is.';
-    $('doneExtra').textContent='Need to update it later? Sign in and choose "Update my business".';
+    $('doneP').textContent='Your email is confirmed. We now verify your listing: your website (if any) must load and show your info, and your logo must be clean. This usually takes a few hours and can take up to 12. We will email you the result.';
+    $('doneExtra').textContent='';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';
     $('doneP').textContent='Your submission went through. Check your email for a confirm link, or check spam.';
