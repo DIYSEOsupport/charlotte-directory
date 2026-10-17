@@ -133,7 +133,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .fb:hover{background:#1877f2;color:#fff}
 .nd:hover{background:#00b246;color:#fff}
 
-.acct{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.acct{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--ink)}
 .acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:flex-end;min-height:32px}
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
@@ -497,8 +497,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
-  <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div><span id="count">Loading...</span><span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span></div>
-  <div class="status"><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
+  <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
+  <div class="status"><span id="count">Loading...</span><span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 </main>
 
@@ -927,13 +927,10 @@ function computeFacets(){
 var CHEV='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>';
 function facetRank(l){var i=['Category','Contact options','Area Served'].indexOf(l);return i===-1?9:i}
 function buildFilters(){
-  var catDef=facetDefs.filter(function(d){return d.label==='Category'})[0];
-  var tabs='<button class="pill'+(st.cat==='ALL'?' active':'')+'" id="allBtn" type="button" data-cat="ALL">All <span class="n">'+all.length+'</span></button>';
-  if(catDef)tabs+=catDef.values.filter(function(v){return catDef.counts[v]}).map(function(v){return '<button class="pill'+(st.cat===v?' active':'')+'" type="button" data-cat="'+esc(v)+'">'+esc(v)+' <span class="n">'+catDef.counts[v]+'</span></button>'}).join('');
-  $('pills').innerHTML=tabs;
+  $('pills').innerHTML='<button class="pill active" id="allBtn" type="button">All <span class="n">'+all.length+'</span></button>';
   var sc=$('panel').scrollTop;
   var p='<div class="ptitle">Narrow it down!</div>';
-  var order=facetDefs.map(function(d,i){return {d:d,i:i}}).filter(function(o){return o.d.label!=='Category'}).sort(function(a,b){return facetRank(a.d.label)-facetRank(b.d.label)||a.i-b.i});
+  var order=facetDefs.map(function(d,i){return {d:d,i:i}}).sort(function(a,b){return facetRank(a.d.label)-facetRank(b.d.label)||a.i-b.i});
   order.forEach(function(o){
     var d=o.d,fi=o.i,sel=pend.f[d.label]||[],open=!!accOpen[d.label];
     p+='<div class="acc c'+(order.indexOf(o)%3)+(open?' open':'')+'" data-l="'+esc(d.label)+'"><button type="button" class="acch" aria-expanded="'+open+'"><span>'+esc(lbl(d.label))+'</span><span class="selcnt'+(sel.length?' on':'')+'">'+sel.length+'</span>'+CHEV+'</button><div class="accb">'
@@ -1208,11 +1205,7 @@ $('filterBtn').onclick=function(){
   if(o){syncPend();buildFilters();$('panel').classList.add('open');this.classList.add('on');this.setAttribute('aria-expanded','true')}
   else closePanel();
 };
-$('pills').addEventListener('click',function(e){
-  var b=e.target.closest('.pill');if(!b)return;
-  st.cat=b.dataset.cat==='ALL'?'ALL':(st.cat===b.dataset.cat?'ALL':b.dataset.cat);
-  buildFilters();apply();
-});
+$('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))resetAll()});
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
