@@ -108,7 +108,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 @keyframes epIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .builtby{display:flex;align-items:center;justify-content:center;padding:24px 16px 32px}
 .builtby a{display:flex;align-items:center;gap:10px;color:#6b5f8a;text-decoration:none;font-size:13px}
-.builtby img{width:44px;height:44px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
+.builtby img{width:32px;height:32px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
 </style>
 </head>
 <body>
@@ -219,7 +219,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 
   <div class="card done-card" id="done">
     <h1 id="doneH">Confirm your email</h1>
-    <p id="doneP">We emailed a confirm link to <b></b>. Tap it, then we review your listing before it goes live.</p>
+    <p id="doneP">We emailed a confirm link to <b></b>.</p>
     <p class="note" id="doneExtra">Not listed until you confirm. Check spam if you don't see it.</p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
@@ -620,7 +620,7 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   if(flag==='Unconfirmed'){
     $('doneH').textContent='Confirm your email';
-    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it, then we review your listing before it goes live.';
+    $('doneP').innerHTML='We emailed a confirm link to <b></b>.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
     $('doneExtra').textContent='Not listed until you confirm.';
   }else if(flag==='unconfirmed'){
