@@ -146,7 +146,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:flex-start;min-height:32px}
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60;width:max-content;max-width:min(80vw,280px);text-align:center}
 .toast.anchored{z-index:99995}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .totop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
@@ -1116,7 +1116,10 @@ function syncToggleAll(){
   var t=$('toggleAll');if(!t)return;
   var allOpen=view.length>0&&view.every(function(b){return openSet[keyOf(b)]});
   var ic=allOpen?'<path d="M7 14l5-5 5 5M7 19l5-5 5 5"/>':'<path d="M7 5l5 5 5-5M7 10l5 5 5-5"/>';
-  t.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ge)"/><g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 0)">'+ic+'</g></svg>'+(allOpen?'Collapse all':'Expand all');
+  var lbl=allOpen?'Collapse all':'Expand all';
+  t.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic+'</svg>';
+  t.setAttribute('aria-label',lbl);
+  t.title=lbl;
   t.style.display=view.length?'':'none';
 }
 
