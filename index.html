@@ -35,10 +35,18 @@ a{color:inherit}
 .hero-row{display:flex;align-items:stretch;gap:8px}
 .hero-row .hero-img{flex:1;min-width:0}
 .hero-ctrls{display:flex;flex-direction:column;gap:6px;flex:none;justify-content:center}
-.hero-ctrls .icon-btn{height:auto;min-width:40px;padding:6px 10px}
+.hero-ctrls .icon-btn{height:auto;min-width:40px;padding:6px 10px;transition:.15s}
 .hero-ctrls .icon-btn .lbl{display:none}
-.hero-ctrls #muteRow #muteBtn{width:40px;height:34px}
-.hero-count{display:block;text-align:center;font-size:11px;font-weight:800;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:10px;padding:5px 4px;box-shadow:2px 2px 0 var(--ink);line-height:1.15}
+.hero-ctrls #muteRow{order:99}
+.hero-ctrls #muteRow #muteBtn{width:40px;height:34px;transition:.15s}
+.hero-ctrls #searchBtn{background:var(--magenta)}
+.hero-ctrls #searchBtn:hover{box-shadow:0 0 0 4px rgba(194,48,122,.35),var(--shadow)}
+.hero-ctrls #filterBtn{background:var(--orange)}
+.hero-ctrls #filterBtn:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),var(--shadow)}
+.hero-ctrls #muteRow #muteBtn:hover{box-shadow:0 0 0 4px rgba(31,181,201,.35),2px 2px 0 #1a1033}
+.hero-ctrls .pills{display:block;padding:0;overflow:visible}
+.hero-ctrls .pill{display:block;width:100%;text-align:center;background:var(--yellow);transition:.15s}
+.hero-ctrls .pill:hover{background:var(--yellow);box-shadow:0 0 0 4px rgba(255,210,63,.45),2px 2px 0 var(--ink);transform:none}
 .hero-img{display:block;width:100%;max-width:520px;margin:0 auto;height:auto;aspect-ratio:3/1;object-fit:cover;object-position:50% 25%;border:4px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--ink);background:var(--purple)}
 .tagline{display:block;width:fit-content;max-width:100%;margin:-14px auto 0;position:relative;font-family:var(--fh);letter-spacing:1.5px;font-size:clamp(18px,4.6vw,26px);background:var(--yellow);color:var(--ink);border:3px solid var(--ink);border-radius:10px;padding:4px 18px;box-shadow:3px 3px 0 var(--ink);transform:rotate(-1.5deg);text-align:center}
 
@@ -489,8 +497,9 @@ input,textarea,select,option,#printArea{text-transform:none}
     <div class="hero-ctrls">
       <button class="icon-btn" id="searchBtn" aria-label="Search" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
       <button class="icon-btn" id="filterBtn" aria-label="Filters" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
+      <div class="pills" id="pills"></div>
+      <span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span>
       <div id="muteRow"></div>
-      <span id="count" class="hero-count">Loading...</span><span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span>
     </div>
   </div>
   <span class="tagline">Small business directory</span>
@@ -504,7 +513,6 @@ input,textarea,select,option,#printArea{text-transform:none}
       <button class="clear" id="clear" aria-label="Clear search">&times;</button>
     </div>
     <div class="panel" id="panel"></div>
-    <div class="pills" id="pills"></div>
   </div>
 </div>
 
@@ -994,7 +1002,7 @@ function apply(){
   render();
   var n=(st.fav?1:0)+(st.showHidden?1:0);for(var l in st.f)n+=(st.f[l]||[]).length;
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
-  $('count').innerHTML='<b>'+view.length+'</b> of '+all.length+' businesses';
+  var allN=document.querySelector('#allBtn .n');if(allN)allN.textContent=view.length===all.length?all.length:(view.length+' of '+all.length);
   $('clear').classList.toggle('show',!!st.q);
 }
 
