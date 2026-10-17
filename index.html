@@ -87,8 +87,9 @@ a{color:inherit}
 .chip.fav.active{background:var(--magenta);color:#fff}
 
 .status{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#fff;font-weight:800;padding:8px 2px 6px;text-shadow:1px 1px 0 var(--ink),-1px -1px 0 var(--ink),1px -1px 0 var(--ink),-1px 1px 0 var(--ink)}
-.status button{background:var(--yellow);border:3px solid var(--ink);border-radius:50px;color:var(--ink);font-weight:800;font-size:12px;cursor:pointer;padding:6px 14px;text-shadow:none;box-shadow:2px 2px 0 var(--ink)}
-.status button:active{transform:translate(2px,2px);box-shadow:none}
+.status button:not(.navbtn){background:var(--yellow);border:3px solid var(--ink);border-radius:50px;color:var(--ink);font-weight:800;font-size:12px;cursor:pointer;padding:6px 14px;text-shadow:none;box-shadow:2px 2px 0 var(--ink)}
+.status button{cursor:pointer}
+.navbtn:active,.status button:active{transform:translate(2px,2px);box-shadow:none}
 
 /* grid + cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:4px 4px 100px}
@@ -319,9 +320,11 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .grid .star{top:14px;right:54px}
 .grid .hidebtn{top:50px;right:54px}
 .grid .pad{padding:8px 14px 16px}
-.stbtns{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;justify-content:flex-end}
+.stbtns{display:flex;flex-direction:column;gap:6px;width:100%;max-width:220px;margin-left:auto}
 .status{flex-wrap:wrap}
-.status button{padding:6px 12px}
+.navbtn{display:flex;align-items:center;gap:8px;width:100%;height:38px;padding:0 14px!important;border:3px solid var(--ink);border-radius:12px!important;box-shadow:2px 2px 0 var(--ink);font-family:var(--fb)!important;font-weight:800!important;font-size:13px!important;letter-spacing:normal!important;text-decoration:none;cursor:pointer;transition:.15s}
+.navbtn:active{transform:translate(2px,2px);box-shadow:none}
+.navbtn svg{flex:none}
 .modal{position:fixed;inset:0;background:rgba(26,16,51,.6);display:none;align-items:center;justify-content:center;z-index:80;padding:20px}
 .modal.show{display:flex}
 .mbox{background:var(--cream);border:4px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:18px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
@@ -428,20 +431,19 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
 span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
-.addbiz{text-shadow:1px 1px 0 var(--ink);font-weight:400;display:inline-flex;align-items:center;gap:6px;font-family:var(--fh);letter-spacing:.8px;font-size:16px;color:#fff;text-decoration:none;background:var(--orange);border:3px solid var(--ink);border-radius:50px;padding:5px 14px;box-shadow:2px 2px 0 var(--ink);transition:.15s}
+.addbiz,#printBtn,#dlBtn,#toggleAll,#emailBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
+.addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
-#printBtn,#dlBtn,#toggleAll,#emailBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink);transition:.15s}
 #printBtn{background:var(--teal)!important}
 #printBtn:hover{box-shadow:0 0 0 4px rgba(31,181,201,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--magenta)!important}
 #dlBtn:hover{box-shadow:0 0 0 4px rgba(194,48,122,.35),2px 2px 0 var(--ink)}
 #toggleAll{background:var(--green)!important}
 #toggleAll:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
-#emailBtn{background:var(--purple)!important;text-decoration:none;display:inline-flex;align-items:center;border:3px solid var(--ink);border-radius:50px;padding:6px 14px;box-shadow:2px 2px 0 var(--ink);font-weight:800;font-size:12px}
-#emailBtn:active{transform:translate(2px,2px);box-shadow:none}
+#emailBtn{background:var(--purple)!important}
 #emailBtn:hover{box-shadow:0 0 0 4px rgba(91,42,134,.35),2px 2px 0 var(--ink)}
 /* Bangers headings + Walter Turncoat text */
-.title,.sect,.mt,.ptitle,.savedrow .svl,.addbiz,.status button,.chip,.catpill,.grid .acts .btn,.btn,.icon-btn .lbl{font-weight:500!important}
+.title,.sect,.mt,.ptitle,.savedrow .svl,.chip,.catpill,.grid .acts .btn,.btn,.icon-btn .lbl{font-weight:500!important}
 .title{letter-spacing:.3px}
 @media(max-width:430px){#searchBtn .lbl{display:none}}
 body{text-transform:uppercase}
@@ -531,7 +533,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
   <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
-  <div class="status"><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button><a id="emailBtn" href="mailto:DIYSEO.support@gmail.com">Help</a></span></div>
+  <div class="status"><span class="stbtns"><a class="navbtn addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button class="navbtn" id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button class="navbtn" id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button class="navbtn" id="toggleAll" type="button">Expand all</button><a class="navbtn" id="emailBtn" href="mailto:DIYSEO.support@gmail.com">✉️ Help</a></span></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 </main>
 
