@@ -218,8 +218,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   </form>
 
   <div class="card done-card" id="done">
-    <h1 id="doneH">One more step!</h1>
-    <p id="doneP">We emailed a confirm link to <b></b>. Tap it to confirm your business.</p>
+    <h1 id="doneH">Confirm your email</h1>
+    <p id="doneP">We emailed a confirm link to <b></b>. Tap it, then we review your listing before it goes live.</p>
     <p class="note" id="doneExtra">Not listed until you confirm. Check spam if you don't see it.</p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
@@ -619,8 +619,8 @@ $('f').addEventListener('submit',function(e){
 });
 function showDone(flag,emailTo){
   if(flag==='Unconfirmed'){
-    $('doneH').textContent='One more step!';
-    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it to confirm.';
+    $('doneH').textContent='Confirm your email';
+    $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it, then we review your listing before it goes live.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
     $('doneExtra').textContent='Not listed until you confirm.';
   }else if(flag==='unconfirmed'){
