@@ -141,11 +141,18 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
           <div class="opts" id="modeopts">
             <button type="button" class="opt" id="modeNew"><span class="bx"></span><span>New business</span></button>
             <button type="button" class="opt" id="modeUpd"><span class="bx"></span><span>Update my business</span></button>
+            <button type="button" class="opt" id="modeDel" style="display:none"><span class="bx"></span><span>Remove my business</span></button>
           </div>
           <div class="biglist" id="bizlist" style="display:none"></div>
           <div class="err" id="modeerr">Pick one to continue.</div>
         </div>
         <button type="button" class="b alt" id="modeRetry" style="display:none;margin-top:8px;font-size:16px;min-height:38px;padding:4px 14px">Try again</button>
+      </div>
+      <div class="fld" id="delConfirm" style="display:none">
+        <span class="l">Remove this listing?</span>
+        <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
+        <p class="note">This takes it off the directory right away. Message DIYSEO.support@gmail.com if you want it back.</p>
+        <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
       </div>
       <h2 style="margin-top:6px">Contact info for person completing form</h2>
       <p class="note">Not published. We only use this if we have questions about your submission.</p>
@@ -166,7 +173,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" id="otherfld" style="display:none"><label class="l" for="other">Other details</label><textarea id="other" style="min-height:76px"></textarea></div>
       <div class="fld" data-req id="typefld"><span class="l">About your business <span class="req">*</span></span>
         <div class="opts" id="types"></div>
-        <div class="sub" id="typeother" style="display:none!important"></div>
+        <div class="sub" id="typeother"><div class="fld"><label class="l" for="typeOtherTxt">Other details</label><textarea id="typeOtherTxt" style="min-height:76px"></textarea></div></div>
         <div class="err">Choose one.</div></div>
       <div class="fld" data-req id="descfld"><label class="l" for="desc">Describe your business <span class="req">*</span></label><div class="help">A few sentences. Shown in the directory.</div><textarea id="desc" maxlength="400"></textarea><div class="cnt"><span id="dcnt">0</span>/400</div><div class="err">Describe your business.</div></div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Next</button></div>
@@ -237,7 +244,7 @@ var TYPES=['Physical Location','Online Only','Mobile Service (landscaping, house
 var AREAS=['Charlotte County','Lee County','Sarasota County','Other'];
 var NAMES=['About you','Business','Contact','Optional','Review'];
 var catOther=false;
-function syncOther(){var t=$('typeother'),a=$('areaother'),sh=catOther||(t&&t.classList.contains('show'))||(a&&a.classList.contains('show')&&$('areafld').closest('.sub')&&$('areafld').closest('.sub').classList.contains('show'));$('otherfld').style.display=sh?'':'none'}
+function syncOther(){$('otherfld').style.display=catOther?'':'none'}
 function syncCat(c){catOther=c==='Other';syncOther()}
 var step=0,logoData='',logoName='',idToken='';
 var bizList=null,mode='',origName='',origLogoId='';
@@ -417,12 +424,13 @@ function resetMode(){
   $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');
   $('oldlogo').style.display='none';$('dellogo').checked=false;
 }
-function sendToScript(payload,done){
+function sendToScript(payload,done,wantKind){
+  wantKind=wantKind||'mine';
   var fin=false,timer=null;
   function onMsg(ev){
     var host=String(ev.origin||'').replace(/^https?:\/\//,'');
     if(!/(googleusercontent|google)\.com$/.test(host))return;
-    var m=ev.data;if(!m||!m.dirForm||m.kind!=='mine')return;
+    var m=ev.data;if(!m||!m.dirForm||m.kind!==wantKind)return;
     window.removeEventListener('message',onMsg);clearTimeout(timer);
     if(!fin){fin=true;done(m)}
   }
@@ -486,7 +494,7 @@ function setRadio(name,value){
   if(any)any.dispatchEvent(new Event('change',{bubbles:true}));
 }
 function clearBiz(){
-  ['biz','pubname','pubtitle','other','desc','phone','web','email','street','street2','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
+  ['biz','pubname','pubtitle','other','typeOtherTxt','desc','phone','web','email','street','street2','city','state','zip','areatext','fb','ndb','ndp','slogan'].forEach(function(id){$(id).value=''});
   qa('input[name="cat"],input[name="btype"],input[name="area"]').forEach(function(i){i.checked=false});
   ['cats','types','areas'].forEach(function(g){var b=$(g);b.dispatchEvent(new Event('change',{bubbles:true}))});
   $('dcnt').textContent='0';
@@ -531,7 +539,7 @@ function renderReview(){
   else if(origLogoId)logo='Keep current logo';
   var sec=[
     ['1. About you',row('Name (private)',$('name').value.trim())+row('Title (private)',$('title').value.trim())+row('How to contact you (private)',$('how').value.trim())],
-    ['2. Business',row('Business name',$('biz').value.trim())+row('Public contact name',$('pubname').value.trim())+row('Public contact title',$('pubtitle').value.trim())+row('Category',val('cat'))+($('otherfld').style.display==='none'?'':row('Other details',$('other').value.trim()))+row('About your business',t)+row('Describe your business',$('desc').value.trim())],
+    ['2. Business',row('Business name',$('biz').value.trim())+row('Public contact name',$('pubname').value.trim())+row('Public contact title',$('pubtitle').value.trim())+row('Category',val('cat'))+($('otherfld').style.display==='none'?'':row('Other details',$('other').value.trim()))+row('About your business',t)+(t==='Other'?row('Other details',$('typeOtherTxt').value.trim()):'')+row('Describe your business',$('desc').value.trim())],
     ['3. Contact',row('Business phone',maskPhone($('phone').value))+row('Website',fixUrl($('web').value))+row('Email for customers',$('email').value.trim())+(phys?row('Street',$('street').value.trim())+row('Suite / Unit',$('street2').value.trim())+row('City',$('city').value.trim())+row('State',$('state').value.trim())+row('Zip',$('zip').value.trim()):'')+(mob?row('Area served',a):'')],
     ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Slogan',$('slogan').value.trim())+row('Logo',logo)]
   ];
@@ -572,7 +580,7 @@ $('f').addEventListener('submit',function(e){
     idToken:idToken,name:$('name').value.trim(),title:$('title').value.trim(),how:$('how').value.trim(),
     businessName:$('biz').value.trim(),pubName:$('pubname').value.trim(),pubTitle:$('pubtitle').value.trim(),
     category:val('cat'),about:'',other:($('otherfld').style.display==='none'?'':$('other').value.trim()),
-    describe:t==='Other'?$('desc').value.trim().slice(0,400):t+'\n\n'+$('desc').value.trim().slice(0,400),
+    describe:t==='Other'?($('typeOtherTxt').value.trim()+'\n\n'+$('desc').value.trim()).trim().slice(0,400):t+'\n\n'+$('desc').value.trim().slice(0,400),
     street:'',street2:'',city:'',state:'',zip:'',area:'',
     phone:maskPhone($('phone').value),website:fixUrl($('web').value),email:$('email').value.trim().toLowerCase(),
     facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),slogan:$('slogan').value.trim(),
@@ -617,10 +625,10 @@ function showDone(flag,emailTo){
     $('doneH').textContent='One more step!';
     $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it to confirm.';
     $('doneP').getElementsByTagName('b')[0].textContent=emailTo||'you';
-    $('doneExtra').textContent='Not listed until you confirm. Goes live within 12 hours after.';
+    $('doneExtra').textContent='Not listed until you confirm.';
   }else if(flag==='Pending'){
     $('doneH').textContent="You're pending!";
-    $('doneP').textContent='Goes live within 12 hours. We will email you when it is.';
+    $('doneP').textContent='Usually goes live within a few hours. We will email you when it is.';
     $('doneExtra').textContent='Need to update it later? Sign in and choose "Update my business".';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';

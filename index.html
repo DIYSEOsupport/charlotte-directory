@@ -38,7 +38,7 @@ a{color:inherit}
 /* sticky controls */
 .controls{position:sticky;top:0;z-index:20;background:var(--cream);border-bottom:4px solid var(--ink);padding:6px 0 6px;padding-top:calc(6px + env(safe-area-inset-top));margin-top:8px;transition:.2s}
 .controls.mini{padding-bottom:0}
-.controls.mini .pills,.controls.mini #muteRow{display:none}
+.controls.mini .pills{display:none}
 .controls.mini .row{margin-bottom:0}
 .controls.mini .row .lbl{display:none}
 .row{display:flex;gap:8px;align-items:center}
@@ -109,6 +109,9 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .err i{color:var(--red)}
 .skel{height:190px;border-radius:18px;border:4px solid var(--ink);background:linear-gradient(100deg,#fff6dc 30%,#ffe3a0 50%,#fff6dc 70%);background-size:300% 100%;animation:sh 1.3s linear infinite;box-shadow:6px 6px 0 var(--ink)}
 @keyframes sh{to{background-position:-300% 0}}
+.refresh-spin{display:none;width:16px;height:16px;border:3px solid #e8d9c2;border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;margin-left:6px;vertical-align:-3px}
+.refresh-spin.on{display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* detail sheet */
 .scrim{position:fixed;inset:0;background:rgba(26,16,51,.75);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -128,7 +131,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .fb:hover{background:#1877f2;color:#fff}
 .nd:hover{background:#00b246;color:#fff}
 
-.acct{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--ink)}
+.acct{margin:10px 0 0;font-size:12px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:flex-end;min-height:32px}
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
@@ -460,10 +463,10 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
-.builtby{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 16px 32px;font-size:14px;color:#6b5f8a}
-.builtby a{display:flex;align-items:center;gap:10px;color:#6b5f8a;text-decoration:none}
-.builtby a:hover{text-decoration:underline}
-.builtby img{width:48px;height:48px;border-radius:9px;object-fit:cover}
+.builtby{display:flex;align-items:center;justify-content:center;padding:24px 16px 32px}
+.builtby a{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800;background:#fff;border:3px solid var(--ink);border-radius:50px;padding:6px 18px 6px 6px;box-shadow:3px 3px 0 var(--ink)}
+.builtby a:hover{background:#fff6dc}
+.builtby img{width:44px;height:44px;border-radius:50%;object-fit:contain;background:#fff;flex:none}
 </style>
 </head>
 <body>
@@ -482,7 +485,6 @@ input,textarea,select,option,#printArea{text-transform:none}
         <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Search" aria-label="Search businesses">
         <button class="clear" id="clear" aria-label="Clear search">&times;</button>
       </div>
-      <button class="icon-btn" id="searchBtn" type="button" aria-label="Search" style="background:var(--orange)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
       <button class="icon-btn" id="filterBtn" aria-label="Filters" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
     </div>
     <div id="muteRow"></div>
@@ -493,8 +495,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
-  <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
-  <div class="status"><span id="count">Loading...</span><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
+  <div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div><span id="count">Loading...</span><span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span></div>
+  <div class="status"><span class="stbtns"><a class="addbiz" href="form.html"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#ga)"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>Add or Update Your Biz</a><button id="printBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#gp)"/><rect x="8" y="3.5" width="8" height="6" fill="#fff"/><rect x="4.5" y="9.5" width="15" height="7" rx="1.5" fill="#fff"/><rect x="8" y="14.5" width="8" height="6" fill="#fff" stroke="#f2500f" stroke-width="1"/><circle cx="17" cy="12" r="0.9" fill="#f2500f"/></svg>Print</button><button id="dlBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffb43a"/><stop offset="1" stop-color="#f2500f"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#gd)"/><path d="M7.5 5.5h5.5l3.5 3.5v2.5M7.5 5.5v13h5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M16.2 12.5v6M13.4 16l2.8 3 2.8-3" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Download</button><button id="toggleAll" type="button">Expand all</button></span></div>
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 </main>
 
@@ -504,7 +506,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div id="printArea"></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
-<div class="builtby"><a href="https://diyseo.support.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
+<div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -865,9 +867,11 @@ function load(){
   if(!all.length){
     try{var c=localStorage.getItem('ccdir-data');if(c){lastRaw=c;showData(JSON.parse(c))}}catch(e){}
   }
+  if(all.length)$('refreshSpin').classList.add('on');
   Papa.parse(CSV_URL+(CSV_URL.indexOf('?')>-1?'&':'?')+'t='+Date.now(),{
     download:true,header:false,skipEmptyLines:true,
     complete:function(res){
+      $('refreshSpin').classList.remove('on');
       var raw='';try{raw=JSON.stringify(res.data||[])}catch(e){}
       if(raw&&raw===lastRaw&&all.length)return;
       lastRaw=raw;
@@ -875,6 +879,7 @@ function load(){
       try{if(raw)localStorage.setItem('ccdir-data',raw)}catch(e){}
     },
     error:function(){
+      $('refreshSpin').classList.remove('on');
       if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
     }
   });
@@ -920,10 +925,13 @@ function computeFacets(){
 var CHEV='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>';
 function facetRank(l){var i=['Category','Contact options','Area Served'].indexOf(l);return i===-1?9:i}
 function buildFilters(){
-  $('pills').innerHTML='<button class="pill active" id="allBtn" type="button">All <span class="n">'+all.length+'</span></button>';
+  var catDef=facetDefs.filter(function(d){return d.label==='Category'})[0];
+  var tabs='<button class="pill'+(st.cat==='ALL'?' active':'')+'" id="allBtn" type="button" data-cat="ALL">All <span class="n">'+all.length+'</span></button>';
+  if(catDef)tabs+=catDef.values.filter(function(v){return catDef.counts[v]}).map(function(v){return '<button class="pill'+(st.cat===v?' active':'')+'" type="button" data-cat="'+esc(v)+'">'+esc(v)+' <span class="n">'+catDef.counts[v]+'</span></button>'}).join('');
+  $('pills').innerHTML=tabs;
   var sc=$('panel').scrollTop;
   var p='<div class="ptitle">Narrow it down!</div>';
-  var order=facetDefs.map(function(d,i){return {d:d,i:i}}).sort(function(a,b){return facetRank(a.d.label)-facetRank(b.d.label)||a.i-b.i});
+  var order=facetDefs.map(function(d,i){return {d:d,i:i}}).filter(function(o){return o.d.label!=='Category'}).sort(function(a,b){return facetRank(a.d.label)-facetRank(b.d.label)||a.i-b.i});
   order.forEach(function(o){
     var d=o.d,fi=o.i,sel=pend.f[d.label]||[],open=!!accOpen[d.label];
     p+='<div class="acc c'+(order.indexOf(o)%3)+(open?' open':'')+'" data-l="'+esc(d.label)+'"><button type="button" class="acch" aria-expanded="'+open+'"><span>'+esc(lbl(d.label))+'</span><span class="selcnt'+(sel.length?' on':'')+'">'+sel.length+'</span>'+CHEV+'</button><div class="accb">'
@@ -976,7 +984,6 @@ function apply(){
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
   $('count').innerHTML='<b>'+view.length+'</b> of '+all.length+' businesses';
   $('clear').classList.toggle('show',!!st.q);
-  var ab=$('allBtn');if(ab)ab.classList.toggle('active',!st.q.trim()&&!st.fav&&n===0);
 }
 
 function hl(text){
@@ -1053,7 +1060,7 @@ function render(){
     if(lk.length)h+='<div class="links">'+lk.join('')+'</div>';
     /* 3. physical address with map icon link */
     var addrText=[b.addressLine,b.cityStateZip].filter(Boolean).join('\n');
-    var showArea=b.area&&!/online only/i.test(b.mode||'');
+    var showArea=b.area&&/mobile service/i.test(b.mode||'');
     if(b.contact)h+='<div><div class="sect">'+esc(lbl('Contact'))+'</div><div class="about area">'+esc(b.contact)+'</div></div>';
     if(addrText){
       h+='<div><div class="sect">'+esc(lbl('Location'))+'</div>';
@@ -1158,7 +1165,7 @@ $('lpGo').onclick=function(){
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 function toggleFav(k,el){
-  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Contact for help!',el);beepBeep();return}
+  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Keep our info handy!',el);beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
@@ -1192,7 +1199,6 @@ function resetAll(){
 var tm;
 $('q').addEventListener('input',e=>{clearTimeout(tm);tm=setTimeout(()=>{st.q=e.target.value;apply()},150)});
 function doSearch(){clearTimeout(tm);st.q=$('q').value;apply();$('q').blur()}
-$('searchBtn').onclick=doSearch;
 $('q').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doSearch()}});
 $('clear').onclick=()=>{$('q').value='';st.q='';apply();$('q').focus()};
 $('filterBtn').onclick=function(){
@@ -1200,7 +1206,11 @@ $('filterBtn').onclick=function(){
   if(o){syncPend();buildFilters();$('panel').classList.add('open');this.classList.add('on');this.setAttribute('aria-expanded','true')}
   else closePanel();
 };
-$('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))resetAll()});
+$('pills').addEventListener('click',function(e){
+  var b=e.target.closest('.pill');if(!b)return;
+  st.cat=b.dataset.cat==='ALL'?'ALL':(st.cat===b.dataset.cat?'ALL':b.dataset.cat);
+  buildFilters();apply();
+});
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
@@ -1266,7 +1276,7 @@ function bizRows(b){
   if(b.nextdoors.length)r.push([lbl('Nextdoor'),b.nextdoors.map(linkText).join(' | ')]);
   var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
   if(addr)r.push([lbl('Address'),addr]);
-  if(b.area&&!/online only/i.test(b.mode||''))r.push([lbl('Area Served'),b.area]);
+  if(b.area&&/mobile service/i.test(b.mode||''))r.push([lbl('Area Served'),b.area]);
   if(b.category&&b.category!=='Local Business')r.push([lbl('Category'),b.category]);
   if(b.description)r.push([lbl('About'),b.description]);
   Object.keys(b.extra).forEach(function(h){r.push([lbl(h),b.extra[h]])});
@@ -1326,25 +1336,7 @@ function showPdfReady(blob,name){
   var sv=d.querySelector('#pdfSave');if(sv)sv.addEventListener('click',function(){setTimeout(close,1500)});
 }
 function saveBlob(blob,name){
-  var ua=navigator.userAgent;
-  var mobile=/Android|iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
-  function viaLink(){
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
-    document.body.appendChild(a);a.click();
-    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},60000);
-  }
-  if(mobile){
-    showPdfReady(blob,name);return;
-    try{
-      var f=new File([blob],name,{type:blob.type||'application/octet-stream'});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){
-        navigator.share({files:[f],title:name}).catch(function(e){if(!e||e.name!=='AbortError')location.href=URL.createObjectURL(blob)});
-        return;
-      }
-    }catch(e){}
-    if(/iPhone|iPad|iPod/i.test(ua)||/Macintosh/.test(ua)){location.href=URL.createObjectURL(blob);return}
-  }
-  viaLink();
+  showPdfReady(blob,name);
 }
 function pdfClean(t){
   return String(t==null?'':t).replace(/[\ud800-\udbff][\udc00-\udfff]/g,'').replace(/[\u2018\u2019]/g,"'").replace(/[\u201c\u201d]/g,'"').replace(/[\u2013\u2014]/g,'-').replace(/\u2026/g,'...').replace(/[\u00a0\t]/g,' ').replace(/[^\x20-\x7e\xa1-\xff]/g,'');
@@ -1468,7 +1460,7 @@ async function buildPdfCanvas(list,keepPages){
     if(b.contact)right.push(field('CONTACT',[{t:b.contact}]));
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join('\n');
     if(addr)right.push(field('ADDRESS',[{t:addr,u:mapUrl(b)}]));
-    if(b.area&&!/online only/i.test(b.mode||''))right.push(field('MOBILE SERVICE AREA',[{t:b.area}]));
+    if(b.area&&/mobile service/i.test(b.mode||''))right.push(field('MOBILE SERVICE AREA',[{t:b.area}]));
     function colH(c){return c.reduce(function(s,f){return s+f.h},0)}
     var gh=Math.max(colH(left),colH(right));
     if(gh){
@@ -1645,7 +1637,7 @@ function contactText(b){
   if(b.reviews)L.push('\u2B50 Google reviews: '+fmtUrl(b.reviews));
   var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
   if(addr){L.push('\uD83D\uDCCD '+addr);var mu2=mapUrl(b);if(mu2)L.push('\uD83D\uDDFA\uFE0F Map: '+mu2)}
-  if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Mobile service area: '+b.area);
+  if(b.area&&/mobile service/i.test(b.mode||''))L.push('\uD83D\uDE97 Mobile service area: '+b.area);
   L.push('');
   L.push('\uD83D\uDCC7 Save contact: https://diyseosupport.github.io/charlotte-directory/?card='+encodeURIComponent(b.name));
   L.push('');
@@ -1674,6 +1666,7 @@ function vcard(b){
   b.nextdoors.forEach(function(x){v.push('URL:'+fmtUrl(x))});
   if(b._photo){var ph='PHOTO;ENCODING=b;TYPE=JPEG:'+b._photo,fold=[];while(ph.length>72){fold.push(ph.slice(0,72));ph=' '+ph.slice(72)}fold.push(ph);v.push(fold.join('\r\n'))}
   if(b.addressLine||b.city||b.state||b.zip)v.push('ADR;TYPE=WORK:;;'+vEsc((b.addressLine||'').replace(/\n/g,', '))+';'+vEsc(b.city)+';'+vEsc(b.state)+';'+vEsc(b.zip)+';');
+  if(b.description)v.push('NOTE:'+vEsc(b.description));
   v.push('END:VCARD');
   return v.join('\r\n');
 }
@@ -1714,7 +1707,7 @@ $('shCard').onclick=async function(){
     /* Android: open the Contacts app "new contact" screen, filled in */
     var P=function(k,v){return v?';S.'+k+'='+encodeURIComponent(v):''};
     var ph=b.phones.map(function(x){return x.replace(/\s*ext.*$/i,'')});
-    var note=[b.slogan||'',b.websites.map(fmtUrl).join('\n'),b.facebook?fmtUrl(b.facebook):'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
+    var note=[b.slogan||'',b.websites.map(fmtUrl).join('\n'),b.facebook?fmtUrl(b.facebook):'',b.area&&/mobile service/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
     var u='intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact'
       +P('name',b.name)+P('company',(b.contact||'').split(',')[0].trim())
