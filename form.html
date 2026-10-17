@@ -218,13 +218,13 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   </form>
 
   <div class="card done-card" id="done">
-    <h1 id="doneH">You're in!</h1>
-    <p id="needHelp" style="text-align:center;font-weight:700;margin:6px 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
-    <p id="doneP">Thank you! Your business will appear in the directory.</p>
-    <p class="note" id="doneExtra"></p>
+    <h1 id="doneH">One more step!</h1>
+    <p id="doneP">We emailed a confirm link to <b></b>. Tap it to confirm your business.</p>
+    <p class="note" id="doneExtra">Not listed until you confirm. Check spam if you don't see it.</p>
     <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
   </div>
 </div>
+<p id="needHelp" style="text-align:center;font-weight:700;margin:14px 0 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
 <div class="navtabs"><a href="mailto:DIYSEO.support@gmail.com">✉️ Help</a><a href="index.html">📋 Directory</a></div>
 <div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
@@ -311,7 +311,7 @@ pick('types','btype',TYPES,syncType);
 function areaVals(){return qa('input[name="area"]:checked').map(function(i){return i.value})}
 $('desc').addEventListener('input',function(){$('dcnt').textContent=this.value.length});
 $('phone').addEventListener('input',function(){this.value=maskPhone(this.value)});
-$('how').addEventListener('blur',function(){if(this.value.indexOf('@')===-1&&this.value.replace(/\D/g,'').length>=10)this.value=maskPhone(this.value)});
+$('how').addEventListener('input',function(){if(this.value.indexOf('@')===-1&&/\d/.test(this.value))this.value=maskPhone(this.value)});
 $('email').addEventListener('blur',function(){this.value=this.value.trim().toLowerCase()});
 $('state').addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z]/g,'')});
 $('zip').addEventListener('input',function(){this.value=this.value.replace(/\D/g,'')});
@@ -618,7 +618,6 @@ $('f').addEventListener('submit',function(e){
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
 });
 function showDone(flag,emailTo){
-  $('needHelp').style.display=flag==='unconfirmed'?'none':'';
   if(flag==='Unconfirmed'){
     $('doneH').textContent='One more step!';
     $('doneP').innerHTML='We emailed a confirm link to <b></b>. Tap it to confirm.';
