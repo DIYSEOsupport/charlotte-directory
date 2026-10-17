@@ -57,8 +57,10 @@ a{color:inherit}
 .pills{display:flex;gap:8px;overflow-x:auto;padding:12px 4px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .pills::-webkit-scrollbar{display:none}
 .pill{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:50px;border:3px solid var(--ink);background:#fff;color:var(--ink);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;box-shadow:2px 2px 0 var(--ink);transition:.1s}
-.pill:hover{background:#ffe9b8}
+.pill:hover{background:#ffe9b8;transform:translateY(-1px);box-shadow:3px 4px 0 var(--ink)}
+.pill:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
 .pill.active{background:var(--orange);color:#fff;text-shadow:1px 1px 0 var(--ink);transform:translate(1px,1px) rotate(-1deg)}
+.pill.active:hover{transform:translate(1px,1px) rotate(-1deg)}
 .pill .n{opacity:.7;font-weight:700}
 
 .panel{display:none;gap:8px;flex-wrap:wrap;padding:12px 4px 4px}
@@ -434,8 +436,8 @@ input,textarea,select,option,#printArea{text-transform:none}
   .grid .bt .slogan{overflow-wrap:anywhere}
 }
 /* v26 login pop-up */
-#muteRow{display:flex;justify-content:flex-end;margin:8px 0 0}
-#muteRow #muteBtn{position:static;width:36px;height:36px;font-size:18px}
+#muteRow{display:flex}
+#muteRow #muteBtn{position:static;width:50px;height:50px;font-size:18px}
 #muteBtn{position:fixed;left:10px;bottom:10px;z-index:99990;width:40px;height:40px;border-radius:50%;border:3px solid #1a1033;background:#ffd23f;box-shadow:2px 2px 0 #1a1033;font-size:20px;line-height:1;cursor:pointer;padding:0}
 #muteBtn.off{background:#ddd}
 @media print{#muteBtn{display:none}}
@@ -486,8 +488,8 @@ input,textarea,select,option,#printArea{text-transform:none}
         <button class="clear" id="clear" aria-label="Clear search">&times;</button>
       </div>
       <button class="icon-btn" id="filterBtn" aria-label="Filters" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="lbl">Filters</span><span class="badge" id="badge"></span></button>
+      <div id="muteRow"></div>
     </div>
-    <div id="muteRow"></div>
     <div class="panel" id="panel"></div>
     <div class="pills" id="pills"></div>
   </div>
