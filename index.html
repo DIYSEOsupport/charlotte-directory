@@ -676,7 +676,7 @@ function initAcct(){
     setTimeout(initAcct,300);return;
   }
   google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:function(r){setAcct(r.credential)},auto_select:!!hasUser});
-  google.accounts.id.renderButton($('gbtn'),{theme:'outline',size:'medium',text:'signin_with',shape:'pill'});
+  google.accounts.id.renderButton($('gbtn'),{type:'icon',theme:'outline',size:'medium',shape:'circle'});
   if(hasUser)google.accounts.id.prompt();
 }
 
