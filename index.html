@@ -430,6 +430,7 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--green)!important}
+#chooser #chAll{background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 #shareBox #shCard{background:var(--orange)}
 #shareBox #shEmail{background:var(--teal)}
 #shareBox #shText{background:var(--magenta)}
@@ -493,7 +494,25 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady p{margin:0 0 14px;font-size:15px}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
-@media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
+@media print{@page{size:letter;margin:0}html,body{margin:0!important;padding:0!important;background:#fff!important}#printArea img.pp{display:block;width:8.5in;height:10.99in;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
+/* compact filters panel */
+.panel.open{padding:8px 10px 0;margin:8px 2px 4px}
+.acc{margin-bottom:6px;border-radius:12px}
+.acch{min-height:38px;font-size:16px;padding:0 10px}
+.acch svg{width:24px;height:24px;padding:4px}
+.accb{padding:2px 12px 4px}
+.opt{min-height:34px}
+.opt input{width:20px;height:20px}
+.accb .opt>span:not(.oc){font-size:15px!important}
+.savedrow{min-height:38px;margin-bottom:6px;padding:0 10px;border-radius:12px}
+.savedrow .svl{font-size:16px}
+.savedrow input{width:22px;height:22px}
+.savedrow.sv1{background:var(--magenta)}
+.savedrow.sv2{background:var(--green)}
+.savedrow.sv1 .svl,.savedrow.sv2 .svl{color:#fff;text-shadow:1px 1px 0 var(--ink)}
+#unhideAll{min-height:36px!important;font-size:15px!important;margin-bottom:6px!important;background:var(--purple);color:#fff;text-shadow:1px 1px 0 var(--ink)}
+.applybar{padding:8px 12px;margin-top:2px}
+.applybar .btn{min-height:38px;font-size:14px}
 </style>
 </head>
 <body>
@@ -988,9 +1007,9 @@ function buildFilters(){
   });
   if(loginSkipped&&!acct.email&&!hasUser)p+='<div class="note" style="margin:6px 2px 10px">Log in to save across devices.</div>';
   var nsv=all.filter(function(b){return favs[keyOf(b)]||isDiy(b)}).length;
-  p+='<label class="savedrow"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
+  p+='<label class="savedrow sv1"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
   var nhd=all.filter(function(b){return hidden[keyOf(b)]}).length;
-  p+='<label class="savedrow"><input type="checkbox" id="hiddenOnly"'+(pend.showHidden?' checked':'')+'><span class="svl">Hidden</span><span class="svc">'+nhd+'</span></label>';
+  p+='<label class="savedrow sv2"><input type="checkbox" id="hiddenOnly"'+(pend.showHidden?' checked':'')+'><span class="svl">Hidden</span><span class="svc">'+nhd+'</span></label>';
   if(nhd)p+='<button class="btn" type="button" id="unhideAll" style="width:100%;margin-bottom:10px">Unhide all ('+nhd+')</button>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
   $('panel').innerHTML=p;
@@ -1784,7 +1803,7 @@ function askAct(kind){
   if(!all.length)return;
   if(view.length===all.length){runAct(view);return}
   $('chT').textContent={print:'Print',pdf:'Download PDF'}[kind];
-  $('chRes').textContent='Current results ('+view.length+')';
+  $('chRes').textContent='Filtered view ('+view.length+')';
   $('chRes').disabled=!view.length;
   $('chAll').textContent='All businesses ('+all.length+')';
   $('chooser').classList.add('show');
