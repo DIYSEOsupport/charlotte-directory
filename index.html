@@ -1563,7 +1563,7 @@ async function buildPdfCanvas(list,keepPages){
   }
 
   /* ----- plan the pages ----- */
-  var headH=168,runH=62;
+  var headH=198,runH=62;
   var plan=[{y:headH,items:[]}],py=headH;
   list.forEach(function(b){
     var its=items(b);
@@ -1586,20 +1586,20 @@ async function buildPdfCanvas(list,keepPages){
     var c=cv.getContext('2d');c.scale(S,S);c.textBaseline='alphabetic';
     c.fillStyle='#fff';c.fillRect(0,0,PW,PH);
     var links=[],reg=function(o){links.push(o)};
-    if(QRI)c.drawImage(QRI,PW-M-(pi===0?78:40),pi===0?36:14,pi===0?78:40,pi===0?78:40);
+    if(QRI){if(pi===0)c.drawImage(QRI,M+CW-44,FOOT+19,20,20);else c.drawImage(QRI,PW-M-40,14,40,40)}
     if(pi===0){
       var heroEl=document.querySelector('.hero-img');
       if(heroEl&&heroEl.complete&&heroEl.naturalWidth){
-        var hh=48,hw=Math.min(CW,hh*heroEl.naturalWidth/heroEl.naturalHeight);
+        var hh=78,hw=Math.min(CW,hh*heroEl.naturalWidth/heroEl.naturalHeight);
         c.drawImage(heroEl,M+(CW-hw)/2,10,hw,hh);
         c.strokeStyle=BC.rule;c.lineWidth=1;c.strokeRect(M+(CW-hw)/2,10,hw,hh);
       }
-      cvSet(c,'600 24px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.textAlign='center';c.fillText('CHARLOTTE COUNTY',M+CW/2,74);
-      cvSet(c,'400 12px '+BF_H,'1px');c.fillStyle=BC.orange;c.fillText('Small Business Directory',M+CW/2,90);
+      cvSet(c,'600 24px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.textAlign='center';c.fillText('CHARLOTTE COUNTY',M+CW/2,104);
+      cvSet(c,'400 12px '+BF_H,'1px');c.fillStyle=BC.orange;c.fillText('Small Business Directory',M+CW/2,120);
       c.textAlign='left';
-      c.fillStyle=BC.orange;c.fillRect(M+CW/2-22,100,44,3);
+      c.fillStyle=BC.orange;c.fillRect(M+CW/2-22,130,44,3);
       cvSet(c,'400 9px '+BF_B,'0px');c.fillStyle=BC.gray;c.textAlign='center';
-      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M+CW/2,118);
+      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M+CW/2,148);
       c.textAlign='left';
     }else{
       cvSet(c,'500 9px '+BF_H,'2px');c.fillStyle=BC.gray;c.fillText('SMALL BUSINESS DIRECTORY',M,40);
