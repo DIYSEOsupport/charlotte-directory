@@ -170,14 +170,14 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" data-req id="typefld"><span class="l">About your business <span class="req">*</span></span>
         <div class="opts" id="types"></div>
         <div class="sub" id="typeother"><div class="fld"><label class="l" for="typeOtherTxt">Other details</label><textarea id="typeOtherTxt" style="min-height:76px"></textarea></div></div>
-        <div class="err">Choose one.</div></div>
-      <div class="fld" data-req id="descfld"><label class="l" for="desc">Describe your business <span class="req">*</span></label><div class="help">A few sentences. Shown in the directory.</div><textarea id="desc" maxlength="400"></textarea><div class="cnt"><span id="dcnt">0</span>/400</div><div class="err">Add a description.</div></div>
+        <div class="err">Choose where you do business.</div></div>
+      <div class="fld" data-req id="descfld"><label class="l" for="desc">Describe your business <span class="req">*</span></label><div class="help">A few sentences. Shown in the directory.</div><textarea id="desc" maxlength="400"></textarea><div class="cnt"><span id="dcnt">0</span>/400</div><div class="err">Describe your business.</div></div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Next</button></div>
     </div>
 
     <div class="card step" data-step="2">
       <h2>Contact &amp; location</h2>
-      <div class="fld" data-req><label class="l" for="phone">Business Phone <span class="req">*</span></label><input type="tel" id="phone" autocomplete="tel"><div class="err">Enter exactly 10 digits, like 941-555-1234.</div></div>
+      <div class="fld" data-req><label class="l" for="phone">Business Phone <span class="req">*</span></label><input type="tel" id="phone" autocomplete="tel"><div class="err">Enter a 10 digit phone, like 941-555-1234.</div></div>
       <div class="fld"><label class="l" for="web">Business Website</label><input type="text" id="web" data-url inputmode="url" autocomplete="url"><div class="err">Enter a web address like mybusiness.com.</div></div>
       <div class="fld" id="emfld"><label class="l" for="email">Email for Customers to Contact You</label><input type="email" id="email" autocomplete="email"><div class="err">Enter a valid email like name@example.com.</div></div>
       <div class="sub" id="physical"><h2 style="font-size:22px">Physical address</h2>
@@ -185,15 +185,15 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
         <div class="fld" data-phys><label class="l" for="street2">Suite / Unit (optional)</label><input type="text" id="street2" autocomplete="address-line2"></div>
         <div class="row2">
           <div class="fld" data-req data-phys><label class="l" for="city">Business City <span class="req">*</span></label><input type="text" id="city" autocomplete="address-level2"><div class="err">Enter your city.</div></div>
-          <div class="fld" data-req data-phys><label class="l" for="state">State <span class="req">*</span></label><div class="help">US state 2 letter abbreviation</div><input type="text" id="state" maxlength="2" autocomplete="address-level1"><div class="err">Two letters.</div></div>
-          <div class="fld" data-req data-phys><label class="l" for="zip">Zip <span class="req">*</span></label><input type="text" id="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code"><div class="err">5 digits.</div></div>
+          <div class="fld" data-req data-phys><label class="l" for="state">State <span class="req">*</span></label><div class="help">US state 2 letter abbreviation</div><input type="text" id="state" maxlength="2" autocomplete="address-level1"><div class="err">Enter a 2 letter state, like FL.</div></div>
+          <div class="fld" data-req data-phys><label class="l" for="zip">Zip <span class="req">*</span></label><input type="text" id="zip" inputmode="numeric" maxlength="5" autocomplete="postal-code"><div class="err">Enter a 5 digit zip.</div></div>
         </div>
       </div>
       <div class="sub" id="mobile"><h2 style="font-size:22px">Area served</h2>
         <div class="fld" data-req data-mob id="areafld"><span class="l">For Mobile Services: Area / City Served <span class="req">*</span></span><div class="help">Pick all that apply, or pick Other and type your area.</div>
           <div class="opts" id="areas"></div>
           <div class="sub" id="areaother" style="margin-top:10px"><label class="l" for="areatext">Your area</label><input type="text" id="areatext"></div>
-          <div class="err">Choose one.</div></div>
+          <div class="err">Choose the area you serve.</div></div>
       </div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Next</button></div>
     </div>
@@ -202,8 +202,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <h2>Optional info to be included</h2>
       <p class="note">Everything on this page is optional.</p>
       <div class="fld"><label class="l" for="fb">Facebook Business Facebook Page</label><input type="text" id="fb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
-      <div class="fld"><label class="l" for="ndb">NextDoor Business Page</label><input type="text" id="ndb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
-      <div class="fld"><label class="l" for="ndp">NextDoor Contact Personal Page</label><input type="text" id="ndp" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
+      <div class="fld"><label class="l" for="ndb">NextDoor Business Page</label><input type="text" id="ndb" data-url inputmode="url"><div class="err">Enter a web address like nextdoor.com/pages/yourbiz.</div></div>
+      <div class="fld"><label class="l" for="ndp">NextDoor Contact Personal Page</label><input type="text" id="ndp" data-url inputmode="url"><div class="err">Enter a web address like nextdoor.com/profile/you.</div></div>
       <div class="fld"><label class="l" for="slogan">Slogan</label><input type="text" id="slogan" maxlength="120"></div>
       <div class="fld"><label class="l" for="licensed" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="licensed">Licensed &amp; Insured</label></div>
       <div class="fld"><span class="l">Upload Logo</span><div class="help">Shows on your card.</div>
@@ -388,10 +388,8 @@ function popForBad(panel){
   if(mode2){errPop('Pick one, neighbor!',['Choose New business or Update my business.']);return}
   var L=[];
   qa('.fld.bad',panel).forEach(function(f){
-    var lb=f.querySelector('label.l,.l'),err=f.querySelector('.err');
-    var name=lb?lb.textContent.replace(/\(optional\)/i,'').replace(/\s*\*\s*$/,'').replace(/\s+/g,' ').trim():'';
-    var msg=err?err.textContent.trim():'Check this one.';
-    L.push((name&&name.length<=40?name+': ':'')+msg);
+    var err=f.querySelector('.err'),msg=err?err.textContent.trim():'';
+    if(msg&&L.indexOf(msg)===-1)L.push(msg);
   });
   if(!L.length)L=['Check the fields marked in red.'];
   var extra=L.length>4?L.length-4:0;L=L.slice(0,4);if(extra)L.push('...and '+extra+' more.');
