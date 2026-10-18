@@ -1629,16 +1629,16 @@ async function buildPdfCanvas(list,keepPages){
     c.strokeStyle=BC.ink;c.lineWidth=1.8;c.stroke();
     drawTab(c,b,x+w-14,y,w-28);
     c.save();rr(c,x,y,w,h-14,10);c.clip();
-    var cy=y+14,lw=im?36:0;
+    var cy=y+16,lw=im?36:0;
     if(im){var bx=30,sc=Math.min(bx/im.width,bx/im.height),iw2=im.width*sc,ih=im.height*sc;c.fillStyle='#fff';c.fillRect(ix,cy,bx,bx);c.drawImage(im,ix+(bx-iw2)/2,cy+(bx-ih)/2,iw2,ih);c.strokeStyle=BC.rule;c.lineWidth=0.8;c.strokeRect(ix,cy,bx,bx)}
     cvSet(c,'600 15px '+BF_H,'0.3px');c.fillStyle=BC.ink;
     var nl=cvWrap(c,b.name,iw-lw).slice(0,2);
     nl.forEach(function(t,i){c.fillText(t,ix+lw,cy+14+i*17)});
-    cy+=Math.max(im?34:0,nl.length*17+2);
+    cy+=Math.max(im?34:0,nl.length*17+2)+3;
     if(b.slogan){
       cvSet(c,'italic 400 10.5px '+BF_B,'0px');c.fillStyle=BC.gray;
-      cvWrap(c,'\u201C'+b.slogan+'\u201D',iw).slice(0,2).forEach(function(t){c.fillText(t,ix,cy+9);cy+=13.5});
-      cy+=4;
+      cvWrap(c,'\u201C'+b.slogan+'\u201D',iw).slice(0,2).forEach(function(t){c.fillText(t,ix,cy+9);cy+=14});
+      cy+=7;
     }
     var ents=[];
     function add(label,vals){ents.push({label:label,vals:vals})}
@@ -1665,18 +1665,18 @@ async function buildPdfCanvas(list,keepPages){
         (v.u?[fit(c,v.t,iw-LW)]:cvWrap(c,v.t,iw-LW)).forEach(function(t){
           var tw=c.measureText(t).width;c.fillStyle=v.u?BC.link:BC.text;c.fillText(t,ix+LW,cy+9);
           if(v.u){c.fillRect(ix+LW,cy+10.5,tw,0.6);reg({x:ix+LW,y:cy,w:tw,h:12,u:v.u})}
-          cy+=14;
+          cy+=16;
         });
       });
-      cy+=2;
+      cy+=4;
     });
     var ab=[b.aboutTop[0]].concat(b.aboutTop.slice(1),b.about).filter(Boolean).join(' ');
-    var n=Math.floor((y+h-14-cy-2)/13.5);
+    var n=Math.floor((y+h-14-cy-2)/14.5);
     if(ab&&n>0){
       cvSet(c,'400 10.5px '+BF_B,'0px');c.fillStyle=BC.text;
       var al=cvWrap(c,ab,iw);
       if(al.length>n){al=al.slice(0,n);al[n-1]=fit(c,al[n-1]+' \u2026',iw)}
-      cy+=3;al.forEach(function(t){c.fillText(t,ix,cy+10);cy+=13.5});
+      cy+=5;al.forEach(function(t){c.fillText(t,ix,cy+10);cy+=14.5});
     }
     c.restore();
   }
