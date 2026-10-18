@@ -374,7 +374,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
   var cb='cfm'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
   function fin(r){
     clearTimeout(t);delete window[cb];sc.remove();$('epGo').style.display='';
-    if(r&&r.res==='done')errPop("You're pending!",['Thank you! Your email is confirmed.',(r.name||'Your business')+' is now Pending while we verify it. This usually takes a few hours and can take up to 12. We will email you the result.'],true);
+    if(r&&r.res==='done')errPop("You're pending!",[
+      'Email confirmed! '+(r.name||'Your business')+' is now Pending.',
+      'Why: we check every listing so the directory only shows real local businesses.',
+      'We check: your website (if you gave one) loads and shows your business name, phone, or email. Your logo is not copied, obscene, or graphic.',
+      'When: usually a few hours, up to 12. We will email you when it is live.'],true);
     else if(r&&r.res==='used')errPop('All set',['This link was already used, or it is no longer valid.','If you added a business, your email is already confirmed and your listing is Pending while we verify it. We will email you the result.'],true);
     else errPop('Oops',['Could not confirm right now. Please tap the link in your email again in a minute, or email us.']);
   }
