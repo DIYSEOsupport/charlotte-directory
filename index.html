@@ -1579,7 +1579,6 @@ async function buildPdfCanvas(list,keepPages){
 
   /* ----- draw ----- */
   var QRI=await loadQr();
-  var DIYI=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='diyseo-logo.png'});
   var BANI=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='pdf-banner.jpg'});
   var out=[];
   for(var pi=0;pi<plan.length;pi++){
@@ -1587,7 +1586,7 @@ async function buildPdfCanvas(list,keepPages){
     var c=cv.getContext('2d');c.scale(S,S);c.textBaseline='alphabetic';
     c.fillStyle='#fff';c.fillRect(0,0,PW,PH);
     var links=[],reg=function(o){links.push(o)};
-    if(QRI){if(pi===0)c.drawImage(QRI,M+CW-44,FOOT+19,20,20);else c.drawImage(QRI,PW-M-40,14,40,40)}
+    if(QRI){if(pi===0)c.drawImage(QRI,M+CW-34,FOOT+6,34,34);else c.drawImage(QRI,PW-M-40,14,40,40)}
     if(pi===0){
       if(BANI){
         var bw=460,bh=bw*BANI.naturalHeight/BANI.naturalWidth;
@@ -1595,7 +1594,7 @@ async function buildPdfCanvas(list,keepPages){
       }
       c.fillStyle=BC.orange;c.fillRect(M+CW/2-22,168,44,3);
       cvSet(c,'400 9px '+BF_B,'0px');c.fillStyle=BC.gray;c.textAlign='center';
-      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M+CW/2,186);
+      c.fillText(list.length+' business'+(list.length===1?'':'es')+' out of '+all.length+' in the directory   |   as of '+today,M+CW/2,186);
       c.textAlign='left';
     }else{
       cvSet(c,'500 9px '+BF_H,'2px');c.fillStyle=BC.gray;c.fillText('SMALL BUSINESS DIRECTORY',M,40);
@@ -1608,10 +1607,8 @@ async function buildPdfCanvas(list,keepPages){
     c.fillStyle=BC.rule;c.fillRect(M,FOOT,CW,0.8);
     cvSet(c,'400 8px '+BF_B,'0px');c.fillStyle=BC.gray;
     c.fillText('Charlotte County Small Business Directory',M,FOOT+14);
-    var pg='Page '+(pi+1)+' of '+plan.length,pw=c.measureText(pg).width;
-    c.fillText(pg,M+CW-pw,FOOT+14);
-    var logoW=DIYI?18:0;
-    if(DIYI)c.drawImage(DIYI,M+CW-logoW,FOOT+20,logoW,logoW);
+    c.fillText('Page '+(pi+1)+' of '+plan.length,M,FOOT+26);
+    if(pi===0){c.textAlign='right';c.fillText('DIYSEO.support@gmail.com',M+CW-40,FOOT+26);c.textAlign='left'}
     var data=cv.toDataURL('image/jpeg',_mob?0.8:0.9);
     out.push({bin:atob(data.split(',')[1]),w:cv.width,h:cv.height,links:links});
     cv.width=1;cv.height=1;
