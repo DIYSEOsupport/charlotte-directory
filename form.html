@@ -639,6 +639,7 @@ $('f').addEventListener('submit',function(e){
       BAD_EMAIL:'The customer email does not look right.',
       BAD_URL:'One of the web addresses does not look right.',
       BAD_PHONE:'The phone number needs 10 digits.',
+      NOT_LIVE:'You can only update your own listings that are live in the directory.',
       NAME_TAKEN:'Another business in the directory already uses that name. Pick a different name.'
     }[code]||('Something went wrong. Please try again.'+(code?' ('+String(code).slice(0,200)+')':''));
     $('fail').textContent=msg;$('fail').style.display='block';
