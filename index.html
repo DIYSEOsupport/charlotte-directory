@@ -546,7 +546,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 </main>
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
-<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
+<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPdf" type="button">PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
 <iframe name="fbFrame" id="fbFrame" title="send" style="display:none"></iframe>
@@ -1588,7 +1588,6 @@ async function buildPdfCanvas(list,keepPages){
   }
 
   /* ----- draw ----- */
-  var QRI=await loadQr();
   var DIYI=await new Promise(function(r){var i=new Image();i.onload=function(){r(safeImg(i))};i.onerror=function(){r(null)};i.src='diyseo-logo.png'});
   var BANI=await new Promise(function(r){var i=new Image();i.onload=function(){r(safeImg(i))};i.onerror=function(){r(null)};i.src='pdf-banner.jpg'});
   var out=[];
@@ -1597,7 +1596,7 @@ async function buildPdfCanvas(list,keepPages){
     var c=cv.getContext('2d');c.scale(S,S);c.textBaseline='alphabetic';
     c.fillStyle='#fff';c.fillRect(0,0,PW,PH);
     var links=[],reg=function(o){links.push(o)};
-    if(pi===0){if(DIYI)c.drawImage(DIYI,M+CW-34,FOOT+6,34,34)}else if(QRI)c.drawImage(QRI,PW-M-40,14,40,40)
+    if(DIYI)c.drawImage(DIYI,M+CW-34,FOOT+6,34,34)
     if(pi===0){
       if(BANI){
         var bw=460,bh=bw*BANI.naturalHeight/BANI.naturalWidth;
@@ -1619,7 +1618,7 @@ async function buildPdfCanvas(list,keepPages){
     cvSet(c,'400 8px '+BF_B,'0px');c.fillStyle=BC.gray;
     c.fillText('Charlotte County Small Business Directory',M,FOOT+14);
     c.fillText('Page '+(pi+1)+' of '+plan.length,M,FOOT+26);
-    if(pi===0){c.textAlign='right';c.fillText('DIYSEO.support@gmail.com',M+CW-40,FOOT+26);c.textAlign='left'}
+    c.textAlign='right';c.fillText('DIYSEO.support@gmail.com',M+CW-40,FOOT+26);c.textAlign='left';
     var data=cv.toDataURL('image/jpeg',_mob?0.8:0.9);
     out.push({bin:atob(data.split(',')[1]),w:cv.width,h:cv.height,links:links});
     cv.width=1;cv.height=1;
@@ -1678,8 +1677,8 @@ function askAct(kind){
   $('chooser').classList.add('show');
 }
 $('dlBtn').onclick=function(){askAct('pdf')};
-$('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');askAct('pdf')};
-$('fmtX').onclick=function(){$('fmtBox').classList.remove('show')};
+$('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
+$('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
 $('chRes').onclick=function(){runAct(view)};
 $('chAll').onclick=function(){runAct(sortedAll())};
@@ -1795,7 +1794,8 @@ async function dlCard(b,ios){
   document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
 }
-$('shPdf').onclick=function(){var b=shareB;closeShare();if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf')};
+var fmtB=null;
+$('shPdf').onclick=function(){var b=shareB;closeShare();if(b){fmtB=b;$('fmtBox').classList.add('show')}};
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
 
