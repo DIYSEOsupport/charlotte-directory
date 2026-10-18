@@ -144,6 +144,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
         <span class="l">Remove this listing?</span>
         <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
         <p class="note">This takes it off the directory right away. You'll need to resubmit it to list it again.</p>
+        <label class="l" for="delReason" style="margin-top:8px">Reason for removing <span style="font-weight:400">(optional)</span></label>
+        <textarea id="delReason" rows="3" maxlength="1000"></textarea>
         <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
       </div>
       <div id="contactBlock" style="display:none">
@@ -486,7 +488,7 @@ $('modeDel').addEventListener('click',function(){
 function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
-  $('delName').textContent=b.businessName;
+  $('delName').textContent=b.businessName;$('delReason').value='';
   $('delConfirm').style.display='block';
 }
 $('delCancel').addEventListener('click',function(){
@@ -494,7 +496,7 @@ $('delCancel').addEventListener('click',function(){
 });
 $('delGo').addEventListener('click',function(){
   $('delGo').disabled=true;
-  sendToScript({action:'remove',idToken:idToken,businessName:origName},function(m){
+  sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim()},function(m){
     $('delGo').disabled=false;
     if(m&&m.ok){
       $('doneH').textContent='Listing removed';
