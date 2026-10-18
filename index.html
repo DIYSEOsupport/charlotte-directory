@@ -49,7 +49,7 @@ a{color:inherit}
 .catpill.cc4{background:var(--purple);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc5{background:var(--yellow);color:var(--ink)}
 #viewCount{margin-left:auto;color:#8a8a99;font-family:var(--fh);font-size:16px;letter-spacing:.6px;white-space:nowrap}
-#hideTogBtn{position:relative}
+#hideTogBtn,#filterBtn{position:relative}
 #hideTogBtn[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--ink)}
 #hideTogBtn .hcnt{position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;line-height:16px;border:2px solid var(--ink);border-radius:50px;background:var(--red);color:#fff;font-size:12px;text-align:center;text-shadow:none}
 .card.ishidden{opacity:.6;filter:grayscale(.5)}
@@ -71,7 +71,7 @@ a{color:inherit}
 .search{position:relative;flex:1}
 .search>svg{pointer-events:none;position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--magenta)}
 .search input{width:100%;height:50px;padding:0 44px;font-size:16px;font-weight:600;border:3px solid var(--ink);border-radius:14px;background:#fff;color:var(--ink);outline:none;box-shadow:var(--shadow);transition:.15s}
-.search input:focus{border-color:var(--magenta);box-shadow:4px 4px 0 var(--magenta)}
+.search input:focus{border-color:var(--purple);box-shadow:4px 4px 0 var(--purple)}
 .search input::placeholder{color:#8a7aa3}
 .clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:16px;cursor:pointer;display:none}
 .clear.show{display:block}
@@ -179,7 +179,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 
 
 .navbtn .badge{position:absolute;top:-8px;right:-8px;min-width:22px;height:22px;padding:0 5px;border-radius:50px;background:var(--red);color:#fff;border:2px solid var(--ink);font-size:12px;line-height:18px;text-align:center;display:none}
-.icon-btn .badge.show{display:block}
+.navbtn .badge.show{display:block}
 .panel{max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .grp{width:100%}
 .gl{font-family:var(--fh);letter-spacing:.8px;font-size:18px;margin:6px 0 6px;color:var(--purple)}
@@ -194,7 +194,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .card:hover{transform:none;box-shadow:6px 6px 0 var(--ink)}
 .card:active{transform:none;box-shadow:6px 6px 0 var(--ink)}
 .bar{width:100%;min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 16px 12px 18px;background:none;border:0;text-align:left;cursor:pointer;color:inherit}
-.bar:hover .title{color:var(--magenta)}
+.bar:hover .title{color:var(--purple)}
 .bt{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}
 .chev{flex:none;width:34px;height:34px;border-radius:50%;border:3px solid var(--ink);background:var(--yellow);display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 0 var(--ink);transition:transform .25s}
 .card.open .chev{transform:rotate(180deg);background:var(--orange)}
@@ -582,11 +582,11 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div class="navrow">
 <button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All <span class="n"></span></button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
+<button class="navbtn icon" id="hideTogBtn" type="button" style="display:none"></button>
 <button class="navbtn obvious" id="toggleAll" type="button" aria-label="Expand all" title="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
 <button class="navbtn icon" id="dlBtn" type="button" aria-label="Download PDF" title="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg></button>
 <button class="navbtn icon" id="shareSiteBtn" type="button" aria-label="Share this directory" title="Share this directory"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
 <div id="muteRow"></div>
-<button class="navbtn icon" id="hideTogBtn" type="button" style="display:none"></button>
 <button class="navbtn icon" id="favTogBtn" type="button" aria-label="Show favorites only" title="Show favorites only" aria-pressed="false"></button>
 <span id="viewCount" aria-live="polite" title="Showing / total"></span>
 </div>
