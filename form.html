@@ -106,9 +106,9 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 #errPop p{margin:0 0 8px;font-size:16px;line-height:1.35;color:#1a1033;text-align:left}
 #errPop .go{display:block;box-sizing:border-box;width:100%;margin:12px 0 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:3px 3px 0 #1a1033}
 @keyframes epIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-.builtby{display:flex;align-items:center;justify-content:center;padding:24px 16px 32px}
-.builtby a{display:flex;align-items:center;gap:10px;color:#6b5f8a;text-decoration:none;font-size:13px}
-.builtby img{width:32px;height:32px;border-radius:0;object-fit:contain;background:transparent;flex:none}
+.navtabs{padding-bottom:32px}
+.navtabs .builtby{padding:4px 16px 4px 6px}
+.builtby img{width:28px;height:28px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 </style>
 </head>
 <body>
@@ -226,8 +226,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
     <div class="nav" id="doneExtraNav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove my business</button></div>
   </div>
 </div>
-<div class="navtabs"><a href="mailto:DIYSEO.support@gmail.com">✉️ Contact Us</a><a href="index.html">📋 Directory</a></div>
-<div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
+<div class="navtabs"><a href="index.html">📋 Directory</a><a class="builtby" href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
