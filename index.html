@@ -1648,7 +1648,7 @@ async function buildPdfCanvas(list,keepPages){
 function doPdf(list,fname){
   toast('Building PDF...');
   var timer=new Promise(function(_,rej){setTimeout(function(){rej(new Error('timeout'))},120000)});
-  Promise.race([buildPdfCanvas(list,false),timer]).then(function(blob){saveBlob(blob,fname||'charlotte-county-business-directory.pdf');toast('PDF ready')}).catch(function(e){console.error(e);errPop('PDF trouble, neighbor!',(e&&e.message==='timeout')?'That took too long. Try fewer businesses: search or filter first, then Download PDF.':'Could not build the PDF. Try again, or filter to fewer businesses first.')});
+  Promise.race([buildPdfCanvas(list,false),timer]).then(function(blob){saveBlob(blob,fname||'charlotte-county-business-directory.pdf');toast('PDF ready')}).catch(function(e){console.error(e);errPop('PDF trouble, neighbor!',(e&&e.message==='timeout')?'That took too long. Try fewer businesses: search or filter first, then Download PDF.':'Could not build the PDF. Try again, or filter to fewer businesses first. ('+((e&&e.message)||e)+')')});
 }
 var pendingAct='';
 function runAct(list){
