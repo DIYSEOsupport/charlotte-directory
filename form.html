@@ -682,6 +682,7 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   $('doneExtraNav').style.display='none';
   $('doneH').textContent='Check your email.';
+  $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';
   $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
