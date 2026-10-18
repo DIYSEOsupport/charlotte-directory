@@ -524,11 +524,12 @@ input,textarea,select,option,#printArea{text-transform:none}
 #toggleAll .lbl{display:none}
 .addbiz{padding:0 12px!important}
 .addbiz .lbl{display:inline;font-size:14px;line-height:1.05;text-align:center}
+.slogan,.grid .bt .slogan{color:#0e95a8!important}
 /* expanded search row */
 #q::-webkit-search-cancel-button{display:none}
 .navgrid .navrow:not(.searchrow){gap:9px}
 .navgrid .navrow:not(.searchrow) .navbtn{padding:0 8px!important;min-width:36px;justify-content:center}
-#tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--ink);color:var(--cream);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--yellow);white-space:nowrap}
+#tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink);border:2px solid var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap}
 #allBtn{padding:0 10px!important}
 #viewCount{font-size:15px;margin-left:auto}
 .searchrow{flex-wrap:nowrap;width:100%}
@@ -1587,7 +1588,7 @@ async function buildPdfCanvas(list,keepPages){
     });
     if(b.slogan){
       cvSet(mc,'italic 400 10px '+BF_B,'0px');
-      cvWrap(mc,'\u201C'+b.slogan+'\u201D',CW).forEach(function(t){L.push({h:14,draw:function(c,y){cvSet(c,'italic 400 10px '+BF_B,'0px');c.fillStyle=BC.gray;c.fillText(t,M,y+11)}})});
+      cvWrap(mc,'\u201C'+b.slogan+'\u201D',CW).forEach(function(t){L.push({h:14,draw:function(c,y){cvSet(c,'italic 400 10px '+BF_B,'0px');c.fillStyle='#33333f';c.fillText(t,M,y+11)}})});
     }
     L.push({h:6,draw:function(){}});
 
@@ -1719,7 +1720,7 @@ async function buildPdfCanvas(list,keepPages){
     nl.forEach(function(t,i){c.fillText(t,ix+lw,cy+14+i*17)});
     cy+=Math.max(im?34:0,nl.length*17+2)+3;
     if(b.slogan){
-      cvSet(c,'italic 400 10.5px '+BF_B,'0px');c.fillStyle=BC.gray;
+      cvSet(c,'italic 400 10.5px '+BF_B,'0px');c.fillStyle='#33333f';
       cvWrap(c,'\u201C'+b.slogan+'\u201D',iw).slice(0,2).forEach(function(t){c.fillText(t,ix,cy+9);cy+=14});
       cy+=7;
     }
