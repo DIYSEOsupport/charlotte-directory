@@ -49,7 +49,11 @@ a{color:inherit}
 .catpill.cc4{background:var(--purple);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc5{background:var(--yellow);color:var(--ink)}
 #viewCount{margin-left:auto;color:#8a8a99;font-family:var(--fh);font-size:16px;letter-spacing:.6px;white-space:nowrap}
-#allBtn.on{box-shadow:inset 0 0 0 3px var(--ink)}
+#hideTogBtn{position:relative}
+#hideTogBtn[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--ink)}
+#hideTogBtn .hcnt{position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;line-height:16px;border:2px solid var(--ink);border-radius:50px;background:var(--red);color:#fff;font-size:12px;text-align:center;text-shadow:none}
+.card.ishidden{opacity:.6;filter:grayscale(.5)}
+.card.ishidden .title::after{content:' \2022  HIDDEN';color:var(--red);font-size:.7em;letter-spacing:1px}
 #allBtn .n{opacity:.7;margin-left:4px}
 #pills:empty{display:none}
 .navmenu .pills{display:flex;flex-direction:column;padding:0;overflow:visible;gap:4px}
@@ -515,8 +519,22 @@ input,textarea,select,option,#printArea{text-transform:none}
 .applybar{margin:0 -8px;justify-content:center}
 .applybar .btn{flex:none;min-width:110px;padding:0 14px}
 /* small icon-only Add/Update + Expand */
-.addbiz,#toggleAll{width:38px;padding:0!important;justify-content:center}
-.addbiz .lbl,#toggleAll .lbl{display:none}
+.addbiz,#toggleAll{padding:0!important;justify-content:center}
+#toggleAll{width:38px}
+#toggleAll .lbl{display:none}
+.addbiz{padding:0 12px!important}
+.addbiz .lbl{display:inline;font-size:14px;line-height:1.05;text-align:center}
+/* expanded search row */
+#q::-webkit-search-cancel-button{display:none}
+.navgrid .navrow:not(.searchrow){gap:9px}
+.navgrid .navrow:not(.searchrow) .navbtn{padding:0 8px!important;min-width:36px;justify-content:center}
+#tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--ink);color:var(--cream);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--yellow);white-space:nowrap}
+#allBtn{padding:0 10px!important}
+#viewCount{font-size:15px;margin-left:auto}
+.searchrow{flex-wrap:nowrap;width:100%}
+.searchrow .search{flex:1;min-width:0}
+.searchrow .search input{height:46px}
+.searchrow .addbiz{height:46px;flex:none;width:auto;max-width:42%}
 #unhideAll{width:auto!important;display:flex;margin:0 auto 6px!important;padding:0 18px}
 #favTogBtn{background:var(--magenta)!important;color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 #favTogBtn[aria-pressed=true]{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important;box-shadow:inset 0 0 0 3px var(--ink)}
@@ -552,9 +570,15 @@ input,textarea,select,option,#printArea{text-transform:none}
   <div class="wrap">
 <div class="menubar"><div id="acct" class="acct"><div id="acctOut"><div id="gbtn"></div></div><div id="acctIn" style="display:none"><span>Signed in as <b id="acctEmail"></b></span><button id="signOut" type="button">Sign out</button></div></div>
 <div class="navgrid">
+<div class="navrow searchrow">
+<div class="search" id="searchBar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+      <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Search" aria-label="Search businesses">
+      <button class="clear" id="clear" aria-label="Clear search">&times;</button>
+    </div>
+<a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add / Update Biz</span></a>
+</div>
 <div class="navrow">
-<button class="navbtn obvious" id="searchBtn" type="button" aria-label="Search" title="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
-<a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add/Update Biz</span></a>
 <button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All <span class="n"></span></button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
 <button class="navbtn obvious" id="toggleAll" type="button" aria-label="Expand all" title="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
@@ -569,12 +593,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div class="pills" id="pills"></div>
 <span id="refreshSpin" class="refresh-spin" aria-hidden="true"></span>
   </div></div>
-        <div class="search" id="searchBar" style="display:none">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-      <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Search" aria-label="Search businesses">
-      <button class="clear" id="clear" aria-label="Clear search">&times;</button>
-    </div>
-    <div class="panel" id="panel"></div>
+        <div class="panel" id="panel"></div>
   </div>
 </div>
 
@@ -584,11 +603,12 @@ input,textarea,select,option,#printArea{text-transform:none}
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
 
   <details id="fbBox" style="margin:28px 0;background:var(--cream);border:3px solid var(--ink);border-radius:12px;padding:14px">
-    <summary style="cursor:pointer;font-family:var(--fh);font-size:18px;color:var(--purple)">Feedback &amp; Suggestions</summary>
+    <summary style="cursor:pointer;font-family:var(--fh);font-size:18px;color:var(--purple)">Help us improve! Tell us what you think</summary>
     <div style="margin-top:10px">
-      <textarea id="fbMsg" rows="3" placeholder="What's working, what's not, what would help?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
+      <p style="margin:0 0 10px;font-size:14px;line-height:1.4">Thank you for being one of our first visitors! This app is brand new, so a few bugs and rough edges are expected. If something looks wrong, breaks, or could work better, please let us know below so we can fix it. We read every message and truly appreciate your help. (Sign in first so we know who it's from.)</p>
+      <textarea id="fbMsg" rows="3" placeholder="What happened? What were you trying to do, and what phone or computer are you using?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
       <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
-        <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send</button>
+        <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send feedback</button>
       </div>
     </div>
   </details>
@@ -1045,7 +1065,6 @@ function buildFilters(){
 function syncPend(){pend={f:JSON.parse(JSON.stringify(st.f)),fav:st.fav,showHidden:st.showHidden,sort:st.sort,picked:st.picked}}
 function closePanel(){var pn=$('panel');pn.classList.remove('open');var fb=$('filterBtn');fb.classList.remove('on');fb.setAttribute('aria-expanded','false')}
 function commitPend(){
-  st.showAll=false;
   st.f={};Object.keys(pend.f).forEach(function(l){if(pend.f[l]&&pend.f[l].length)st.f[l]=pend.f[l].slice()});
   st.fav=pend.fav;
   st.showHidden=pend.showHidden;
@@ -1082,8 +1101,8 @@ function apply(){
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
   var allN=document.querySelector('#allBtn .n');if(allN)allN.textContent=all.length;
   $('clear').classList.toggle('show',!!st.q);
-  $('allBtn').classList.toggle('on',!!st.showAll);
-  $('viewCount').textContent=view.length+' of '+all.length;
+  var nhv=view.filter(function(b){return hidden[keyOf(b)]&&!isDiy(b)}).length;
+  $('viewCount').textContent=view.length+' of '+all.length+(st.showAll&&nhv?' ('+nhv+' hidden shown)':'');
   if(typeof updHideBtn==='function'){updHideBtn();updFavBtn()}
 }
 
@@ -1139,7 +1158,7 @@ function render(){
   }
   g.innerHTML=view.map(function(b,i){
     var key=keyOf(b),k=esc(key),open=!!openSet[key],id='d'+i;
-    var h='<article class="card'+(open?' open':'')+((favs[key]||isDiy(b))?' saved':'')+((b.category&&b.category!=='Local Business')?'':' nocat')+'" data-k="'+k+'">'
+    var h='<article class="card'+(open?' open':'')+((favs[key]||isDiy(b))?' saved':'')+((hidden[key]&&!isDiy(b))?' ishidden':'')+((b.category&&b.category!=='Local Business')?'':' nocat')+'" data-k="'+k+'">'
       +'<button class="star" type="button" data-act="save" aria-pressed="'+((favs[key]||isDiy(b))?'true':'false')+'" aria-label="'+((favs[key]||isDiy(b))?'Remove from saved':'Save')+'" title="'+((favs[key]||isDiy(b))?'Saved':'Save')+'"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" stroke-linejoin="round"/></svg></button>'
       +(isDiy(b)?'':'<button class="hidebtn" type="button" data-act="hide" aria-pressed="'+(hidden[key]?'true':'false')+'" aria-label="'+(hidden[key]?'Unhide':'Hide from my view')+'" title="'+(hidden[key]?'Unhide':'Hide from my view')+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.4 10.4 0 0112 5c6 0 9.5 5.5 9.9 7a11 11 0 01-2.4 3.9M6.6 6.6C3.8 8.3 2.3 11 2.1 12c.3 1.1 2.4 4.3 5.7 6.1A10.6 10.6 0 0012 19c1 0 2-.1 2.9-.4M9.9 10a3 3 0 004.1 4.1"/></svg></button>')
       +'<button class="bar" type="button" aria-expanded="'+open+'" aria-controls="'+id+'">'
@@ -1306,19 +1325,28 @@ $('q').addEventListener('input',e=>{clearTimeout(tm);tm=setTimeout(()=>{st.q=e.t
 function doSearch(){clearTimeout(tm);st.q=$('q').value;apply();$('q').blur()}
 $('q').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doSearch()}});
 $('clear').onclick=()=>{$('q').value='';st.q='';apply();$('q').focus()};
-$('searchBtn').onclick=function(){
-  var sb=$('searchBar'),open=sb.style.display==='none';
-  sb.style.display=open?'block':'none';
-  this.classList.toggle('on',open);this.setAttribute('aria-expanded',open?'true':'false');
-  if(open)$('q').focus();
-};
 $('filterBtn').onclick=function(){
   var o=!$('panel').classList.contains('open');
   if(o){syncPend();buildFilters();$('panel').classList.add('open');this.classList.add('on');this.setAttribute('aria-expanded','true')}
   else closePanel();
 };
 $('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))resetAll()});
-$('allBtn').onclick=function(){resetAll();st.showAll=true;apply();toast('Showing all '+all.length)};
+(function(){
+  var tip=document.createElement('div'),cur=null;tip.id='tip';document.body.appendChild(tip);
+  function hide(){tip.style.display='none';if(cur&&cur.dataset.t){cur.title=cur.dataset.t;delete cur.dataset.t}cur=null}
+  function show(b){
+    var t=b.getAttribute('aria-label')||b.title;if(!t)return;
+    hide();cur=b;if(b.title){b.dataset.t=b.title;b.removeAttribute('title')}
+    tip.textContent=t;tip.style.display='block';
+    var r=b.getBoundingClientRect(),w=tip.offsetWidth;
+    tip.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';
+    tip.style.top=(r.bottom+8)+'px';
+  }
+  document.addEventListener('mouseover',function(e){var b=e.target.closest&&e.target.closest('.navbtn');if(b)show(b);else if(cur)hide()});
+  document.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.navbtn');if(b)show(b)});
+  document.addEventListener('focusout',hide);document.addEventListener('scroll',hide,true);document.addEventListener('click',function(){setTimeout(hide,1200)});
+})();
+$('allBtn').onclick=function(){resetAll();toast('Filters cleared')};
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
@@ -1841,26 +1869,23 @@ function askAct(kind){
 }
 $('dlBtn').onclick=function(){askAct('pdf')};
 $('shareSiteBtn').onclick=function(){openShare(null)};
-var lastHidden=null,EYE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYEOFF='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 19C6 19 2 12 2 12a18 18 0 0 1 4.1-5M9.9 5.2A9.7 9.7 0 0 1 12 5c6 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"/></svg>';
+var EYE='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYEOFF='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 19C6 19 2 12 2 12a18 18 0 0 1 4.1-5M9.9 5.2A9.7 9.7 0 0 1 12 5c6 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"/></svg>';
 var STAR='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l3 6.3 6.9.9-5 4.8 1.3 6.9L12 18l-6.2 3.4 1.3-6.9-5-4.8 6.9-.9z"/></svg>',STARON=STAR.replace('fill="none"','fill="currentColor"');
 function updFavBtn(){var b=$('favTogBtn');b.innerHTML=st.fav?STARON:STAR;b.setAttribute('aria-pressed',st.fav?'true':'false')}
 $('favTogBtn').onclick=function(){
   if(!st.fav&&!Object.keys(favs).length){toast('Tap the star on a card to save favorites');return}
-  st.showAll=false;st.fav=pend.fav=!st.fav;buildFilters();apply();
+  st.fav=pend.fav=!st.fav;buildFilters();apply();
 };
 function updHideBtn(){
   var n=Object.keys(hidden).length,b=$('hideTogBtn'),t;
-  if(!n&&!lastHidden){b.style.display='none';return}
+  if(!n){b.style.display='none';return}
   b.style.display='';
-  b.innerHTML=n?EYEOFF:EYE;
-  t=n?'Unhide all ('+n+')':'Hide them again';
+  b.innerHTML=(st.showAll?EYE:EYEOFF)+'<span class="hcnt">'+n+'</span>';
+  b.setAttribute('aria-pressed',st.showAll?'true':'false');
+  t=st.showAll?'Hide the '+n+' hidden again':'Show the '+n+' hidden';
   b.title=t;b.setAttribute('aria-label',t);
 }
-$('hideTogBtn').onclick=function(){
-  if(Object.keys(hidden).length){lastHidden=hidden;hidden={};st.showHidden=pend.showHidden=false;toast('All unhidden')}
-  else if(lastHidden){hidden=lastHidden;lastHidden=null;toast('Hidden again')}
-  st.showAll=false;saveHidden();buildFilters();apply();
-};
+$('hideTogBtn').onclick=function(){st.showAll=!st.showAll;buildFilters();apply()};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
 $('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
