@@ -7,9 +7,10 @@
 // (it's a global var set after sign-in) and copy the string.
 //
 // Usage:
-//   node scripts/test-submit.js YOUR_ID_TOKEN [count]
+//   node scripts/test-submit.js YOUR_ID_TOKEN [count] [contactEmail]
 //
 // count defaults to 1. Each run uses a random suffix so names don't collide.
+// contactEmail overrides the business's public contact email on every submission.
 
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
 
@@ -21,7 +22,7 @@ const TEMPLATES = [
   { businessName: 'Test Garden Gate Nursery', category: 'Home & Garden Services', desc: 'Plants for Florida yards', phone: '941-555-0305', email: 'gardengate@example.com', website: 'gardengate.example.com' },
 ];
 
-async function submitOne(idToken, tmpl, suffix) {
+async function submitOne(idToken, tmpl, suffix, contactEmail) {
   const payload = {
     idToken,
     name: 'Test Owner', title: 'Owner', how: tmpl.phone,
@@ -29,7 +30,7 @@ async function submitOne(idToken, tmpl, suffix) {
     category: tmpl.category, about: '', other: '',
     describe: `Mobile - No fixed location\n\n${tmpl.desc}`,
     street: '', street2: '', city: '', state: '', zip: '', area: '',
-    phone: tmpl.phone, website: tmpl.website, email: tmpl.email,
+    phone: tmpl.phone, website: tmpl.website, email: contactEmail || tmpl.email,
     facebook: '', ndBiz: '', ndPersonal: '', slogan: '',
     logoData: '', logoName: '',
     originalName: '', logoAction: 'none', licensed: '',
@@ -46,13 +47,14 @@ async function submitOne(idToken, tmpl, suffix) {
 async function main() {
   const idToken = process.argv[2];
   const count = Math.min(Number(process.argv[3] || 1), TEMPLATES.length);
+  const contactEmail = process.argv[4] || '';
   if (!idToken) {
-    console.error('Usage: node scripts/test-submit.js YOUR_ID_TOKEN [count]');
+    console.error('Usage: node scripts/test-submit.js YOUR_ID_TOKEN [count] [contactEmail]');
     process.exit(1);
   }
   const suffix = Date.now().toString(36);
   for (let i = 0; i < count; i++) {
-    await submitOne(idToken, TEMPLATES[i], suffix);
+    await submitOne(idToken, TEMPLATES[i], suffix, contactEmail);
   }
 }
 

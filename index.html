@@ -146,8 +146,9 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:flex-start;min-height:32px}
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60;width:max-content;max-width:min(80vw,280px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,30px);background:var(--yellow);border:3px solid var(--ink);box-shadow:var(--shadow);color:var(--ink);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:60;width:max-content;max-width:min(80vw,280px);text-align:center;white-space:pre-line}
 .toast.anchored{z-index:99995}
+.toast.blue{background:var(--blue);color:#fff}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .totop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
 .totop.show{opacity:1;pointer-events:auto}
@@ -530,14 +531,27 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 <main class="wrap">
   <div id="dbg" style="display:none;background:#fff;border:3px solid var(--ink);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;word-break:break-word"></div>
-  
+
   <div class="grid" id="grid"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+
+  <details id="fbBox" style="margin:28px 0;background:var(--cream);border:3px solid var(--ink);border-radius:12px;padding:14px">
+    <summary style="cursor:pointer;font-family:var(--fh);font-size:18px;color:var(--purple)">Feedback &amp; Suggestions</summary>
+    <div style="margin-top:10px">
+      <textarea id="fbMsg" rows="3" placeholder="What's working, what's not, what would help?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
+      <input id="fbEmail" type="email" placeholder="Your email (optional, if you want a reply)" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;margin-top:8px">
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
+        <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send</button>
+        <span id="fbStatus" style="font-size:13px;color:var(--muted)"></span>
+      </div>
+    </div>
+  </details>
 </main>
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
 <div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPdf" type="button">Download PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
+<iframe name="fbFrame" id="fbFrame" title="send" style="display:none"></iframe>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
 <div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a><a id="emailBtn" href="mailto:DIYSEO.support@gmail.com" aria-label="Help"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Help</a></div>
@@ -694,8 +708,8 @@ document.addEventListener('error',function(e){
   t.style.display='none';
 },true);
 function keyOf(b){return b.name.toLowerCase().trim()}
-function toast(m,anchorEl){
-  var t=$('toast');t.textContent=m;
+function toast(m,anchorEl,cls){
+  var t=$('toast');t.textContent=m;t.classList.remove('blue');if(cls)t.classList.add(cls);
   if(anchorEl&&anchorEl.getBoundingClientRect){
     var r=anchorEl.getBoundingClientRect();
     var tm=Math.min(140,window.innerWidth/2-12);
@@ -1205,7 +1219,7 @@ $('lpGo').onclick=function(){
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 function toggleFav(k,el){
-  if(/diyseo/i.test(k)){toast('DIYSEO built this directory. Keep our info handy!',el);beepBeep();return}
+  if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
@@ -1791,6 +1805,22 @@ initAcct();
   b.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span class="lbl">Back to form</span>';
   row.insertBefore(b,row.firstChild);
 })();
+$('fbSend').addEventListener('click',function(){
+  var msg=$('fbMsg').value.trim();
+  if(!msg){$('fbStatus').textContent='Type a message first.';return}
+  $('fbSend').disabled=true;$('fbStatus').textContent='Sending...';
+  var fm=document.createElement('form');
+  fm.method='POST';fm.action=CSV_URL;fm.target='fbFrame';fm.style.display='none';
+  var ta=document.createElement('textarea');ta.name='payload';
+  ta.value=JSON.stringify({action:'feedback',message:msg,email:$('fbEmail').value.trim()});
+  fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
+  setTimeout(function(){if(fm.parentNode)fm.parentNode.removeChild(fm)},1000);
+  setTimeout(function(){
+    $('fbSend').disabled=false;$('fbStatus').textContent='Sent, thanks!';
+    $('fbMsg').value='';$('fbEmail').value='';
+    setTimeout(function(){$('fbStatus').textContent=''},4000);
+  },800);
+});
 load();
 setInterval(load,60000);
 document.addEventListener('visibilitychange',function(){if(!document.hidden)load()});
