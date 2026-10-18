@@ -415,7 +415,8 @@ function resetMode(){
   $('modefld').style.display='none';$('modefld').classList.remove('bad');
   $('modebox').style.display='none';$('bizlist').style.display='none';$('bizlist').innerHTML='';
   $('modeRetry').style.display='none';$('modemsg').textContent='';
-  $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');
+  $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');$('modeDel').classList.remove('sel');
+  $('modeDel').style.display='none';$('delConfirm').style.display='none';
   $('oldlogo').style.display='none';$('dellogo').checked=false;
   $('contactBlock').style.display='none';
 }
@@ -450,25 +451,60 @@ function loadMine(){
     }
     bizList=m.businesses||[];
     if(!bizList.length){$('modefld').style.display='none';mode='new';$('contactBlock').style.display='block';return}
-    $('modemsg').textContent='';$('modebox').style.display='block';
+    $('modemsg').textContent='';$('modebox').style.display='block';$('modeDel').style.display='';
   });
 }
 $('modeRetry').addEventListener('click',loadMine);
+function clearModeSel(){
+  $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');$('modeDel').classList.remove('sel');
+  $('delConfirm').style.display='none';
+}
 $('modeNew').addEventListener('click',function(){
   mode='new';origName='';origLogoId='';
-  $('modeNew').classList.add('sel');$('modeUpd').classList.remove('sel');
-  $('bizlist').style.display='none';$('modefld').classList.remove('bad');
+  clearModeSel();$('modeNew').classList.add('sel');
+  $('bizlist').style.display='none';$('modebox').style.display='block';$('modefld').classList.remove('bad');
   clearBiz();
   $('contactBlock').style.display='block';
 });
 $('modeUpd').addEventListener('click',function(){
   mode='update';
-  $('modeUpd').classList.add('sel');$('modeNew').classList.remove('sel');
-  $('modefld').classList.remove('bad');
+  clearModeSel();$('modeUpd').classList.add('sel');
+  $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='block';
   if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);return}
   if(!origName){clearBiz()}
   showBizList();
+});
+$('modeDel').addEventListener('click',function(){
+  mode='remove';origName='';
+  clearModeSel();$('modeDel').classList.add('sel');
+  $('modebox').style.display='block';$('modefld').classList.remove('bad');
+  $('contactBlock').style.display='none';
+  if(bizList.length===1){showDelConfirm(bizList[0]);return}
+  showBizList();
+});
+function showDelConfirm(b){
+  origName=b.businessName;
+  $('modebox').style.display='none';
+  $('delName').textContent=b.businessName;
+  $('delConfirm').style.display='block';
+}
+$('delCancel').addEventListener('click',function(){
+  $('delConfirm').style.display='none';$('modebox').style.display='block';
+});
+$('delGo').addEventListener('click',function(){
+  $('delGo').disabled=true;
+  sendToScript({action:'remove',idToken:idToken,businessName:origName},function(m){
+    $('delGo').disabled=false;
+    if(m&&m.ok){
+      $('doneH').textContent='Listing removed';
+      qa('.step').forEach(function(s){s.classList.remove('show')});
+      $('steps').style.display='none';$('delConfirm').style.display='none';
+      $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+    }else{
+      alert((m&&m.error)||'Could not remove. Try again.');
+    }
+  },'remove');
 });
 function showBizList(){
   var box=$('bizlist');box.style.display='grid';
@@ -480,6 +516,7 @@ function showBizList(){
   if(f)f.addEventListener('input',function(){var q=f.value.toLowerCase();qa('#bizbtns button').forEach(function(b){b.style.display=b.textContent.toLowerCase().indexOf(q)===-1?'none':''})});
   $('bizbtns').addEventListener('click',function(e){
     var b=e.target.closest('[data-bi]');if(!b)return;
+    if(mode==='remove'){showDelConfirm(bizList[+b.dataset.bi]);return}
     qa('#bizbtns button').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
     fillBiz(bizList[+b.dataset.bi]);
     $('contactBlock').style.display='block';
