@@ -75,8 +75,9 @@ input[type=file]{font:700 14px var(--fb);max-width:100%}
 .fail{display:none;margin-top:12px;padding:10px 12px;background:#fff;border:3px solid var(--err);border-radius:12px;color:var(--err);font-weight:800;font-size:14px}
 a.lnk{color:#124080;font-weight:800}
 .navtabs{display:flex;gap:10px;justify-content:center;padding:10px 16px 0;flex-wrap:wrap}
-.navtabs a{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:50px;border:3px solid #1a1033;font-weight:800;font-size:14px;text-decoration:none;color:#1a1033;background:#fff;box-shadow:2px 2px 0 #1a1033;transition:.15s}
-.navtabs a:hover{transform:translateY(-1px);box-shadow:3px 4px 0 #1a1033}
+.navtabs a{display:inline-flex;align-items:center;gap:8px;font-family:var(--fh);letter-spacing:1px;font-size:21px;font-weight:400;color:var(--ink);background:linear-gradient(135deg,#ffb43a,#f2500f);border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);padding:10px 24px;min-height:50px;box-sizing:border-box;text-decoration:none}
+.navtabs a:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.navtabs a.builtby{background:#fff}
 h1,h2,.l,.dot,.tile,.opt,button.b,.sticker,.boom{font-weight:500}
 body{text-transform:uppercase}
 input,textarea,select,option,#printArea{text-transform:none}
@@ -107,7 +108,6 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 #errPop .go{display:block;box-sizing:border-box;width:100%;margin:12px 0 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:3px 3px 0 #1a1033}
 @keyframes epIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .navtabs{padding-bottom:32px}
-.navtabs .builtby{padding:4px 16px 4px 6px}
 .builtby img{width:28px;height:28px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 </style>
 </head>
