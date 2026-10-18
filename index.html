@@ -537,8 +537,8 @@ input,textarea,select,option,#printArea{text-transform:none}
   <details id="fbBox" style="margin:28px 0;background:var(--cream);border:3px solid var(--ink);border-radius:12px;padding:14px">
     <summary style="cursor:pointer;font-family:var(--fh);font-size:18px;color:var(--purple)">Feedback &amp; Suggestions</summary>
     <div style="margin-top:10px">
+      <p style="margin:0 0 8px;font-size:13px;color:var(--muted)">We won't reply, but we read every one. Thanks for helping us improve!</p>
       <textarea id="fbMsg" rows="3" placeholder="What's working, what's not, what would help?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
-      <input id="fbEmail" type="email" placeholder="Your email (optional, if you want a reply)" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;margin-top:8px">
       <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
         <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send</button>
         <span id="fbStatus" style="font-size:13px;color:var(--muted)"></span>
@@ -1806,18 +1806,19 @@ initAcct();
   row.insertBefore(b,row.firstChild);
 })();
 $('fbSend').addEventListener('click',function(){
+  if(!acct.email){$('fbStatus').textContent='Log in to send feedback.';return}
   var msg=$('fbMsg').value.trim();
   if(!msg){$('fbStatus').textContent='Type a message first.';return}
   $('fbSend').disabled=true;$('fbStatus').textContent='Sending...';
   var fm=document.createElement('form');
   fm.method='POST';fm.action=CSV_URL;fm.target='fbFrame';fm.style.display='none';
   var ta=document.createElement('textarea');ta.name='payload';
-  ta.value=JSON.stringify({action:'feedback',message:msg,email:$('fbEmail').value.trim()});
+  ta.value=JSON.stringify({action:'feedback',message:msg,idToken:acct.token});
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
   setTimeout(function(){if(fm.parentNode)fm.parentNode.removeChild(fm)},1000);
   setTimeout(function(){
-    $('fbSend').disabled=false;$('fbStatus').textContent='Sent, thanks!';
-    $('fbMsg').value='';$('fbEmail').value='';
+    $('fbSend').disabled=false;$('fbStatus').textContent='Thanks for the feedback!';
+    $('fbMsg').value='';
     setTimeout(function(){$('fbStatus').textContent=''},4000);
   },800);
 });
