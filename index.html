@@ -38,7 +38,11 @@ a{color:inherit}
 .navbtn.icon{width:36px;padding:0!important;justify-content:center}
 #muteRow #muteBtn{background:var(--teal);width:30px;padding:0!important;justify-content:center}
 #searchBtn{background:var(--magenta)}
-#filterBtn{background:var(--orange)}
+#filterBtn{background:var(--blue)}
+#filterBtn.on{background:var(--red)!important;box-shadow:inset 0 0 0 3px var(--yellow)}
+#allBtn{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important;font-family:'Bangers',var(--fh)!important;font-weight:400!important;font-size:17px!important;letter-spacing:1px;padding:0 14px}
+#allBtn .n{opacity:.7;margin-left:4px}
+#pills:empty{display:none}
 .navmenu .pills{display:flex;flex-direction:column;padding:0;overflow:visible;gap:4px}
 .navmenu .pill{display:flex;width:100%;box-sizing:border-box;background:var(--yellow);padding:0 8px;height:30px;font-size:12px;border-radius:10px}
 .hero-img{display:block;width:100%;max-width:520px;margin:0 auto;height:auto;aspect-ratio:3/1;object-fit:cover;object-position:50% 25%;border:4px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--ink);background:var(--purple)}
@@ -542,6 +546,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 </div>
 <div class="navrow">
 <button class="navbtn obvious" id="searchBtn" type="button" aria-label="Search" title="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
+<button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All <span class="n"></span></button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
 <button class="navbtn icon" id="dlBtn" type="button" aria-label="Download PDF" title="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg></button>
 <button class="navbtn icon" id="shareSiteBtn" type="button" aria-label="Share this directory" title="Share this directory"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
@@ -1006,7 +1011,7 @@ function computeFacets(){
 var CHEV='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>';
 function facetRank(l){var i=['Category','Contact options','Area Served'].indexOf(l);return i===-1?9:i}
 function buildFilters(){
-  $('pills').innerHTML='<button class="pill active" id="allBtn" type="button">All <span class="n">'+all.length+'</span></button>';
+  $('pills').innerHTML='';
   var sc=$('panel').scrollTop;
   var p='<div class="ptitle">Narrow it down!</div>';
   var order=facetDefs.map(function(d,i){return {d:d,i:i}}).sort(function(a,b){return facetRank(a.d.label)-facetRank(b.d.label)||a.i-b.i});
@@ -1299,6 +1304,7 @@ $('filterBtn').onclick=function(){
   else closePanel();
 };
 $('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))resetAll()});
+$('allBtn').onclick=function(){if(Object.keys(hidden).length){lastHidden=hidden;hidden={};saveHidden()}resetAll()};
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
