@@ -357,15 +357,31 @@ function honk(){
   }catch(e){}
 }
 function escH(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function errPop(title,lines){
+function errPop(title,lines,quiet){
   $('epT').textContent=title||'Hold up, neighbor!';
   $('epM').innerHTML=lines.map(function(l){return '<p>'+escH(l)+'</p>'}).join('');
-  $('errPop').classList.add('show');honk();
+  $('errPop').classList.add('show');if(!quiet)honk();
   setTimeout(function(){try{$('epGo').focus()}catch(e){}},50);
 }
 $('epGo').onclick=function(){$('errPop').classList.remove('show')};
 $('errPop').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').classList.remove('show')});
+/* confirm link from the email: form.html?confirm=CODE */
+(function(){
+  var code=(location.search.match(/[?&]confirm=([^&#]+)/)||[])[1];if(!code)return;
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+  errPop('Confirming...',['One moment while we confirm your email.'],true);$('epGo').style.display='none';
+  var cb='cfm'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
+  function fin(r){
+    clearTimeout(t);delete window[cb];sc.remove();$('epGo').style.display='';
+    if(r&&r.res==='done')errPop("You're pending!",['Thank you! Your email is confirmed.',(r.name||'Your business')+' is now Pending while we verify it. This usually takes a few hours and can take up to 12. We will email you the result.'],true);
+    else if(r&&r.res==='used')errPop('All set',['This link was already used, or it is no longer valid.','If you added a business, your email is already confirmed and your listing is Pending while we verify it. We will email you the result.'],true);
+    else errPop('Oops',['Could not confirm right now. Please tap the link in your email again in a minute, or email us.']);
+  }
+  window[cb]=fin;
+  sc.src=ENDPOINT+'?confirm='+encodeURIComponent(decodeURIComponent(code))+'&callback='+cb;sc.onerror=function(){fin(null)};
+  document.body.appendChild(sc);
+})();
 function popForBad(panel){
   var login=$('loginfld').classList.contains('bad'),mode2=$('modefld').classList.contains('bad');
   if(login){errPop('Sign in first, neighbor!',['Tap the Google sign-in button, then try again.']);return}
