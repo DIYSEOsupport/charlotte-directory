@@ -606,7 +606,7 @@ input,textarea,select,option,#printArea{text-transform:none}
   <details id="fbBox" style="margin:28px 0;background:var(--cream);border:3px solid var(--ink);border-radius:12px;padding:14px">
     <summary style="cursor:pointer;font-family:var(--fh);font-size:18px;color:var(--purple)">Help us improve! Tell us what you think</summary>
     <div style="margin-top:10px">
-      <p style="margin:0 0 10px;font-size:14px;line-height:1.4">Thank you for being one of our first visitors! This app is brand new, so a few bugs and rough edges are expected. If something looks wrong, breaks, or could work better, please let us know below so we can fix it. We read every message and truly appreciate your help. (Sign in first so we know who it's from.)</p>
+      <p style="margin:0 0 10px;font-size:14px;line-height:1.4">Thanks for being one of our first visitors! This app is brand new, so expect a few bugs. Tell us what looks wrong or could work better and we'll fix it.</p>
       <textarea id="fbMsg" rows="3" placeholder="What happened? What were you trying to do, and what phone or computer are you using?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
       <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
         <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send feedback</button>
@@ -621,7 +621,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <div id="printArea"></div>
 <iframe name="fbFrame" id="fbFrame" title="send" style="display:none"></iframe>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
-<div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
+<div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p id="lpP">Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -1270,6 +1270,7 @@ function beepBeep(){
   }catch(e){}
 }
 function showLoginPop(){
+  fbLogin=false;$('lpP').textContent='Log in to save favorites across devices.';
   $('loginPop').classList.add('show');honk();
 }
 function escH(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -1281,7 +1282,8 @@ function errPop(title,lines){
 $('epGo').onclick=function(){$('errPop').classList.remove('show')};
 $('errPop').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
 function closeLoginPop(){$('loginPop').classList.remove('show')}
-$('lpNo').onclick=function(){loginSkipped=true;try{localStorage.setItem('ccdir-login-skip','1')}catch(e){}closeLoginPop();try{buildFilters()}catch(e){}};
+var fbLogin=false;
+$('lpNo').onclick=function(){if(fbLogin){closeLoginPop();return}loginSkipped=true;try{localStorage.setItem('ccdir-login-skip','1')}catch(e){}closeLoginPop();try{buildFilters()}catch(e){}};
 $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLoginPop()});
 $('lpGo').onclick=function(){
   closeLoginPop();
@@ -2033,7 +2035,7 @@ initAcct();
   row.insertBefore(b,row.firstChild);
 })();
 $('fbSend').addEventListener('click',function(){
-  if(!acct.email){toast('Log in to send feedback.');return}
+  if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');honk();return}
   var msg=$('fbMsg').value.trim();
   if(!msg){toast('Type a message first.');return}
   $('fbSend').disabled=true;
