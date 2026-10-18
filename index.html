@@ -1580,6 +1580,7 @@ async function buildPdfCanvas(list,keepPages){
   /* ----- draw ----- */
   var QRI=await loadQr();
   var DIYI=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='diyseo-logo.png'});
+  var BANI=await new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='pdf-banner.jpg'});
   var out=[];
   for(var pi=0;pi<plan.length;pi++){
     var cv=document.createElement('canvas');cv.width=PW*S;cv.height=PH*S;
@@ -1588,18 +1589,13 @@ async function buildPdfCanvas(list,keepPages){
     var links=[],reg=function(o){links.push(o)};
     if(QRI){if(pi===0)c.drawImage(QRI,M+CW-44,FOOT+19,20,20);else c.drawImage(QRI,PW-M-40,14,40,40)}
     if(pi===0){
-      var heroEl=document.querySelector('.hero-img');
-      if(heroEl&&heroEl.complete&&heroEl.naturalWidth){
-        var hh=78,hw=Math.min(CW,hh*heroEl.naturalWidth/heroEl.naturalHeight);
-        c.drawImage(heroEl,M+(CW-hw)/2,10,hw,hh);
-        c.strokeStyle=BC.rule;c.lineWidth=1;c.strokeRect(M+(CW-hw)/2,10,hw,hh);
+      if(BANI){
+        var bw=460,bh=bw*BANI.naturalHeight/BANI.naturalWidth;
+        c.drawImage(BANI,M+(CW-bw)/2,10,bw,bh);
       }
-      cvSet(c,'600 24px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.textAlign='center';c.fillText('CHARLOTTE COUNTY',M+CW/2,104);
-      cvSet(c,'400 12px '+BF_H,'1px');c.fillStyle=BC.orange;c.fillText('Small Business Directory',M+CW/2,120);
-      c.textAlign='left';
-      c.fillStyle=BC.orange;c.fillRect(M+CW/2-22,130,44,3);
+      c.fillStyle=BC.orange;c.fillRect(M+CW/2-22,168,44,3);
       cvSet(c,'400 9px '+BF_B,'0px');c.fillStyle=BC.gray;c.textAlign='center';
-      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M+CW/2,148);
+      c.fillText(list.length+' business'+(list.length===1?'':'es')+'   |   '+today,M+CW/2,186);
       c.textAlign='left';
     }else{
       cvSet(c,'500 9px '+BF_H,'2px');c.fillStyle=BC.gray;c.fillText('SMALL BUSINESS DIRECTORY',M,40);
