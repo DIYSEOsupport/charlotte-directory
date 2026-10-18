@@ -1279,7 +1279,7 @@ function beepBeep(){
 }
 function showLoginPop(){
   fbLogin=false;$('lpP').textContent='Log in to save favorites across devices.';
-  $('loginPop').classList.add('show');honk();
+  $('loginPop').classList.add('show');if(!favHonked){favHonked=true;honk()}
 }
 function escH(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function errPop(title,lines){
@@ -1299,18 +1299,19 @@ $('lpGo').onclick=function(){
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
+var favHonked=false;
 function toggleFav(k,el){
   if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
-  if(favs[k]&&!acct.email){if(hasUser||loginSkipped)honk();else showLoginPop()}
+  if(favs[k]&&!acct.email){if(hasUser||loginSkipped){if(!favHonked){favHonked=true;honk()}}else showLoginPop()}
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
     else if(!promptedOnce&&window.google&&google.accounts&&google.accounts.id){promptedOnce=true;try{google.accounts.id.prompt()}catch(e){}}
   }
-  toast(favs[k]?(acct.email?'Saved':'Saved on this device. Log in to sync.'):'Removed',el);
+  toast(favs[k]?(acct.email?'Saved':'Saved on this device only'):'Removed',el);
   apply();
 }
 
