@@ -1436,7 +1436,7 @@ function fetchLogoData(b){
   var p=new Promise(function(res){
     var done=false;
     function fin(v){if(!done){done=true;res(v)}}
-    setTimeout(function(){fin(null)},15000);
+    setTimeout(function(){fin(null)},6000);
     function fromUrl(u,cors){var im=new Image();if(cors)im.crossOrigin='anonymous';im.onload=function(){fin(im)};im.onerror=function(){fin(null)};im.src=u}
     var id=logoId(b.logo);
     if(id&&/drive\.google\.com/i.test(b.logo)){
@@ -1752,6 +1752,7 @@ $('shEmail').onclick=function(){
 $('shText').onclick=async function(){
   var b=shareB;closeShare();if(!b)return;
   var t=contactText(b),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
+  toast('Preparing...');
   try{
     try{var im=await fetchLogoData(b);b._photo=im?logoJpeg(im,256):''}catch(e){b._photo=''}
     var fn=(b.name.replace(/[^\w\- ]+/g,'').trim()||'contact')+'.vcf';
