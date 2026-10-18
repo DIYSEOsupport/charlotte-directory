@@ -430,6 +430,12 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--green)!important}
+#shareBox #shCard{background:var(--orange)}
+#shareBox #shEmail{background:var(--teal)}
+#shareBox #shText{background:var(--magenta)}
+#shareBox #shPrint{background:var(--green)}
+#shareBox #shPdf{background:var(--purple)}
+#shareBox .btn:not(#shX){color:#fff;text-shadow:1px 1px 0 var(--ink)}
 #shareSiteBtn{background:var(--purple)!important;color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 #dlBtn:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
 #toggleAll{background:var(--green)!important}
@@ -544,7 +550,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 </main>
 
 <div class="modal" id="chooser"><div class="mbox"><div class="mt" id="chT"></div><button class="btn main" id="chRes" type="button"></button><button class="btn" id="chAll" type="button"></button><button class="btn" id="chX" type="button">Cancel</button></div></div>
-<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPdf" type="button">PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
+<div class="modal" id="shareBox"><div class="mbox"><div class="mt" id="shT"></div><button class="btn main" id="shCard" type="button">Save to phone contacts</button><button class="btn" id="shEmail" type="button">Email</button><button class="btn" id="shText" type="button">Send contact card</button><button class="btn" id="shPrint" type="button" style="display:none">Print</button><button class="btn" id="shPdf" type="button">PDF</button><button class="btn" id="shX" type="button">Cancel</button></div></div>
 <div class="modal" id="fmtBox"><div class="mbox"><div class="mt">Download</div><button class="btn main" id="fmtPdf" type="button">PDF</button><button class="btn" id="fmtX" type="button">Cancel</button></div></div>
 <div id="printArea"></div>
 <iframe name="fbFrame" id="fbFrame" title="send" style="display:none"></iframe>
@@ -1846,6 +1852,7 @@ function openShare(b){
   $('shT').textContent=b?b.name:'Share this directory';
   $('shCard').style.display=b?'':'none';
   $('shEmail').style.display=b?'':'none';
+  $('shPrint').style.display=b?'none':'';
   $('shText').textContent=b?'Send contact card':'Share link';
   $('shText').style.display=(!b||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))?'':'none';
   $('shareBox').classList.add('show');
@@ -1915,6 +1922,7 @@ async function dlCard(b,ios){
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
 }
 var fmtB=null;
+$('shPrint').onclick=function(){closeShare();askAct('print')};
 $('shPdf').onclick=function(){var b=shareB,site=shareSite;closeShare();if(site){askAct('pdf');return}if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf')};
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
