@@ -108,7 +108,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 @keyframes epIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .builtby{display:flex;align-items:center;justify-content:center;padding:24px 16px 32px}
 .builtby a{display:flex;align-items:center;gap:10px;color:#6b5f8a;text-decoration:none;font-size:13px}
-.builtby img{width:32px;height:32px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
+.builtby img{width:32px;height:32px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 </style>
 </head>
 <body>
@@ -219,11 +219,9 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 
   <div class="card done-card" id="done">
     <h1 id="doneH">Confirm your email</h1>
-    <p class="note" id="doneExtra">Not listed until you confirm. Check email for instructions.</p>
-    <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button></div>
+    <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove my business</button></div>
   </div>
 </div>
-<p id="needHelp" style="text-align:center;font-weight:700;margin:14px 0 0">Need help? <a href="mailto:DIYSEO.support@gmail.com">DIYSEO.support@gmail.com</a></p>
 <div class="navtabs"><a href="mailto:DIYSEO.support@gmail.com">✉️ Help</a><a href="index.html">📋 Directory</a></div>
 <div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
@@ -619,16 +617,15 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   if(flag==='Unconfirmed'){
     $('doneH').textContent='Confirm your email';
-    $('doneExtra').textContent='Not listed until you confirm. Check email for instructions.';
   }else if(flag==='unconfirmed'){
     $('doneH').textContent='Check your email!';
-    $('doneExtra').textContent='Not listed until you confirm. Check email for instructions.';
   }
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';
   $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
 }
 $('again').addEventListener('click',function(){location.reload()});
+$('updateBiz').addEventListener('click',function(){location.reload()});
 renderSteps();
 initLogin();
 try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setSignedIn(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
