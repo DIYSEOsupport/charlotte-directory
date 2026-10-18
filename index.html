@@ -47,7 +47,7 @@ a{color:inherit}
 .catpill.cc2{background:var(--magenta);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc3{background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc4{background:var(--purple);color:#fff;text-shadow:1px 1px 0 var(--ink)}
-.catpill.cc5{background:var(--yellow);color:var(--ink)}
+.catpill.cc5{background:#12407a;color:#fff;text-shadow:1px 1px 0 var(--ink)}
 #viewCount{margin-left:auto;color:#8a8a99;font-family:var(--fh);font-size:16px;letter-spacing:.6px;white-space:nowrap}
 #hideTogBtn,#filterBtn{position:relative}
 #hideTogBtn[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--ink)}
@@ -531,6 +531,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 .navgrid .navrow:not(.searchrow) .navbtn{padding:0 8px!important;min-width:36px;justify-content:center}
 #tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink);border:2px solid var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap}
 #allBtn{padding:0 10px!important}
+@media(max-width:400px){.navgrid .navrow:not(.searchrow){gap:5px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 5px!important;min-width:34px}#toggleAll{width:34px}}
+@media(max-width:340px){.navgrid .navrow:not(.searchrow){gap:3px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 3px!important;min-width:31px}#toggleAll{width:31px}}
 #viewCount{font-size:15px;margin-left:auto}
 .searchrow{flex-wrap:nowrap;width:100%}
 .searchrow .search{flex:1;min-width:0}
@@ -580,7 +582,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add / Update Biz</span></a>
 </div>
 <div class="navrow">
-<button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All <span class="n"></span></button>
+<button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All</button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
 <button class="navbtn icon" id="hideTogBtn" type="button" style="display:none"></button>
 <button class="navbtn obvious" id="toggleAll" type="button" aria-label="Expand all" title="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
@@ -1100,7 +1102,6 @@ function apply(){
   render();
   var n=(st.fav?1:0)+(st.showHidden?1:0);for(var l in st.f)n+=(st.f[l]||[]).length;
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
-  var allN=document.querySelector('#allBtn .n');if(allN)allN.textContent=all.length;
   $('clear').classList.toggle('show',!!st.q);
   var nhv=view.filter(function(b){return hidden[keyOf(b)]&&!isDiy(b)}).length;
   $('viewCount').textContent=view.length+' of '+all.length+(st.showAll&&nhv?' ('+nhv+' hidden shown)':'');
@@ -1698,7 +1699,7 @@ async function buildPdfCanvas(list,keepPages){
   }
 
   /* ----- rolodex cards: one per business, tab on top, slot at bottom ----- */
-  var CATC={'Home & Garden Services':'#1f8a4c','Local Trades & Repairs':'#ff7a1a','Food & Drinks':'#c2307a','Shops & Retail':'#1fb5c9','Beauty, Salons & Fitness':'#5b2a86','Professional & Online Services':'#ffd23f'};
+  var CATC={'Home & Garden Services':'#1f8a4c','Local Trades & Repairs':'#ff7a1a','Food & Drinks':'#c2307a','Shops & Retail':'#1fb5c9','Beauty, Salons & Fitness':'#5b2a86','Professional & Online Services':'#12407a'};
   function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
   function drawTab(c,b,right,top,maxW){
     var cat=(b.category&&b.category!=='Local Business')?b.category:'Local Business',col=CATC[canonCat(cat)]||'#6b6b7a';
@@ -1706,7 +1707,7 @@ async function buildPdfCanvas(list,keepPages){
     var lab=fit(c,cat.toUpperCase(),maxW-20),tw=c.measureText(lab).width,tx=right-tw-20;
     c.strokeStyle=BC.ink;c.lineWidth=1.8;c.fillStyle=col;rr(c,tx,top-14,tw+20,18,6);c.fill();c.stroke();
     c.fillStyle='#fff6dc';c.fillRect(tx+1,top-0.5,tw+18,3);
-    c.fillStyle=col==='#ffd23f'?BC.ink:'#fff';c.fillText(lab,tx+10,top-4);
+    c.fillStyle='#fff';c.fillText(lab,tx+10,top-4);
   }
   function gridCard(c,g,reg){
     var b=g.b,x=g.x,y=g.y,w=g.w,h=g.h,ix=x+12,iw=w-24,LW=50,im=b._img;
