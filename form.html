@@ -146,12 +146,14 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
         <p class="note">This takes it off the directory right away. Message DIYSEO.support@gmail.com if you want it back.</p>
         <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
       </div>
+      <div id="contactBlock" style="display:none">
       <h2 style="margin-top:6px">Contact info for person completing form</h2>
       <p class="note">Not published. We only use this if we have questions about your submission.</p>
       <div class="fld" data-req><label class="l" for="name">Name <span class="req">*</span></label><input type="text" id="name" autocomplete="name"><div class="err">Enter your name.</div></div>
       <div class="fld" data-req><label class="l" for="title">Title <span class="req">*</span></label><input type="text" id="title" autocomplete="organization-title"><div class="err">Enter your title.</div></div>
       <div class="fld" data-req><label class="l" for="how">How to contact you with questions about your submission? <span class="req">*</span></label><input type="text" id="how" placeholder="Phone or email"><div class="err" id="howerr">Enter a 10 digit phone number or a valid email.</div></div>
       <div class="nav"><span></span><button type="button" class="b" data-next>Next</button></div>
+      </div>
     </div>
 
     <div class="card step" data-step="1">
@@ -219,7 +221,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 
   <div class="card done-card" id="done">
     <h1 id="doneH">Confirm your email</h1>
-    <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove my business</button></div>
+    <p class="note" id="doneNote">Open your email and tap the confirm link to finish.</p>
+    <div class="nav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="https://mail.google.com" target="_blank" rel="noopener"><button type="button" class="b" id="openMail">Open email</button></a><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove my business</button></div>
   </div>
 </div>
 <div class="navtabs"><a href="mailto:DIYSEO.support@gmail.com">✉️ Help</a><a href="index.html">📋 Directory</a></div>
@@ -414,6 +417,7 @@ function resetMode(){
   $('modeRetry').style.display='none';$('modemsg').textContent='';
   $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');
   $('oldlogo').style.display='none';$('dellogo').checked=false;
+  $('contactBlock').style.display='none';
 }
 function sendToScript(payload,done,wantKind){
   wantKind=wantKind||'mine';
@@ -445,7 +449,7 @@ function loadMine(){
       return;
     }
     bizList=m.businesses||[];
-    if(!bizList.length){$('modefld').style.display='none';mode='new';return}
+    if(!bizList.length){$('modefld').style.display='none';mode='new';$('contactBlock').style.display='block';return}
     $('modemsg').textContent='';$('modebox').style.display='block';
   });
 }
@@ -455,11 +459,13 @@ $('modeNew').addEventListener('click',function(){
   $('modeNew').classList.add('sel');$('modeUpd').classList.remove('sel');
   $('bizlist').style.display='none';$('modefld').classList.remove('bad');
   clearBiz();
+  $('contactBlock').style.display='block';
 });
 $('modeUpd').addEventListener('click',function(){
   mode='update';
   $('modeUpd').classList.add('sel');$('modeNew').classList.remove('sel');
   $('modefld').classList.remove('bad');
+  $('contactBlock').style.display='block';
   if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);return}
   if(!origName){clearBiz()}
   showBizList();
@@ -476,6 +482,7 @@ function showBizList(){
     var b=e.target.closest('[data-bi]');if(!b)return;
     qa('#bizbtns button').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
     fillBiz(bizList[+b.dataset.bi]);
+    $('contactBlock').style.display='block';
   });
 }
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
