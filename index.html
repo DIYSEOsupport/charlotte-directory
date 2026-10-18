@@ -159,7 +159,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .fb:hover{background:#1877f2;color:#fff}
 .nd:hover{background:#00b246;color:#fff}
 
-.acct{margin:0;font-size:12px;font-weight:800;color:var(--ink)}
+.acct{display:flex;align-items:center;gap:8px;margin:0;font-size:12px;font-weight:800;color:var(--ink)}
 .acct>div{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:flex-start;min-height:32px}
 #acctEmail{text-transform:none;word-break:break-all}
 #signOut{font:inherit;font-weight:800;border:2px solid var(--ink);background:var(--yellow);color:var(--ink);border-radius:10px;padding:3px 10px;cursor:pointer}
@@ -531,6 +531,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 .navgrid .navrow:not(.searchrow) .navbtn{padding:0 8px!important;min-width:36px;justify-content:center}
 #tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink);border:2px solid var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap}
 #allBtn{padding:0 10px!important}
+#allBtn.on{box-shadow:inset 0 0 0 3px var(--ink),2px 2px 0 var(--ink)!important}
+#backForm{display:inline-flex;align-items:center;gap:5px;margin-left:auto;height:32px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:var(--green);color:#fff;text-shadow:1px 1px 0 var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:14px;text-decoration:none;white-space:nowrap}
 @media(max-width:400px){.navgrid .navrow:not(.searchrow){gap:5px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 5px!important;min-width:34px}#toggleAll{width:34px}}
 @media(max-width:340px){.navgrid .navrow:not(.searchrow){gap:3px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 3px!important;min-width:31px}#toggleAll{width:31px}}
 #viewCount{font-size:15px;margin-left:auto}
@@ -1066,7 +1068,13 @@ function buildFilters(){
 }
 
 function syncPend(){pend={f:JSON.parse(JSON.stringify(st.f)),fav:st.fav,showHidden:st.showHidden,sort:st.sort,picked:st.picked}}
-function closePanel(){var pn=$('panel');pn.classList.remove('open');var fb=$('filterBtn');fb.classList.remove('on');fb.setAttribute('aria-expanded','false')}
+function updBadge(){
+  var o=$('panel').classList.contains('open'),s=o?pend:st;
+  var n=(s.fav?1:0)+(s.showHidden?1:0);for(var l in s.f)n+=(s.f[l]||[]).length;
+  var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
+  var ab=$('allBtn'),on=!n&&!st.q;ab.classList.toggle('on',on);ab.setAttribute('aria-pressed',on);
+}
+function closePanel(){var pn=$('panel');pn.classList.remove('open');var fb=$('filterBtn');fb.classList.remove('on');fb.setAttribute('aria-expanded','false');updBadge()}
 function commitPend(){
   st.f={};Object.keys(pend.f).forEach(function(l){if(pend.f[l]&&pend.f[l].length)st.f[l]=pend.f[l].slice()});
   st.fav=pend.fav;
@@ -1100,8 +1108,7 @@ function apply(){
   view.sort((a,b)=>s==='name-desc'?b.name.localeCompare(a.name):s==='cat-asc'?catCmp(a,b):s==='loc-asc'?a.location.localeCompare(b.location)||a.name.localeCompare(b.name):a.name.localeCompare(b.name));
   if(!st.q.trim()&&!st.fav&&!st.showHidden&&_n===0&&st.cat==='ALL'){var _i=-1;for(var _k=0;_k<view.length;_k++){if(/diyseo/i.test(view[_k].name)){_i=_k;break}}if(_i>0){view.unshift(view.splice(_i,1)[0])}}
   render();
-  var n=(st.fav?1:0)+(st.showHidden?1:0);for(var l in st.f)n+=(st.f[l]||[]).length;
-  var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
+  updBadge();
   $('clear').classList.toggle('show',!!st.q);
   var nhv=view.filter(function(b){return hidden[keyOf(b)]&&!isDiy(b)}).length;
   $('viewCount').textContent=view.length+' of '+all.length+(st.showAll&&nhv?' ('+nhv+' hidden shown)':'');
@@ -1331,7 +1338,7 @@ $('q').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefau
 $('clear').onclick=()=>{$('q').value='';st.q='';apply();$('q').focus()};
 $('filterBtn').onclick=function(){
   var o=!$('panel').classList.contains('open');
-  if(o){syncPend();buildFilters();$('panel').classList.add('open');this.classList.add('on');this.setAttribute('aria-expanded','true')}
+  if(o){syncPend();buildFilters();$('panel').classList.add('open');this.classList.add('on');this.setAttribute('aria-expanded','true');updBadge()}
   else closePanel();
 };
 $('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))resetAll()});
@@ -1361,8 +1368,8 @@ $('panel').addEventListener('click',function(e){
 $('panel').addEventListener('change',function(e){
   var t=e.target;
   if(t.name==='sortopt'){pend.sort=t.value;pend.picked=true;var cs=$('panel').querySelector('.cursort');if(cs)cs.textContent=(t.nextSibling&&t.nextSibling.textContent)||'';return}
-  if(t.id==='favOnly'){pend.fav=t.checked;return}
-  if(t.id==='hiddenOnly'){pend.showHidden=t.checked;return}
+  if(t.id==='favOnly'){pend.fav=t.checked;updBadge();return}
+  if(t.id==='hiddenOnly'){pend.showHidden=t.checked;updBadge();return}
   if(t.dataset&&t.dataset.fi!==undefined){
     var d=facetDefs[+t.dataset.fi];if(!d)return;
     var v=d.values[+t.dataset.vi];
@@ -1372,6 +1379,7 @@ $('panel').addEventListener('change',function(e){
     if(!t.checked&&i!==-1)a.splice(i,1);
     var acc=t.closest('.acc'),c=acc.querySelector('.selcnt');
     c.textContent=a.length;c.classList.toggle('on',a.length>0);
+    updBadge();
   }
 });
 
@@ -2030,10 +2038,10 @@ $('signOut').addEventListener('click',signOut);try{var sv=localStorage.getItem('
 initAcct();
 (function(){
   if(!/form\.html/i.test(document.referrer))return;
-  var row=document.querySelector('.navrow');if(!row)return;
-  var b=document.createElement('a');b.href='form.html';b.className='navbtn obvious';b.style.cssText='background:var(--purple)!important';
-  b.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span class="lbl">Back to form</span>';
-  row.insertBefore(b,row.firstChild);
+  if(!$('acct'))return;
+  var b=document.createElement('a');b.href='form.html';b.id='backForm';
+  b.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to form';
+  $('acct').appendChild(b);
 })();
 $('fbSend').addEventListener('click',function(){
   if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');honk();return}
