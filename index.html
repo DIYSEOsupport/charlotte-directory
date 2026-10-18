@@ -430,6 +430,7 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--green)!important}
+#shareSiteBtn{background:var(--purple)!important;color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 #dlBtn:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
 #toggleAll{background:var(--green)!important}
 #toggleAll:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
@@ -487,10 +488,6 @@ input,textarea,select,option,#printArea{text-transform:none}
 #pdfReady .go{display:block;box-sizing:border-box;width:100%;margin:8px 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;text-decoration:none;box-shadow:3px 3px 0 #1a1033;cursor:pointer}
 #pdfReady .go.alt{background:#fff;color:#1a1033}
 @media print{#printArea img.pp{display:block;width:100%;height:auto;page-break-after:always;break-after:page}#printArea img.pp:last-child{page-break-after:auto;break-after:auto}}
-.builtby{display:flex;align-items:center;justify-content:center;gap:10px;padding:24px 16px 32px}
-.builtby a{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:800}
-.builtby a:hover{text-decoration:underline}
-.builtby img{width:32px;height:32px;border-radius:10px;object-fit:contain;background:#fff;flex:none}
 </style>
 </head>
 <body>
@@ -514,6 +511,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 <button class="navbtn obvious" id="searchBtn" type="button" aria-label="Search" title="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Search</span></button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
 <button class="navbtn icon" id="dlBtn" type="button" aria-label="Download PDF" title="Download PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 18h14"/></svg></button>
+<button class="navbtn icon" id="shareSiteBtn" type="button" aria-label="Share this directory" title="Share this directory"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg></button>
 <div id="muteRow"></div>
 </div>
 </div>
@@ -552,7 +550,6 @@ input,textarea,select,option,#printArea{text-transform:none}
 <iframe name="fbFrame" id="fbFrame" title="send" style="display:none"></iframe>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <div id="loginPop" role="dialog" aria-modal="true" aria-labelledby="lpT"><div class="bx"><div class="hd" id="lpT">Hold up, neighbor!</div><p>Log in to save favorites across devices.</p><button type="button" class="go" id="lpGo">Log in</button><button type="button" class="go alt" id="lpNo">Not now</button></div></div>
-<div class="builtby"><a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a><a id="emailBtn" href="mailto:DIYSEO.support@gmail.com" aria-label="Contact Us"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Contact Us</a></div>
 <div class="toast" id="toast"></div>
 <button class="totop" id="top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
@@ -988,6 +985,7 @@ function buildFilters(){
   p+='<label class="savedrow"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
   var nhd=all.filter(function(b){return hidden[keyOf(b)]}).length;
   p+='<label class="savedrow"><input type="checkbox" id="hiddenOnly"'+(pend.showHidden?' checked':'')+'><span class="svl">Hidden</span><span class="svc">'+nhd+'</span></label>';
+  if(nhd)p+='<button class="btn" type="button" id="unhideAll" style="width:100%;margin-bottom:10px">Unhide all ('+nhd+')</button>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
   $('panel').innerHTML=p;
   $('panel').scrollTop=sc;
@@ -1269,6 +1267,7 @@ $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
   if(e.target.closest('#applyBtn')){commitPend();return}
+  if(e.target.closest('#unhideAll')){hidden={};saveHidden();st.showHidden=pend.showHidden=false;toast('All unhidden');buildFilters();apply();return}
   if(e.target.closest('#reset')){resetAll();return}
 });
 $('panel').addEventListener('change',function(e){
@@ -1785,6 +1784,7 @@ function askAct(kind){
   $('chooser').classList.add('show');
 }
 $('dlBtn').onclick=function(){askAct('pdf')};
+$('shareSiteBtn').onclick=function(){openShare(null)};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
 $('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
@@ -1840,18 +1840,22 @@ function vcard(b){
   v.push('END:VCARD');
   return v.join('\r\n');
 }
+var shareSite=false,SITE_URL='https://diyseosupport.github.io/charlotte-directory/',SITE_NAME='Charlotte County Small Business Directory';
 function openShare(b){
-  shareB=b;
-  $('shT').textContent=b.name;
-  $('shText').style.display=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)?'':'none';
+  shareB=b;shareSite=!b;
+  $('shT').textContent=b?b.name:'Share this directory';
+  $('shCard').style.display=b?'':'none';
+  $('shEmail').style.display=b?'':'none';
+  $('shText').textContent=b?'Send contact card':'Share link';
+  $('shText').style.display=(!b||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))?'':'none';
   $('shareBox').classList.add('show');
 }
 var shareClosedAt=0;
 function closeShare(){$('shareBox').classList.remove('show');shareClosedAt=Date.now()}
 $('shEmail').onclick=function(){
-  var b=shareB;closeShare();if(!b)return;
-  var subj=b.name+' — Charlotte County Small Business Directory';
-  var body=contactText(b)+'\n\n——————————\nShared via the Charlotte County Small Business Directory\ndiyseosupport.github.io/charlotte-directory';
+  var b=shareB,site=shareSite;closeShare();if(!b&&!site)return;
+  var subj=site?SITE_NAME:b.name+' — Charlotte County Small Business Directory';
+  var body=site?'Find local businesses in Charlotte County:\n'+SITE_URL:contactText(b)+'\n\n——————————\nShared via the Charlotte County Small Business Directory\ndiyseosupport.github.io/charlotte-directory';
   if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
     window.open('https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body),'_blank','noopener');
     return;
@@ -1861,7 +1865,15 @@ $('shEmail').onclick=function(){
   document.body.appendChild(a);a.click();a.remove();
 };
 $('shText').onclick=async function(){
-  var b=shareB;closeShare();if(!b)return;
+  var b=shareB,site=shareSite;closeShare();
+  if(site){
+    var u='Find local businesses in Charlotte County: '+SITE_URL;
+    if(navigator.share){try{await navigator.share({title:SITE_NAME,url:SITE_URL});return}catch(e){if(e&&e.name==='AbortError')return}}
+    if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){try{await navigator.clipboard.writeText(SITE_URL);toast('Link copied')}catch(e){toast(SITE_URL)}return}
+    var a0=document.createElement('a');a0.href='sms:'+(/iPhone|iPad|iPod/i.test(navigator.userAgent)?'&':'?')+'body='+encodeURIComponent(u);
+    document.body.appendChild(a0);a0.click();a0.remove();return;
+  }
+  if(!b)return;
   var t=contactText(b),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
   toast('Preparing...');
   try{
@@ -1903,7 +1915,7 @@ async function dlCard(b,ios){
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1000);
 }
 var fmtB=null;
-$('shPdf').onclick=function(){var b=shareB;closeShare();if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf')};
+$('shPdf').onclick=function(){var b=shareB,site=shareSite;closeShare();if(site){askAct('pdf');return}if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf')};
 $('shX').onclick=closeShare;
 $('shareBox').addEventListener('click',function(e){if(e.target===this)closeShare()});
 
