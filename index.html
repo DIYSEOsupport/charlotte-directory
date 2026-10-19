@@ -40,7 +40,6 @@ a{color:inherit}
 #searchBtn{background:var(--magenta)}
 #filterBtn{background:var(--blue)}
 #filterBtn.on{background:var(--red)!important;box-shadow:inset 0 0 0 3px var(--yellow)}
-#allBtn{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important;font-family:'Bangers',var(--fh)!important;font-weight:400!important;font-size:17px!important;letter-spacing:1px;padding:0 14px}
 /* category pill colors, same as the PDF tabs */
 .catpill.cc0{background:var(--green);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc1{background:var(--orange);color:#fff;text-shadow:1px 1px 0 var(--ink)}
@@ -54,7 +53,6 @@ a{color:inherit}
 #hideTogBtn .hcnt{position:absolute;top:-8px;right:-8px;min-width:20px;height:20px;line-height:16px;border:2px solid var(--ink);border-radius:50px;background:var(--red);color:#fff;font-size:12px;text-align:center;text-shadow:none}
 .card.ishidden{opacity:.6;filter:grayscale(.5)}
 .card.ishidden .title::after{content:' \2022  HIDDEN';color:var(--red);font-size:.7em;letter-spacing:1px}
-#allBtn .n{opacity:.7;margin-left:4px}
 #pills:empty{display:none}
 .navmenu .pills{display:flex;flex-direction:column;padding:0;overflow:visible;gap:4px}
 .navmenu .pill{display:flex;width:100%;box-sizing:border-box;background:var(--yellow);padding:0 8px;height:30px;font-size:12px;border-radius:10px}
@@ -532,8 +530,6 @@ input,textarea,select,option,#printArea{text-transform:none}
 .navgrid .navrow:not(.searchrow){gap:9px}
 .navgrid .navrow:not(.searchrow) .navbtn{padding:0 8px!important;min-width:36px;justify-content:center}
 #tip{position:fixed;z-index:99999;display:none;pointer-events:none;background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink);border:2px solid var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:15px;padding:6px 12px;border-radius:10px;box-shadow:2px 2px 0 var(--ink);white-space:nowrap}
-#allBtn{padding:0 10px!important}
-#allBtn.on{box-shadow:inset 0 0 0 3px var(--ink),2px 2px 0 var(--ink)!important}
 #backForm{display:inline-flex;align-items:center;gap:5px;margin-left:auto;height:32px;padding:0 10px;border:2px solid var(--ink);border-radius:10px;background:var(--green);color:#fff;text-shadow:1px 1px 0 var(--ink);box-shadow:2px 2px 0 var(--ink);font-family:var(--fh);letter-spacing:.8px;font-size:14px;text-decoration:none;white-space:nowrap}
 @media(max-width:400px){.navgrid .navrow:not(.searchrow){gap:5px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 5px!important;min-width:34px}#toggleAll{width:34px}}
 @media(max-width:340px){.navgrid .navrow:not(.searchrow){gap:3px}.navgrid .navrow:not(.searchrow) .navbtn{padding:0 3px!important;min-width:31px}#toggleAll{width:31px}}
@@ -586,7 +582,6 @@ input,textarea,select,option,#printArea{text-transform:none}
 <a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add / Update Biz</span></a>
 </div>
 <div class="navrow">
-<button class="navbtn" id="allBtn" type="button" aria-label="Show all businesses" title="Show all businesses">All</button>
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
 <button class="navbtn icon" id="hideTogBtn" type="button" style="display:none"></button>
 <button class="navbtn obvious" id="toggleAll" type="button" aria-label="Expand all" title="Expand all"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9V5h4M16 9V5h-4M8 15v4h4M16 15v4h-4"/></svg><span class="lbl">Expand all</span></button>
@@ -1077,7 +1072,6 @@ function updBadge(){
   var o=$('panel').classList.contains('open'),s=o?pend:st;
   var n=(s.fav?1:0)+(s.showHidden?1:0);for(var l in s.f)n+=(s.f[l]||[]).length;
   var bd=$('badge');bd.textContent=n;bd.classList.toggle('show',n>0);
-  var ab=$('allBtn'),on=!n&&!st.q;ab.classList.toggle('on',on);ab.setAttribute('aria-pressed',on);
 }
 function closePanel(){var pn=$('panel');pn.classList.remove('open');var fb=$('filterBtn');fb.classList.remove('on');fb.setAttribute('aria-expanded','false');updBadge()}
 function commitPend(){
@@ -1105,7 +1099,7 @@ function apply(){
     if(st.cat!=='ALL'&&b.category!==st.cat)return false;
     for(var l in st.f){var sel=st.f[l];if(sel&&sel.length&&!(b.fx[l]||[]).some(v=>sel.indexOf(v)!==-1))return false}
     if(st.fav&&!favs[keyOf(b)]&&!isDiy(b))return false;
-    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(hidden[keyOf(b)]&&!isDiy(b))return false;
+    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(!st.showAll&&hidden[keyOf(b)]&&!isDiy(b))return false;
     return true;
   });
   var s=st.sort;
@@ -1303,8 +1297,8 @@ $('lpGo').onclick=function(){
   try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
-var favHonked=false;try{favHonked=localStorage.getItem('ccdir-fav-honk')==='1'}catch(e){}
-function favHonk(){if(favHonked)return;favHonked=true;try{localStorage.setItem('ccdir-fav-honk','1')}catch(e){}honk()}
+var favHonked=false;
+function favHonk(){if(favHonked)return;favHonked=true;honk()}
 function toggleFav(k,el){
   if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
@@ -1325,6 +1319,7 @@ function toggleHide(k,el){
   if(hidden[k])delete hidden[k];else hidden[k]=1;
   saveHidden();
   if(hidden[k]&&favs[k]){delete favs[k];saveFavs()}
+  if(hidden[k])st.showAll=false;
   // hidden cards leave the list, so the Undo popup sits at the bottom of the screen instead of on the card
   toast(hidden[k]?'Hidden.':'Unhidden',hidden[k]?null:el);
   if(hidden[k]){
@@ -1370,7 +1365,6 @@ $('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))res
   document.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.navbtn');if(b)show(b)});
   document.addEventListener('focusout',hide);document.addEventListener('scroll',hide,true);document.addEventListener('click',function(){setTimeout(hide,1200)});
 })();
-$('allBtn').onclick=function(){resetAll();toast('Showing all')};
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
@@ -1911,7 +1905,7 @@ function updHideBtn(){
   t=st.showHidden?'Back to normal view':'Show only the '+n+' hidden';
   b.title=t;b.setAttribute('aria-label',t);
 }
-$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;buildFilters();apply()};
+$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;st.showAll=!st.showHidden;buildFilters();apply()};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
 $('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
