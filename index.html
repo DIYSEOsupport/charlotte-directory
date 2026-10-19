@@ -1100,7 +1100,7 @@ function apply(){
     if(st.cat!=='ALL'&&b.category!==st.cat)return false;
     for(var l in st.f){var sel=st.f[l];if(sel&&sel.length&&!(b.fx[l]||[]).some(v=>sel.indexOf(v)!==-1))return false}
     if(st.fav&&!favs[keyOf(b)]&&!isDiy(b))return false;
-    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(hidden[keyOf(b)]&&!isDiy(b))return false;
+    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(!st.showAll&&hidden[keyOf(b)]&&!isDiy(b))return false;
     return true;
   });
   var s=st.sort;
@@ -1319,6 +1319,7 @@ function toggleHide(k,el){
   if(hidden[k])delete hidden[k];else hidden[k]=1;
   saveHidden();
   if(hidden[k]&&favs[k]){delete favs[k];saveFavs()}
+  if(hidden[k])st.showAll=false;
   toast(hidden[k]?'Hidden. Find it under Filters > Hidden.':'Unhidden',el);
   buildFilters();apply();
 }
@@ -1357,7 +1358,7 @@ $('pills').addEventListener('click',function(e){if(e.target.closest('.pill'))res
   document.addEventListener('focusin',function(e){var b=e.target.closest&&e.target.closest('.navbtn');if(b)show(b)});
   document.addEventListener('focusout',hide);document.addEventListener('scroll',hide,true);document.addEventListener('click',function(){setTimeout(hide,1200)});
 })();
-$('allBtn').onclick=function(){resetAll();toast('Showing all')};
+$('allBtn').onclick=function(){resetAll();st.showAll=true;apply();toast('Showing all')};
 $('panel').addEventListener('click',function(e){
   var h=e.target.closest('.acch');
   if(h){var acc=h.parentNode,l=acc.dataset.l;accOpen[l]=!accOpen[l];acc.classList.toggle('open',!!accOpen[l]);h.setAttribute('aria-expanded',!!accOpen[l]);return}
@@ -1897,7 +1898,7 @@ function updHideBtn(){
   t=st.showHidden?'Back to normal view':'Show only the '+n+' hidden';
   b.title=t;b.setAttribute('aria-label',t);
 }
-$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;st.showAll=false;buildFilters();apply()};
+$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;st.showAll=!st.showHidden;buildFilters();apply()};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
 $('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
