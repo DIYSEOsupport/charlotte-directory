@@ -456,8 +456,8 @@ span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:
 #shareBox .btn:not(#shX){color:#fff;text-shadow:1px 1px 0 var(--ink)}
 #shareSiteBtn{background:var(--purple)!important;color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 #dlBtn:hover{box-shadow:0 0 0 4px rgba(31,138,76,.35),2px 2px 0 var(--ink)}
-#toggleAll{background:var(--teal)!important}
-#toggleAll:hover{box-shadow:0 0 0 4px rgba(31,182,201,.35),2px 2px 0 var(--ink)}
+#toggleAll{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important}
+#toggleAll:hover{box-shadow:0 0 0 4px rgba(255,210,63,.45),2px 2px 0 var(--ink)}
 /* Bangers headings + Walter Turncoat text */
 .title,.sect,.mt,.ptitle,.savedrow .svl,.chip,.catpill,.grid .acts .btn,.btn,.icon-btn .lbl{font-weight:500!important}
 .title{letter-spacing:.3px}
@@ -523,7 +523,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 #toggleAll{width:38px}
 #toggleAll .lbl{display:none}
 .addbiz{padding:0 12px!important}
-.addbiz .lbl{display:inline;font-size:14px;line-height:1.05;text-align:center}
+.addbiz .lbl{display:inline;font-size:18px;line-height:1.05;text-align:center;white-space:normal;overflow:visible;text-overflow:clip}
 .slogan,.grid .bt .slogan{color:#0e95a8!important}
 /* expanded search row */
 #q::-webkit-search-cancel-button{display:none}
@@ -536,12 +536,12 @@ input,textarea,select,option,#printArea{text-transform:none}
 #viewCount{font-size:15px;margin-left:auto}
 .searchrow{flex-wrap:nowrap;width:100%}
 .searchrow .search{flex:1;min-width:0}
-.searchrow .search input{height:46px}
-.searchrow .addbiz{height:46px;flex:none;width:auto;max-width:42%}
+.searchrow .search input{height:52px}
+.searchrow .addbiz{height:52px;flex:none;width:auto;max-width:46%}
 #unhideAll{width:auto!important;display:flex;margin:0 auto 6px!important;padding:0 18px}
 #favTogBtn{background:var(--magenta)!important;color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 #favTogBtn[aria-pressed=true]{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important;box-shadow:inset 0 0 0 3px var(--ink)}
-#hideTogBtn{background:var(--yellow)!important;color:var(--ink)!important;text-shadow:none!important}
+#hideTogBtn{background:var(--red)!important;color:#fff!important;text-shadow:none!important}
 .acc{margin-bottom:6px;border-radius:12px}
 .acch{min-height:38px;font-size:16px;padding:0 10px}
 .acch svg{width:24px;height:24px;padding:4px}
@@ -579,7 +579,7 @@ input,textarea,select,option,#printArea{text-transform:none}
       <input id="q" type="search" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Search" aria-label="Search businesses">
       <button class="clear" id="clear" aria-label="Clear search">&times;</button>
     </div>
-<a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add / Update Biz</span></a>
+<a class="navbtn obvious addbiz" href="form.html" aria-label="Add or Update Your Biz" title="Add or Update Your Biz"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" aria-hidden="true" style="flex:none;filter:drop-shadow(1px 1px 0 var(--ink))"><path d="M12 5v14M5 12h14"/></svg><span class="lbl">Add / Update Biz</span></a>
 </div>
 <div class="navrow">
 <button class="navbtn icon" id="filterBtn" type="button" aria-label="Filters" title="Filters" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M19 6h1M4 12h3M13 12h7M4 18h11M21 18h0"/><circle cx="16" cy="6" r="2.4"/><circle cx="10" cy="12" r="2.4"/><circle cx="18" cy="18" r="2.4"/></svg><span class="badge" id="badge"></span></button>
@@ -1224,7 +1224,7 @@ var loginSkipped=false;try{loginSkipped=localStorage.getItem('ccdir-login-skip')
   var b=document.createElement('button');b.id='muteBtn';b.type='button';
   var svgOn='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6a8 8 0 0 1 0 12"/></svg>';
   var svgOff='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9l5 5M21 9l-5 5"/></svg>';
-  function paint(){b.innerHTML=honkMuted?svgOff:svgOn;b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Turn honk sound on':'Turn honk sound off');b.title=b.getAttribute('aria-label')}
+  function paint(){b.innerHTML=honkMuted?svgOff:svgOn;b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Unmute':'Mute');b.title=b.getAttribute('aria-label')}
   paint();
   b.onclick=function(){honkMuted=!honkMuted;try{localStorage.setItem('ccdir-mute',honkMuted?'1':'0')}catch(e){}paint();if(!honkMuted)honk()};
   var row=document.getElementById('muteRow');(row||document.body).appendChild(b);
