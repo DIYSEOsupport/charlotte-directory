@@ -1099,7 +1099,7 @@ function apply(){
     if(st.cat!=='ALL'&&b.category!==st.cat)return false;
     for(var l in st.f){var sel=st.f[l];if(sel&&sel.length&&!(b.fx[l]||[]).some(v=>sel.indexOf(v)!==-1))return false}
     if(st.fav&&!favs[keyOf(b)]&&!isDiy(b))return false;
-    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(!st.showAll&&hidden[keyOf(b)]&&!isDiy(b))return false;
+    if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(hidden[keyOf(b)]&&!isDiy(b))return false;
     return true;
   });
   var s=st.sort;
@@ -1319,7 +1319,6 @@ function toggleHide(k,el){
   if(hidden[k])delete hidden[k];else hidden[k]=1;
   saveHidden();
   if(hidden[k]&&favs[k]){delete favs[k];saveFavs()}
-  if(hidden[k])st.showAll=false;
   // hidden cards leave the list, so the Undo popup sits at the bottom of the screen instead of on the card
   toast(hidden[k]?'Hidden.':'Unhidden',hidden[k]?null:el);
   if(hidden[k]){
@@ -1893,7 +1892,7 @@ var STAR='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="cu
 function updFavBtn(){var b=$('favTogBtn');b.innerHTML=st.fav?STARON:STAR;b.setAttribute('aria-pressed',st.fav?'true':'false')}
 $('favTogBtn').onclick=function(){
   if(!st.fav&&!Object.keys(favs).length){toast('Tap the star on a card to save favorites');return}
-  st.fav=pend.fav=!st.fav;st.showHidden=pend.showHidden=false;st.showAll=false;buildFilters();apply();
+  st.fav=pend.fav=!st.fav;st.showHidden=pend.showHidden=false;buildFilters();apply();
 };
 function updHideBtn(){
   // count only businesses that are still listed (old keys from removed listings do not count)
@@ -1905,7 +1904,7 @@ function updHideBtn(){
   t=st.showHidden?'Back to normal view':'Show only the '+n+' hidden';
   b.title=t;b.setAttribute('aria-label',t);
 }
-$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;st.showAll=!st.showHidden;buildFilters();apply()};
+$('hideTogBtn').onclick=function(){st.showHidden=pend.showHidden=!st.showHidden;st.fav=pend.fav=false;buildFilters();apply()};
 $('fmtPdf').onclick=function(){$('fmtBox').classList.remove('show');var b=fmtB;fmtB=null;if(b)doPdf([b],(b.name.replace(/[^\w\- ]+/g,'').trim()||'business')+'.pdf');else askAct('pdf')};
 $('fmtX').onclick=function(){fmtB=null;$('fmtBox').classList.remove('show')};
 $('fmtBox').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
