@@ -612,7 +612,10 @@ input,textarea,select,option,#printArea{text-transform:none}
     <div style="margin-top:10px">
       <p style="margin:0 0 10px;font-size:14px;line-height:1.4">Thanks for being one of our first visitors! This app is brand new, so expect a few bugs. Tell us what looks wrong or could work better and we'll fix it.</p>
       <textarea id="fbMsg" rows="3" placeholder="What happened? What were you trying to do, and what phone or computer are you using?" style="width:100%;font-family:inherit;font-size:14px;padding:8px;border:2px solid var(--ink);border-radius:8px;resize:vertical"></textarea>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
+      <div id="fbThumbs" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"></div>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <label for="fbFile" style="background:#fff;color:var(--ink);border:3px solid var(--ink);border-radius:8px;padding:8px 14px;font-family:var(--fh);cursor:pointer">Add screenshots</label>
+        <input type="file" id="fbFile" accept="image/*" multiple style="display:none">
         <button type="button" id="fbSend" style="background:var(--orange);color:#fff;border:3px solid var(--ink);border-radius:8px;padding:8px 18px;font-family:var(--fh);cursor:pointer">Send feedback</button>
       </div>
     </div>
@@ -2052,13 +2055,34 @@ $('fbSend').addEventListener('click',function(){
   var fm=document.createElement('form');
   fm.method='POST';fm.action=CSV_URL;fm.target='fbFrame';fm.style.display='none';
   var ta=document.createElement('textarea');ta.name='payload';
-  ta.value=JSON.stringify({action:'feedback',message:msg,idToken:acct.token});
+  ta.value=JSON.stringify({action:'feedback',message:msg,idToken:acct.token,shots:fbShots.map(function(u){return u.split(',')[1]})});
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
   setTimeout(function(){if(fm.parentNode)fm.parentNode.removeChild(fm)},1000);
   setTimeout(function(){
     $('fbSend').disabled=false;toast('Thanks for the feedback!');
-    $('fbMsg').value='';
+    $('fbMsg').value='';fbShots=[];drawShots();
   },800);
+});
+/* feedback screenshots: up to 3, shrunk to JPEG so the upload stays small */
+var fbShots=[];
+function drawShots(){
+  $('fbThumbs').innerHTML=fbShots.map(function(u,i){return '<span style="position:relative;display:inline-block"><img src="'+u+'" alt="Screenshot '+(i+1)+'" style="width:64px;height:64px;object-fit:cover;border:2px solid var(--ink);border-radius:8px;display:block"><button type="button" data-rm="'+i+'" aria-label="Remove screenshot" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);background:var(--red);color:#fff;font-size:14px;line-height:18px;padding:0;cursor:pointer">&times;</button></span>'}).join('');
+}
+$('fbThumbs').addEventListener('click',function(e){var b=e.target.closest('[data-rm]');if(b){fbShots.splice(+b.dataset.rm,1);drawShots()}});
+$('fbFile').addEventListener('change',function(){
+  [].slice.call(this.files).forEach(function(file){
+    if(!/^image\//.test(file.type))return;
+    if(fbShots.length>=3){toast('Up to 3 screenshots.');return}
+    var img=new Image(),url=URL.createObjectURL(file);
+    img.onload=function(){
+      var k=Math.min(1,1400/Math.max(img.width,img.height)),c=document.createElement('canvas');
+      c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);
+      if(fbShots.length<3){fbShots.push(c.toDataURL('image/jpeg',0.8));drawShots()}
+    };
+    img.src=url;
+  });
+  this.value='';
 });
 load();
 setInterval(load,60000);
