@@ -701,7 +701,7 @@ function checkAdminPending(){
     if(r.flagged)L.push(r.flagged+' flagged, waiting for your OK.');
     if(r.pending)L.push(r.pending+' pending, being checked.');
     if(r.unconfirmed)L.push(r.unconfirmed+' not confirmed yet.');
-    errPop('Boss alert, neighbor!',L);
+    errPop('Boss alert, neighbor!',L,true);
   });
 }
 var syncWarned=false,syncRetried=false;
@@ -1275,10 +1275,10 @@ function showLoginPop(){
   $('loginPop').classList.add('show');favHonk()
 }
 function escH(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-function errPop(title,lines){
+function errPop(title,lines,quiet){
   $('epT').textContent=title||'Hold up, neighbor!';
   $('epM').innerHTML=[].concat(lines).map(function(l){return '<p>'+escH(l)+'</p>'}).join('');
-  $('errPop').classList.add('show');honk();
+  $('errPop').classList.add('show');if(!quiet)honk();
 }
 $('epGo').onclick=function(){$('errPop').classList.remove('show')};
 $('errPop').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')});
