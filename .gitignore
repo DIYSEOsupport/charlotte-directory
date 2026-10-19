@@ -7,3 +7,10 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Local-only archives (not published)
+old/
+new/
+dummy-data/
+tmp24/
+tmp26/
