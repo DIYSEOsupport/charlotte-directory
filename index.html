@@ -1062,7 +1062,7 @@ function buildFilters(){
   if(loginSkipped&&!acct.email&&!hasUser)p+='<div class="note" style="margin:6px 2px 10px">Log in to save across devices.</div>';
   var nsv=all.filter(function(b){return favs[keyOf(b)]||isDiy(b)}).length;
   p+='<label class="savedrow sv1"><input type="checkbox" id="favOnly"'+(pend.fav?' checked':'')+'><span class="svl">Saved</span><span class="svc">'+nsv+'</span></label>';
-  var nhd=all.filter(function(b){return hidden[keyOf(b)]}).length;
+  var nhd=all.filter(function(b){return hidden[keyOf(b)]&&!isDiy(b)}).length;
   p+='<label class="savedrow sv2"><input type="checkbox" id="hiddenOnly"'+(pend.showHidden?' checked':'')+'><span class="svl">Hidden</span><span class="svc">'+nhd+'</span></label>';
   if(nhd)p+='<button class="btn" type="button" id="unhideAll" style="width:100%;margin-bottom:10px">Unhide all ('+nhd+')</button>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
@@ -1893,8 +1893,9 @@ $('favTogBtn').onclick=function(){
   st.fav=pend.fav=!st.fav;st.showHidden=pend.showHidden=false;st.showAll=false;buildFilters();apply();
 };
 function updHideBtn(){
-  var n=Object.keys(hidden).length,b=$('hideTogBtn'),t;
-  if(!n){b.style.display='none';return}
+  // count only businesses that are still listed (old keys from removed listings do not count)
+  var n=all.filter(function(x){return hidden[keyOf(x)]&&!isDiy(x)}).length,b=$('hideTogBtn'),t;
+  if(!n){b.style.display='none';if(st.showHidden){st.showHidden=pend.showHidden=false;st.showAll=true;apply()}return}
   b.style.display='';
   b.innerHTML=(st.showHidden?EYE:EYEOFF)+'<span class="hcnt">'+n+'</span>';
   b.setAttribute('aria-pressed',st.showHidden?'true':'false');
