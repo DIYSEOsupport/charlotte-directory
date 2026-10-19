@@ -1293,7 +1293,7 @@ $('lpGo').onclick=function(){
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
-function favHonk(){if(favHonked)return;favHonked=true;honk()}
+function favHonk(){if(favHonked)return;favHonked=true;beepBeep()}
 function toggleFav(k,el){
   if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
@@ -2046,7 +2046,7 @@ initAcct();
   $('acct').appendChild(b);
 })();
 $('fbSend').addEventListener('click',function(){
-  if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');honk();return}
+  if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');return}
   var msg=$('fbMsg').value.trim();
   if(!msg){toast('Type a message first.');return}
   $('fbSend').disabled=true;
