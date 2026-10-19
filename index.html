@@ -1300,7 +1300,6 @@ function toggleFav(k,el){
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
   if(favs[k]&&!acct.email){if(hasUser||loginSkipped)favHonk();else showLoginPop()}
-  if(!favs[k])beepBeep();
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
