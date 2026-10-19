@@ -1267,7 +1267,7 @@ function beepBeep(){
       o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+0.12);
     }
     var t0=c.currentTime+0.02;
-    squeeze(t0);
+    squeeze(t0);squeeze(t0+0.16);
   }catch(e){}
 }
 function showLoginPop(){
@@ -1293,13 +1293,14 @@ $('lpGo').onclick=function(){
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
-function favHonk(){if(favHonked)return;favHonked=true;beepBeep()}
+function favHonk(){if(favHonked)return;favHonked=true;honk()}
 function toggleFav(k,el){
   if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
   saveFavs();
   if(favs[k]&&!acct.email){if(hasUser||loginSkipped)favHonk();else showLoginPop()}
+  if(!favs[k])beepBeep();
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
@@ -2046,7 +2047,7 @@ initAcct();
   $('acct').appendChild(b);
 })();
 $('fbSend').addEventListener('click',function(){
-  if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');return}
+  if(!acct.email){fbLogin=true;$('lpP').textContent='Log in first so we can reach you if we need more info.';$('loginPop').classList.add('show');beepBeep();return}
   var msg=$('fbMsg').value.trim();
   if(!msg){toast('Type a message first.');return}
   $('fbSend').disabled=true;
