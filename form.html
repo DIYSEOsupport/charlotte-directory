@@ -91,6 +91,17 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 .rv dl{margin:0}
 .rv dt{font-family:var(--fh);letter-spacing:.6px;font-size:15px;color:var(--purple);margin:6px 0 0}
 .rv dd{margin:0;font-weight:700;font-size:15px;word-break:break-word;text-transform:none}
+/* busy overlay: checking for businesses, sending the form */
+#busy{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;background:rgba(26,16,51,.6);padding:16px}
+#busy.show{display:flex}
+#busy .bx{background:var(--cream,#fff6dc);border:4px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:24px 26px;text-align:center;max-width:320px}
+#busy .spin{width:72px;height:72px;margin:0 auto 14px;border-radius:50%;border:9px solid var(--yellow,#ffd23f);border-top-color:var(--magenta,#c2307a);border-right-color:var(--orange,#ff7a1a);animation:bspin .8s linear infinite}
+#busy .bt{font-family:var(--fh);font-size:24px;letter-spacing:1px;color:var(--ink);line-height:1.15}
+#busy .dots{margin-top:10px}
+#busy .dots i{display:inline-block;width:10px;height:10px;margin:0 4px;border-radius:50%;background:var(--ink);animation:bdot 1s ease-in-out infinite}
+#busy .dots i:nth-child(2){animation-delay:.15s}#busy .dots i:nth-child(3){animation-delay:.3s}
+@keyframes bspin{to{transform:rotate(360deg)}}
+@keyframes bdot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-8px);opacity:1}}
 .logocrop{display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px}
 .logocrop canvas{width:120px;height:120px;background:#fff;border:3px solid var(--ink);border-radius:12px;touch-action:none;cursor:grab}
 .logocrop input[type=range]{width:160px}
@@ -233,6 +244,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 </div>
 <div class="navtabs"><a href="index.html">📋 Directory</a><a class="builtby" href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
+<div id="busy" role="status" aria-live="polite"><div class="bx"><div class="spin" aria-hidden="true"></div><div class="bt" id="busyT"></div><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div></div></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -439,6 +451,7 @@ function resetMode(){
   $('oldlogo').style.display='none';$('dellogo').checked=false;
   $('contactBlock').style.display='none';
 }
+function busy(msg){var b=$('busy');if(msg){$('busyT').textContent=msg;b.classList.add('show')}else b.classList.remove('show')}
 function sendToScript(payload,done,wantKind){
   wantKind=wantKind||'mine';
   var fin=false,timer=null;
@@ -460,8 +473,9 @@ function sendToScript(payload,done,wantKind){
 function loadMine(){
   var tok=idToken;
   $('modefld').style.display='block';$('modebox').style.display='none';$('modeRetry').style.display='none';
-  $('modemsg').textContent='Checking for your businesses...';
+  $('modemsg').textContent='Checking for your businesses...';busy('Checking for your businesses');
   sendToScript({action:'mine',idToken:tok},function(m){
+    busy(false);
     if(tok!==idToken)return;
     if(!m||!m.ok){
       $('modemsg').textContent=(m&&m.error==='LOGIN_EXPIRED')?'Your sign-in ran out of time. Sign in again.':'Could not check your businesses. Tap Try again, or just fill in the form as a new business.';
@@ -512,9 +526,9 @@ $('delCancel').addEventListener('click',function(){
   $('delConfirm').style.display='none';$('modebox').style.display='block';
 });
 $('delGo').addEventListener('click',function(){
-  $('delGo').disabled=true;
+  $('delGo').disabled=true;busy('Removing your listing');
   sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim()},function(m){
-    $('delGo').disabled=false;
+    $('delGo').disabled=false;busy(false);
     if(m&&m.ok){
       $('doneH').textContent='Listing removed';
       $('doneExtraNav').style.display='flex';
@@ -669,10 +683,10 @@ $('f').addEventListener('submit',function(e){
   };
   if(t==='Physical Location'){d.street=$('street').value.trim();d.street2=$('street2').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
   if(/^Mobile/.test(t)){d.area=a.map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ')}
-  var go=$('go');go.disabled=true;go.textContent='Sending... wait a few seconds';$('fail').style.display='none';
+  var go=$('go');go.disabled=true;go.textContent='Sending... wait a few seconds';busy('Sending your business');$('fail').style.display='none';
   if(!/^https:\/\//.test(ENDPOINT)){go.disabled=false;go.textContent='Submit my business';$('fail').textContent='This form is not connected to the directory yet. Tell the site owner.';$('fail').style.display='block';return}
   function fail(code){
-    go.disabled=false;go.textContent='Submit my business';
+    busy(false);go.disabled=false;go.textContent='Submit my business';
     var msg={
       WRONG_OWNER:'That business name belongs to a different Google account. Sign in with the account you used before.',
       LOGIN_EXPIRED:'Your sign-in ran out of time. Go back to step 1 and sign in again.',
@@ -701,6 +715,7 @@ $('f').addEventListener('submit',function(e){
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
 });
 function showDone(flag,emailTo){
+  busy(false);
   $('doneExtraNav').style.display='none';
   $('doneH').textContent='Check your email.';
   $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
