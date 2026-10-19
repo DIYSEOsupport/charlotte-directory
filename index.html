@@ -49,6 +49,7 @@ a{color:inherit}
 .catpill.cc3{background:var(--teal);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc4{background:var(--purple);color:#fff;text-shadow:1px 1px 0 var(--ink)}
 .catpill.cc5{background:#12407a;color:#fff;text-shadow:1px 1px 0 var(--ink)}
+.catpill.cc6{background:#6b6b7a;color:#fff;text-shadow:1px 1px 0 var(--ink)}
 #viewCount{margin-left:auto;color:#8a8a99;font-family:var(--fh);font-size:16px;letter-spacing:.6px;white-space:nowrap}
 #hideTogBtn,#filterBtn{position:relative}
 #hideTogBtn[aria-pressed=true]{box-shadow:inset 0 0 0 3px var(--ink)}
@@ -905,7 +906,7 @@ function route(r,v){
   return false;
 }
 
-var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty, Salons & Fitness','Professional & Online Services'];
+var CATS=['Home & Garden Services','Local Trades & Repairs','Food & Drinks','Shops & Retail','Beauty, Salons & Fitness','Professional & Online Services','Other'];
 var CAT_OLD={neighborhoodfoodanddrinks:'Food & Drinks',mainstreetshopsandretail:'Shops & Retail'};
 function catKey(x){return x.toString().toLowerCase().replace(/^\s*\d+[\.\)\-\s]*/,'').replace(/&/g,'and').replace(/[^a-z]/g,'')}
 function canonCat(v){var k=catKey(v);if(CAT_OLD[k])return CAT_OLD[k];for(var i=0;i<CATS.length;i++){if(catKey(CATS[i])===k)return CATS[i]}return ''}
@@ -1724,7 +1725,7 @@ async function buildPdfCanvas(list,keepPages){
   }
 
   /* ----- rolodex cards: one per business, tab on top, slot at bottom ----- */
-  var CATC={'Home & Garden Services':'#1f8a4c','Local Trades & Repairs':'#ff7a1a','Food & Drinks':'#c2307a','Shops & Retail':'#1fb5c9','Beauty, Salons & Fitness':'#5b2a86','Professional & Online Services':'#12407a'};
+  var CATC={'Home & Garden Services':'#1f8a4c','Local Trades & Repairs':'#ff7a1a','Food & Drinks':'#c2307a','Shops & Retail':'#1fb5c9','Beauty, Salons & Fitness':'#5b2a86','Professional & Online Services':'#12407a','Other':'#6b6b7a'};
   function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
   function drawTab(c,b,right,top,maxW){
     var cat=(b.category&&b.category!=='Local Business')?b.category:'Local Business',col=CATC[canonCat(cat)]||'#6b6b7a';
