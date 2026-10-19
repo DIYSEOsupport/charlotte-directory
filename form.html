@@ -713,8 +713,13 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   busy(false);
   $('doneExtraNav').style.display='none';
-  $('doneH').textContent='Check your email.';
-  $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
+  if(flag==='Pending'){
+    $('doneH').textContent='Update received.';
+    $('doneNote').textContent='Your changes are pending review. We will email you when they are live.';
+  }else{
+    $('doneH').textContent='Check your email.';
+    $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
+  }
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';
   $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
