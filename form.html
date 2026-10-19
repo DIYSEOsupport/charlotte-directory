@@ -103,6 +103,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 #busy .dots i:nth-child(2){animation-delay:.15s}#busy .dots i:nth-child(3){animation-delay:.3s}
 @keyframes bspin{to{transform:rotate(360deg)}}
 @keyframes bdot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-8px);opacity:1}}
+.bst{font-size:.75em;opacity:.75;white-space:nowrap}
 .logocrop{display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px}
 .logocrop canvas{width:120px;height:120px;background:#fff;border:3px solid var(--ink);border-radius:12px;touch-action:none;cursor:grab}
 .logocrop input[type=range]{width:160px}
@@ -539,7 +540,7 @@ function showBizList(){
   var box=$('bizlist');box.style.display='grid';
   var h='';
   if(bizList.length>8)h+='<input type="text" id="bizfind" placeholder="Type to find a business">';
-  h+='<div class="biglist" id="bizbtns">'+bizList.map(function(b,i){return '<button type="button" class="opt'+(b.businessName===origName?' sel':'')+'" data-bi="'+i+'"><span class="bx"></span><span>'+esc(b.businessName)+'</span></button>'}).join('')+'</div>';
+  h+='<div class="biglist" id="bizbtns">'+bizList.map(function(b,i){return '<button type="button" class="opt'+(b.businessName===origName?' sel':'')+'" data-bi="'+i+'"><span class="bx"></span><span>'+esc(b.businessName)+(b.status&&b.status!=='Approved'?' <small class="bst">(waiting for approval)</small>':'')+'</span></button>'}).join('')+'</div>';
   box.innerHTML=h;
   var f=$('bizfind');
   if(f)f.addEventListener('input',function(){var q=f.value.toLowerCase();qa('#bizbtns button').forEach(function(b){b.style.display=b.textContent.toLowerCase().indexOf(q)===-1?'none':''})});
@@ -688,7 +689,7 @@ $('f').addEventListener('submit',function(e){
       BAD_EMAIL:'The customer email does not look right.',
       BAD_URL:'One of the web addresses does not look right.',
       BAD_PHONE:'The phone number needs 10 digits.',
-      NOT_LIVE:'You can only update your own listings that are live in the directory.',
+      NOT_LIVE:'You can only update your own listings.',
       NAME_TAKEN:'Another business in the directory already uses that name. Pick a different name.'
     }[code]||('Something went wrong. Please try again.'+(code?' ('+String(code).slice(0,200)+')':''));
     $('fail').textContent=msg;$('fail').style.display='block';
