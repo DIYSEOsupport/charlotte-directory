@@ -75,7 +75,7 @@ input[type=file]{font:700 14px var(--fb);max-width:100%}
 .fail{display:none;margin-top:12px;padding:10px 12px;background:#fff;border:3px solid var(--err);border-radius:12px;color:var(--err);font-weight:800;font-size:14px}
 a.lnk{color:#124080;font-weight:800}
 .navtabs{display:flex;gap:10px;justify-content:center;padding:10px 16px 0;flex-wrap:wrap}
-.navtabs a{display:inline-flex;align-items:center;gap:8px;font-family:var(--fh);letter-spacing:1px;font-size:21px;font-weight:400;color:var(--ink);background:linear-gradient(135deg,#ffb43a,#f2500f);border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);padding:10px 24px;min-height:50px;box-sizing:border-box;text-decoration:none}
+.navtabs a{display:inline-flex;align-items:center;gap:6px;font-family:var(--fh);letter-spacing:1px;font-size:15px;font-weight:400;color:var(--ink);background:linear-gradient(135deg,#ffb43a,#f2500f);border:2px solid var(--ink);border-radius:10px;box-shadow:2px 2px 0 var(--ink);padding:5px 14px;min-height:34px;box-sizing:border-box;text-decoration:none}
 .navtabs a:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
 .navtabs a.builtby{background:#fff}
 h1,h2,.l,.dot,.tile,.opt,button.b,.sticker,.boom{font-weight:500}
@@ -122,7 +122,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 #errPop .go{display:block;box-sizing:border-box;width:100%;margin:12px 0 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:3px 3px 0 #1a1033}
 @keyframes epIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 .navtabs{padding-bottom:32px}
-.builtby img{width:28px;height:28px;border-radius:0;object-fit:contain;background:transparent;flex:none}
+.builtby img{width:20px;height:20px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 </style>
 </head>
 <body>
@@ -385,10 +385,10 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
 (function(){
   var code=(location.search.match(/[?&]confirm=([^&#]+)/)||[])[1];if(!code)return;
   try{history.replaceState(null,'',location.pathname)}catch(e){}
-  errPop('Confirming...',['One moment while we confirm your email.'],true);$('epGo').style.display='none';
+  busy('Confirming your email');
   var cb='cfm'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
   function fin(r){
-    clearTimeout(t);delete window[cb];sc.remove();$('epGo').style.display='';
+    clearTimeout(t);delete window[cb];sc.remove();busy(false);
     if(r&&r.res==='done')errPop("You're pending!",['Email confirmed. We will email you when '+(r.name||'your business')+' is live, usually within a few hours.'],true);
     else if(r&&r.res==='used')errPop('All set',['This link was already used. We will email you when your listing is live.'],true);
     else errPop('Oops',['Could not confirm right now. Please tap the link in your email again in a minute, or email us.']);
