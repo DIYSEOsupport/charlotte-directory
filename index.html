@@ -36,7 +36,9 @@ a{color:inherit}
 .hero-row .hero-img{flex:1;min-width:0}
 .menubar{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:0 0 10px}
 .navbtn.icon{width:36px;padding:0!important;justify-content:center}
-#muteRow #muteBtn{background:var(--teal);width:30px;padding:0!important;justify-content:center}
+#muteRow #muteBtn{background:var(--yellow)!important;width:30px;padding:0!important;justify-content:center}
+#muteBtn .spk{font-size:18px;line-height:1}
+#muteBtn.off{background:#ddd!important}
 #searchBtn{background:var(--magenta)}
 #filterBtn{background:var(--blue)}
 #filterBtn.on{background:var(--red)!important;box-shadow:inset 0 0 0 3px var(--yellow)}
@@ -443,7 +445,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .icon-btn .lbl{font-size:18px!important}
 .grid .bt .slogan{font-family:var(--fh)!important;font-weight:400!important;font-style:normal!important;font-size:15px!important;letter-spacing:.6px}
 span.n{font-family:var(--fh)!important;font-weight:400!important;letter-spacing:.8px}
-.addbiz,#dlBtn,#toggleAll,#muteBtn,#searchBtn,#filterBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
+.addbiz,#dlBtn,#toggleAll,#searchBtn,#filterBtn{color:#fff!important;text-shadow:1px 1px 0 var(--ink)}
 .addbiz{background:var(--orange)!important}
 .addbiz:hover{box-shadow:0 0 0 4px rgba(255,122,26,.35),2px 2px 0 var(--ink)}
 #dlBtn{background:var(--green)!important}
@@ -1093,7 +1095,7 @@ function apply(){
     }
     if(st.cat!=='ALL'&&b.category!==st.cat)return false;
     for(var l in st.f){var sel=st.f[l];if(sel&&sel.length&&!(b.fx[l]||[]).some(v=>sel.indexOf(v)!==-1))return false}
-    if(st.fav&&!favs[keyOf(b)]&&!isDiy(b))return false;
+    if(st.fav&&!favs[keyOf(b)]&&!isDiy(b)&&!favKeep[keyOf(b)])return false;
     if(st.showHidden){if(!hidden[keyOf(b)])return false}else if(hidden[keyOf(b)]&&!isDiy(b))return false;
     return true;
   });
@@ -1224,7 +1226,7 @@ var loginSkipped=false;try{loginSkipped=localStorage.getItem('ccdir-login-skip')
   var b=document.createElement('button');b.id='muteBtn';b.type='button';
   var svgOn='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M19 6a8 8 0 0 1 0 12"/></svg>';
   var svgOff='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10v4h4l5 5V5L7 10H3z"/><path d="M16 9l5 5M21 9l-5 5"/></svg>';
-  function paint(){b.innerHTML=honkMuted?svgOff:svgOn;b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Unmute':'Mute');b.title=b.getAttribute('aria-label')}
+  function paint(){b.innerHTML='<span class="spk" aria-hidden="true">'+(honkMuted?'\uD83D\uDD07':'\uD83D\uDD0A')+'</span>';b.className='navbtn'+(honkMuted?' off':'');b.setAttribute('aria-label',honkMuted?'Unmute':'Mute');b.title=b.getAttribute('aria-label')}
   paint();
   b.onclick=function(){honkMuted=!honkMuted;try{localStorage.setItem('ccdir-mute',honkMuted?'1':'0')}catch(e){}paint();if(!honkMuted)honk()};
   var row=document.getElementById('muteRow');(row||document.body).appendChild(b);
@@ -1293,11 +1295,13 @@ $('lpGo').onclick=function(){
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
+var favKeep={}; // unstarred while in the favorites view: stay on screen so they can be re-starred
 function favHonk(){if(favHonked)return;favHonked=true;honk()}
 function toggleFav(k,el){
   if(/diyseo/i.test(k)){toast('DIYSEO built this directory.\nKeep our info handy!',el,'blue');beepBeep();return}
   if(Date.now()-shareClosedAt<800)return;
   if(favs[k])delete favs[k];else favs[k]=1;
+  if(st.fav&&!favs[k])favKeep[k]=1;
   saveFavs();
   if(favs[k]&&!acct.email){if(hasUser||loginSkipped)favHonk();else showLoginPop()}
   if(acct.email||hasUser){
@@ -1887,7 +1891,7 @@ var STAR='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="cu
 function updFavBtn(){var b=$('favTogBtn');b.innerHTML=st.fav?STARON:STAR;b.setAttribute('aria-pressed',st.fav?'true':'false')}
 $('favTogBtn').onclick=function(){
   if(!st.fav&&!Object.keys(favs).length){toast('Tap the star on a card to save favorites');return}
-  st.fav=pend.fav=!st.fav;st.showHidden=pend.showHidden=false;buildFilters();apply();
+  st.fav=pend.fav=!st.fav;st.showHidden=pend.showHidden=false;favKeep={};buildFilters();apply();
 };
 function updHideBtn(){
   // count only businesses that are still listed (old keys from removed listings do not count)
