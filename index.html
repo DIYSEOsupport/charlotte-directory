@@ -1056,6 +1056,7 @@ function buildFilters(){
     p+='<div class="acc c'+(order.indexOf(o)%7)+(open?' open':'')+'" data-l="'+esc(d.label)+'"><button type="button" class="acch" aria-expanded="'+open+'"><span>'+esc(lbl(d.label))+'</span><span class="selcnt'+(sel.length?' on':'')+'">'+sel.length+'</span>'+CHEV+'</button><div class="accb">'
       +d.values.map(function(v,vi){return '<label class="opt"><input type="checkbox" data-fi="'+fi+'" data-vi="'+vi+'"'+(sel.indexOf(v)!==-1?' checked':'')+'><span>'+esc(v)+'</span><span class="oc">'+d.counts[v]+'</span></label>'}).join('')+'</div></div>';
   });
+  if(loginSkipped&&!acct.email&&!hasUser)p+='<div class="note" style="margin:6px 2px 10px">Log in to save across devices.</div>';
   p+='<div class="applybar"><button class="btn" type="button" id="reset">Reset all</button><button class="btn main" type="button" id="applyBtn">Apply filters</button></div>';
   $('panel').innerHTML=p;
   $('panel').scrollTop=sc;
@@ -1893,7 +1894,7 @@ function updHideBtn(){
   var n=all.filter(function(x){return hidden[keyOf(x)]&&!isDiy(x)}).length,b=$('hideTogBtn'),t;
   if(!n){b.style.display='none';if(st.showHidden){st.showHidden=pend.showHidden=false;apply()}return}
   b.style.display='';
-  b.innerHTML=(st.showHidden?EYE:EYEOFF)+'<span class="hcnt">'+n+'</span>';
+  b.innerHTML=st.showHidden?EYE:EYEOFF;
   b.setAttribute('aria-pressed',st.showHidden?'true':'false');
   t=st.showHidden?'Back to normal view':'Show only the '+n+' hidden';
   b.title=t;b.setAttribute('aria-label',t);
