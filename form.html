@@ -91,6 +91,9 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 .rv dl{margin:0}
 .rv dt{font-family:var(--fh);letter-spacing:.6px;font-size:15px;color:var(--purple);margin:6px 0 0}
 .rv dd{margin:0;font-weight:700;font-size:15px;word-break:break-word;text-transform:none}
+.logocrop{display:none;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px}
+.logocrop canvas{width:120px;height:120px;background:#fff;border:3px solid var(--ink);border-radius:12px;touch-action:none;cursor:grab}
+.logocrop input[type=range]{width:160px}
 .oldlogo{display:none;margin:8px 0 0;align-items:center;gap:12px;flex-wrap:wrap}
 .oldlogo img{height:64px;width:auto;max-width:64px;object-fit:contain;background:#fff;border:3px solid var(--ink);border-radius:12px}
 .oldlogo label{font-weight:800;font-size:14px;cursor:pointer}
@@ -207,7 +210,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld"><label class="l" for="slogan">Slogan</label><input type="text" id="slogan" maxlength="120"></div>
       <div class="fld"><label class="l" for="licensed" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="licensed">Licensed &amp; Insured</label></div>
       <div class="fld"><span class="l">Upload Logo</span><div class="help">Shows on your card.</div>
-        <div class="logo-row"><img id="logoprev" alt="Business Logo"><input type="file" id="logo" accept="image/*"></div><div class="err" id="logoerr" style="display:none">That file is too big. Try a smaller picture.</div>
+        <div class="logo-row"><input type="file" id="logo" accept="image/*"></div>
+        <div id="logoprev" class="logocrop"><canvas id="logocan" width="480" height="480" aria-label="Logo preview"></canvas><div><label class="note" for="logozoom" style="display:block;margin:0 0 4px">Zoom</label><input type="range" id="logozoom" min="1" max="4" step="0.01" value="1"><div class="note" style="margin:4px 0 0">Drag the picture to frame it. This square is how it shows on your card.</div></div></div><div class="err" id="logoerr" style="display:none">That file is too big. Try a smaller picture.</div>
         <div class="oldlogo" id="oldlogo"><img id="oldlogoimg" alt="Current logo"><div><div class="note" style="margin:0 0 4px">This is your current logo. It stays unless you pick a new one or delete it.</div><label><input type="checkbox" id="dellogo"> Delete my logo</label></div></div></div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Review</button></div>
     </div>
@@ -610,19 +614,40 @@ $('logo').addEventListener('change',function(){
   rd.onload=function(){
     var im=new Image();
     im.onload=function(){
-      var m=480,s=Math.min(1,m/Math.max(im.width,im.height)),w=Math.max(1,Math.round(im.width*s)),h=Math.max(1,Math.round(im.height*s));
-      var c=document.createElement('canvas');c.width=m;c.height=m;
-      var ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,m,m);
-      ctx.drawImage(im,(m-w)/2,(m-h)/2,w,h);
-      logoData=c.toDataURL('image/jpeg',0.86);logoName=f.name;
-      $('logoprev').src=logoData;$('logoprev').style.display='block';
+      logoName=f.name;startCrop(im);
     };
     im.onerror=function(){$('logoerr').style.display='block'};
     im.src=rd.result;
   };
   rd.readAsDataURL(f);
 });
-
+/* square logo cropper: zoom slider + drag. Zoom 1 = whole picture fits. */
+var crop={im:null,z:1,x:0,y:0};
+function startCrop(im){
+  var fit=480/Math.max(im.width,im.height),cover=480/Math.min(im.width,im.height);
+  crop={im:im,fit:fit,z:1,x:0,y:0};
+  $('logozoom').max=Math.max(4,cover/fit*2.5).toFixed(2);
+  // tall pictures (phone screenshots) start zoomed to fill the square
+  crop.z=im.height/im.width>1.4?cover/fit:1;$('logozoom').value=crop.z;
+  $('logoprev').style.display='flex';drawCrop();
+}
+function drawCrop(){
+  var c=crop,im=c.im;if(!im)return;
+  var k=c.fit*c.z,w=im.width*k,h=im.height*k;
+  c.x=Math.max(-Math.max(0,(w-480)/2)-120,Math.min(Math.max(0,(w-480)/2)+120,c.x));
+  c.y=Math.max(-Math.max(0,(h-480)/2)-120,Math.min(Math.max(0,(h-480)/2)+120,c.y));
+  var cv=$('logocan'),ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,480,480);
+  ctx.drawImage(im,(480-w)/2+c.x,(480-h)/2+c.y,w,h);
+  logoData=cv.toDataURL('image/jpeg',0.86);
+}
+$('logozoom').addEventListener('input',function(){crop.z=+this.value;drawCrop()});
+(function(){
+  var cv=$('logocan'),drag=null;
+  cv.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY};cv.setPointerCapture(e.pointerId);cv.style.cursor='grabbing'});
+  cv.addEventListener('pointermove',function(e){if(!drag)return;var r=480/cv.clientWidth;crop.x+=(e.clientX-drag.x)*r;crop.y+=(e.clientY-drag.y)*r;drag={x:e.clientX,y:e.clientY};drawCrop()});
+  function end(){drag=null;cv.style.cursor='grab'}
+  cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+})();
 $('f').addEventListener('submit',function(e){
   e.preventDefault();
   if(step!==4){if(checkStep(step))show(step+1);return}
