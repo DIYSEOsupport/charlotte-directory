@@ -6,8 +6,8 @@ A no-login directory for Charlotte County small businesses, built and maintained
 
 | File | Use |
 |---|---|
-| `officialSpinlogo.gif` | **Primary animated logo** — used on all web/phone views: index, form, directory, emails, PDFs |
-| `officialstaticlogo.png` | **Static version** — for print materials only |
+| `The_new_dynamic_logo.gif` | **Primary animated logo** — used on all web/phone views: index, form, directory, emails, PDFs |
+| `The_new_static_logo.png` | **Static version** — for print materials only |
 | `dummy-logos/*.png` | Initials-monogram placeholder logos for demo/test listings only — never use for real businesses |
 
 **Deprecated (no longer used):** `diyseo-logo.png`, `email-logo.png`, `qr-logo.png`
