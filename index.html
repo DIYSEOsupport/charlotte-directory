@@ -577,7 +577,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 .site-footer{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:25}
 .site-footer a{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;text-decoration:none;color:var(--ink);font-family:var(--fh);font-size:12px;letter-spacing:1px}
 .site-footer a:hover{opacity:.85}
-.site-footer img{width:100px;height:100px}
+.site-footer img{width:100px;height:100px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 </style>
 </head>
 <body>
@@ -1310,7 +1310,9 @@ $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLogin
 $('lpGo').onclick=function(){
   closeLoginPop();
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
-  try{if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}catch(e){}
+  setTimeout(function(){
+    var gbtn=$('gbtn');if(gbtn){var btn=gbtn.querySelector('div[role="button"]');if(btn)btn.click();else if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}
+  },400);
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
@@ -2124,7 +2126,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)load
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener">
-    <img src="diyseo_logo_transparent.gif" alt="DIYSEO logo">
+    <img src="The_new_dynamic_logo.gif" alt="DIYSEO logo">
     <span>Built by DIYSEO</span>
   </a>
 </footer>
