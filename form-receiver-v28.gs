@@ -1306,9 +1306,10 @@ function savesReply_(p, cb) {
 function notifyBoss_(name, d, label, notes) {
   try {
     d = d || {};
-    var url = SpreadsheetApp.openById(SHEET_ID).getUrl();
+    var pend = pendingSheet_();
+    var pendingUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + pend.getSheetId();
     var lines = [
-      'Open the "Pending" tab, then set Status to Approved (goes live) or Rejected.',
+      'Tap the link below to open the Pending tab, then set Status to Approved (goes live) or Rejected.',
       notes ? 'Why it needs you: ' + notes : '',
       '',
       'Business: ' + name,
@@ -1319,7 +1320,7 @@ function notifyBoss_(name, d, label, notes) {
       'Website: ' + (d.website || '(none)'),
       'Logo: ' + (d.logoId ? 'attached below, check it before approving' : '(none)'),
       '',
-      'Sheet: ' + url,
+      'OPEN PENDING TAB: ' + pendingUrl,
       '',
       SITE_TEXT + '  ' + SITE_URL
     ];
