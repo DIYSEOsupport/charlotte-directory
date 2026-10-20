@@ -760,6 +760,7 @@ function load(){
       computeFacets();
       buildFilters();
       apply();
+      if(!window._cardDone){window._cardDone=1;try{var cm=/[?&]card=([^&]+)/.exec(location.search);if(cm){var cn=decodeURIComponent(cm[1].replace(/\+/g,' ')).toLowerCase();var cb=all.filter(function(x){return x.name.toLowerCase()===cn})[0];if(cb)openShare(cb)}}catch(e){}}
     },
     error:function(){
       if(!all.length)$('grid').innerHTML='<div class="err"><h3>Could not load the directory</h3><p>Check your connection and try again in a minute.</p><button class="btn" onclick="load()">Try again</button></div>';
@@ -1146,6 +1147,7 @@ function cvSet(ctx,font,ls){ctx.font=font;try{ctx.letterSpacing=ls||'0px'}catch(
 /* ---------- business logos (for PDF + contact photo) ---------- */
 var logoCache={};
 function logoId(u){var m=/[?&]id=([\w-]+)/.exec(u||'');return m?m[1]:''}
+function loadQr(){return new Promise(function(r){var i=new Image();i.onload=function(){r(i)};i.onerror=function(){r(null)};i.src='The_new_dynamic_logo.gif'})}
 function fetchLogoData(b){
   if(!b||!b.logo)return Promise.resolve(null);
   if(logoCache[b.logo])return logoCache[b.logo];
@@ -1290,12 +1292,14 @@ async function buildPdfCanvas(list){
   });
 
   /* ----- draw ----- */
+  var QRI=await loadQr();
   var out=[];
   for(var pi=0;pi<plan.length;pi++){
     var cv=document.createElement('canvas');cv.width=PW*S;cv.height=PH*S;
     var c=cv.getContext('2d');c.scale(S,S);c.textBaseline='alphabetic';
     c.fillStyle='#fff';c.fillRect(0,0,PW,PH);
     var links=[],reg=function(o){links.push(o)};
+    if(QRI)c.drawImage(QRI,PW-M-(pi===0?78:40),pi===0?36:14,pi===0?78:40,pi===0?78:40);
     if(pi===0){
       cvSet(c,'400 10px '+BF_H,'3px');c.fillStyle=BC.orange;c.fillText('CHARLOTTE COUNTY',M,56);
       cvSet(c,'600 32px '+BF_H,'0.5px');c.fillStyle=BC.purple;c.fillText('Small Business Directory',M,90);
@@ -1398,13 +1402,22 @@ function contactText(b){
   if(addr){L.push('\uD83D\uDCCD '+addr);var mu2=mapUrl(b);if(mu2)L.push('\uD83D\uDDFA\uFE0F Map: '+mu2)}
   if(b.area&&!/online only/i.test(b.mode||''))L.push('\uD83D\uDE97 Mobile service area: '+b.area);
   L.push('');
+  L.push('\uD83D\uDCC7 Save contact: https://diyseosupport.github.io/charlotte-directory/?card='+encodeURIComponent(b.name));
+  L.push('');
   L.push('Charlotte County Small Business Directory');
   L.push('https://diyseosupport.github.io/charlotte-directory/');
   return L.join('\n');
 }
 function vEsc(x){return (x||'').toString().replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;')}
+function personName(b){
+  var c=(b.contact||'').replace(/\s+/g,' ').trim();
+  if(!c)return{full:b.name,given:'',family:''};
+  var p=c.split(' ');
+  return{full:c,given:p[0],family:p.slice(1).join(' ')};
+}
 function vcard(b){
-  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(b.name),'N:'+vEsc(b.name)+';;;;','ORG:'+vEsc(b.name)];
+  var pn=personName(b);
+  var v=['BEGIN:VCARD','VERSION:3.0','FN:'+vEsc(pn.full),'N:'+(b.contact?vEsc(pn.family)+';'+vEsc(pn.given)+';;;':vEsc(b.name)+';;;;'),'ORG:'+vEsc(b.name)];
   if(b.pubTitle)v.push('TITLE:'+vEsc(b.pubTitle));
   if(b.category&&b.category!=='Local Business')v.push('CATEGORIES:'+vEsc(b.category));
   b.phones.forEach(function(x){v.push('TEL;TYPE=WORK,VOICE:'+x.replace(/\s*ext.*$/i,''))});
@@ -1458,7 +1471,7 @@ $('shCard').onclick=async function(){
     var note=[b.slogan||'',b.websites.map(fmtUrl).join('\n'),b.facebook?fmtUrl(b.facebook):'',b.area&&!/online only/i.test(b.mode||'')?'Mobile service area: '+b.area:'','Found in the Charlotte County Small Business Directory'].filter(Boolean).join('\n');
     var addr=[b.addressLine,b.cityStateZip].filter(Boolean).join(', ').replace(/\n/g,', ');
     var u='intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact'
-      +P('name',b.name)+P('company',b.name)+P('job_title',b.pubTitle)
+      +P('name',personName(b).full)+P('company',b.name)+P('job_title',b.pubTitle)
       +P('phone',ph[0])+P('secondary_phone',ph[1])+P('email',b.emails[0])+P('secondary_email',b.emails[1])
       +P('postal',addr)+P('notes',note)+';end';
     var t0=Date.now();
