@@ -31,9 +31,9 @@ var LOGO_FOLDER_NAME = 'Directory Logos';
 var DIRECTORY_URL = 'https://diyseosupport.github.io/charlotte-directory/';
 var FORM_URL = 'https://diyseosupport.github.io/charlotte-directory/form.html';
 var FROM_EMAIL = 'DIYSEO.support@gmail.com';
-var QR_URL = 'https://diyseosupport.github.io/charlotte-directory/The_new_dynamic_logo.gif';
+var QR_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_round_logo.gif';
 var BANNER_URL = 'https://diyseosupport.github.io/charlotte-directory/hero.jpg';
-var DIYSEO_LOGO_URL = 'https://diyseosupport.github.io/charlotte-directory/The_new_dynamic_logo.gif';
+var DIYSEO_LOGO_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_round_logo.gif';
 
 var TIMESTAMP_HEADER = 'Timestamp';
 var OTHER_HEADER = 'Other details'; // what owners type when they pick category Other
