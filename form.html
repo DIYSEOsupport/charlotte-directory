@@ -627,9 +627,17 @@ $('logo').addEventListener('change',function(){
   if(f.size>12*1024*1024){$('logoerr').style.display='block';this.value='';return}
   var rd=new FileReader();
   rd.onload=function(){
+    // GIF: keep as-is without cropping
+    if(f.type==='image/gif'){
+      logoData=rd.result;logoName=f.name;
+      var prev=$('logocan');prev.style.display='none';
+      $('logoprev').style.display='flex';
+      $('logoprev').innerHTML='<img src="'+rd.result+'" style="max-width:200px;max-height:200px;border-radius:12px">';
+      return;
+    }
     var im=new Image();
     im.onload=function(){
-      logoName=f.name;startCrop(im);
+      logoName=f.name;$('logocan').style.display='block';startCrop(im);
     };
     im.onerror=function(){$('logoerr').style.display='block'};
     im.src=rd.result;
