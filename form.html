@@ -165,8 +165,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
         <span class="l">Remove this listing?</span>
         <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
         <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
-        <div class="fld" data-req data-del><label class="l" for="delHow">Your phone or email <span class="req">*</span></label><div class="help">So we can reach you if needed.</div><input type="text" id="delHow" placeholder="Phone or email"><div class="err">Enter a 10 digit phone number or a valid email.</div></div>
-        <label class="l" for="delReason" style="margin-top:8px">Reason for removing <span style="font-weight:400">(optional)</span></label>
+        <label class="l" for="delReason">Reason for removing <span style="font-weight:400">(optional)</span></label>
         <textarea id="delReason" rows="3" maxlength="1000"></textarea>
         <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
       </div>
@@ -438,6 +437,7 @@ function checkStep(n){
     if(f.id==='typefld'){if(!val('btype'))bad(f);return}
     if(f.id==='areafld'){if(!f.closest('.sub').classList.contains('show'))return;var a=areaVals();if(!a.length||(a.indexOf('Other')!==-1&&!$('areatext').value.trim()))bad(f);return}
     if(f.hasAttribute('data-phys')&&!$('physical').classList.contains('show'))return;
+    if(f.closest('#contactBlock')&&$('contactBlock').style.display==='none')return;
     var el=f.querySelector('input,textarea');if(!el)return;
     var v=el.value.trim();
     if(!v){bad(f);return}
@@ -521,7 +521,7 @@ $('modeUpd').addEventListener('click',function(){
   clearModeSel();$('modeUpd').classList.add('sel');
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='none';
-  if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);$('contactBlock').style.display='block';return}
+  if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);return}
   if(!origName){clearBiz()}
   showBizList();
 });
@@ -536,26 +536,13 @@ $('modeDel').addEventListener('click',function(){
 function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
-  $('delName').textContent=b.businessName;$('delReason').value='';$('delHow').value='';
-  var fld=$('delHow').closest('.fld');if(fld)fld.classList.remove('bad');
+  $('delName').textContent=b.businessName;$('delReason').value='';
   $('delConfirm').style.display='block';
 }
-$('delHow').addEventListener('input',function(){
-  if(this.value.indexOf('@')===-1&&/\d/.test(this.value)&&!/[A-Za-z]/.test(this.value))this.value=maskPhone(this.value);
-  var fld=this.closest('.fld');if(fld)fld.classList.remove('bad');
-});
 $('delCancel').addEventListener('click',function(){
   $('delConfirm').style.display='none';$('modebox').style.display='block';
 });
-function validateDelHow(){
-  var v=$('delHow').value.trim(),fld=$('delHow').closest('.fld');
-  if(!v){fld.classList.add('bad');return false}
-  if(v.indexOf('@')!==-1){if(!EMAIL_RE.test(v)){fld.classList.add('bad');return false}}
-  else if(v.replace(/\D/g,'').length!==10){fld.classList.add('bad');return false}
-  return true;
-}
 $('delGo').addEventListener('click',function(){
-  if(!validateDelHow()){errPop('Contact info needed',['Enter your phone or email so we can reach you if needed.']);return}
   $('delGo').disabled=true;busy('Sending confirmation email');
   sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim()},function(m){
     $('delGo').disabled=false;busy(false);
@@ -584,7 +571,6 @@ function showBizList(){
     if(mode==='remove'){showDelConfirm(bizList[+b.dataset.bi]);return}
     qa('#bizbtns button').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
     fillBiz(bizList[+b.dataset.bi]);
-    $('contactBlock').style.display='block';
   });
 }
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -769,7 +755,7 @@ initLogin();
 try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.exp*1000>Date.now()+60000)setSignedIn(sv);else if(sv)localStorage.removeItem('ccdir-token')}catch(e){}
 </script>
 <footer class="site-footer">
-  <a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener">
+  <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
     <img src="The_new_dynamic_logo.gif" alt="DIYSEO logo">
   </a>
 </footer>

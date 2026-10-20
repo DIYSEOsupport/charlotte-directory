@@ -58,8 +58,8 @@ var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvP
 var MAX_CHECKS_PER_RUN = 12;
 var PENDING_TAB = 'Pending';
 var REJECTED_TAB = 'Rejected';
-var SITE_URL = 'https://diyseosupport.gumroad.com';
-var SITE_TEXT = 'DIYSEO.support.gumroad.com';
+var SITE_URL = 'https://diyseosupport.github.io/maps-guide-landing/';
+var SITE_TEXT = 'diyseosupport.github.io/maps-guide-landing';
 
 var ADMIN_EMAILS = ['diyseo.support@gmail.com'];
 var ALLOW_CLAIM_OLD_ROWS = true;
