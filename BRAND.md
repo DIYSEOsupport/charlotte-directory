@@ -1,15 +1,16 @@
 # Charlotte County Small Business Directory — Brand Guide
 
-A free, no-login directory for Charlotte County small businesses, built and maintained by **DIYSEO**. Brand feel: hand-drawn carnival/sticker style — thick ink outlines, hard flat drop shadows (no blur), bright candy colors, playful copy. Never corporate, never minimal/flat-SaaS.
+A no-login directory for Charlotte County small businesses, built and maintained by **DIYSEO**. Brand feel: hand-drawn carnival/sticker style — thick ink outlines, hard flat drop shadows (no blur), bright candy colors, playful copy. Never corporate, never minimal/flat-SaaS.
 
 ## Logo files
 
 | File | Use |
 |---|---|
-| `diyseo-logo.png` | Footer "Built by DIYSEO" badge on `index.html` / `form.html` (circular, `object-fit:contain`, 44px) |
-| `email-logo.png` | Email header banner (`BANNER_URL` in `form-receiver-v28.gs`) |
-| `qr-logo.png` | QR code + badge, bottom of every email and page 1 of exported PDFs |
+| `officialSpinlogo.gif` | **Primary animated logo** — used on all web/phone views: index, form, directory, emails, PDFs |
+| `officialstaticlogo.png` | **Static version** — for print materials only |
 | `dummy-logos/*.png` | Initials-monogram placeholder logos for demo/test listings only — never use for real businesses |
+
+**Deprecated (no longer used):** `diyseo-logo.png`, `email-logo.png`, `qr-logo.png`
 
 Always link the DIYSEO logo to **`https://diyseosupport.gumroad.com`** (one word, no dot before "support" — `diyseo.support.gumroad.com` is NOT a real domain and will 404).
 
