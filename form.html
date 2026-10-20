@@ -521,6 +521,7 @@ $('modeUpd').addEventListener('click',function(){
   clearModeSel();$('modeUpd').classList.add('sel');
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='none';
+  $('name').value='';$('title').value='';$('how').value='';
   if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);show(1);return}
   if(!origName){clearBiz()}
   showBizList();
@@ -592,7 +593,7 @@ function clearBiz(){
 function fillBiz(b){
   clearBiz();
   origName=b.businessName||'';
-  $('name').value=b.name||'';$('title').value=b.title||'';$('how').value=b.how||'';
+  if(mode!=='update'){$('name').value=b.name||'';$('title').value=b.title||'';$('how').value=b.how||'';}
   $('biz').value=b.businessName||'';$('pubname').value=b.pubName||'';$('pubtitle').value=b.pubTitle||'';
   setRadio('cat',b.category||'');
   var d=b.describe||'';

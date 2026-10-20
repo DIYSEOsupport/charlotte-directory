@@ -316,9 +316,15 @@ function doPost(e) {
         if (tcPendRm >= 0) pend.getRange(r.row, tcPendRm + 1).setValue(rmToken);
         if (ncPendRm >= 0) pend.getRange(r.row, ncPendRm + 1).setValue(noteRm);
       });
-      // Send confirmation email
+      // Send confirmation email - use public business email if available
       var rmLive = rmRows.length > 0;
-      queueMail_({ kind: 'removeConfirm', to: email, name: rmName, token: rmToken, wasLive: rmLive });
+      var emColRm = colNamed_(headersRm, 'Email');
+      var rmSendTo = email;
+      if (emColRm >= 0 && rmRows.length > 0) {
+        var pubEmail = String(rmRows[0].vals[emColRm] || '').trim().toLowerCase();
+        if (pubEmail && EMAIL_RE.test(pubEmail)) rmSendTo = pubEmail;
+      }
+      queueMail_({ kind: 'removeConfirm', to: rmSendTo, name: rmName, token: rmToken, wasLive: rmLive });
       return reply_({ ok: true, kind: 'remove' });
     }
 
