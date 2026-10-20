@@ -1,5 +1,3 @@
-*.gs
-
 # Playwright
 node_modules/
 /test-results/
