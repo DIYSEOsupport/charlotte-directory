@@ -164,7 +164,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" id="delConfirm" style="display:none">
         <span class="l">Remove this listing?</span>
         <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
-        <p class="note">This takes it off the directory right away. You'll need to resubmit it to list it again.</p>
+        <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
+        <div class="fld" data-req data-del><label class="l" for="delHow">Your phone or email <span class="req">*</span></label><div class="help">So we can reach you if needed.</div><input type="text" id="delHow" placeholder="Phone or email"><div class="err">Enter a 10 digit phone number or a valid email.</div></div>
         <label class="l" for="delReason" style="margin-top:8px">Reason for removing <span style="font-weight:400">(optional)</span></label>
         <textarea id="delReason" rows="3" maxlength="1000"></textarea>
         <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
@@ -250,7 +251,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
   </div>
 </div>
 <div class="navtabs"><a href="index.html">📋 Directory</a></div>
-<div class="navtabs builtrow"><a class="builtby" href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo">Built by DIYSEO</a></div>
+<div class="navtabs builtrow"><a class="builtby" href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener"><img src="diyseo-logo.png" alt="DIYSEO logo"></a></div>
 <iframe name="subframe" id="subframe" title="send" style="display:none"></iframe>
 <div id="busy" role="status" aria-live="polite"><div class="bx"><div class="spin" aria-hidden="true"></div><div class="bt" id="busyT"></div><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div></div></div>
 <div id="errPop" role="alertdialog" aria-modal="true" aria-labelledby="epT"><div class="bx"><div class="hd" id="epT">Hold up, neighbor!</div><div id="epM"></div><button type="button" class="go" id="epGo">Got it</button></div></div>
@@ -398,6 +399,22 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
   sc.src=ENDPOINT+'?confirm='+encodeURIComponent(decodeURIComponent(code))+'&callback='+cb;sc.onerror=function(){fin(null)};
   document.body.appendChild(sc);
 })();
+/* confirm removal link from the email: form.html?confirmRemove=CODE */
+(function(){
+  var code=(location.search.match(/[?&]confirmRemove=([^&#]+)/)||[])[1];if(!code)return;
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+  busy('Confirming removal');
+  var cb='cfmr'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
+  function fin(r){
+    clearTimeout(t);delete window[cb];sc.remove();busy(false);
+    if(r&&r.res==='done')errPop('Listing removed',[(r.name||'Your business')+' has been removed from the directory.'],true);
+    else if(r&&r.res==='used')errPop('Link expired',['This removal link was already used or has expired. If you still want to remove your listing, sign in and request removal again.'],true);
+    else errPop('Oops',['Could not confirm removal right now. Please tap the link in your email again in a minute, or email us.']);
+  }
+  window[cb]=fin;
+  sc.src=ENDPOINT+'?confirmRemove='+encodeURIComponent(decodeURIComponent(code))+'&callback='+cb;sc.onerror=function(){fin(null)};
+  document.body.appendChild(sc);
+})();
 function popForBad(panel){
   var login=$('loginfld').classList.contains('bad'),mode2=$('modefld').classList.contains('bad');
   if(login){errPop('Sign in first, neighbor!',['Tap the Google sign-in button, then try again.']);return}
@@ -520,19 +537,33 @@ $('modeDel').addEventListener('click',function(){
 function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
-  $('delName').textContent=b.businessName;$('delReason').value='';
+  $('delName').textContent=b.businessName;$('delReason').value='';$('delHow').value='';
+  var fld=$('delHow').closest('.fld');if(fld)fld.classList.remove('bad');
   $('delConfirm').style.display='block';
 }
+$('delHow').addEventListener('input',function(){
+  if(this.value.indexOf('@')===-1&&/\d/.test(this.value)&&!/[A-Za-z]/.test(this.value))this.value=maskPhone(this.value);
+  var fld=this.closest('.fld');if(fld)fld.classList.remove('bad');
+});
 $('delCancel').addEventListener('click',function(){
   $('delConfirm').style.display='none';$('modebox').style.display='block';
 });
+function validateDelHow(){
+  var v=$('delHow').value.trim(),fld=$('delHow').closest('.fld');
+  if(!v){fld.classList.add('bad');return false}
+  if(v.indexOf('@')!==-1){if(!EMAIL_RE.test(v)){fld.classList.add('bad');return false}}
+  else if(v.replace(/\D/g,'').length!==10){fld.classList.add('bad');return false}
+  return true;
+}
 $('delGo').addEventListener('click',function(){
-  $('delGo').disabled=true;busy('Removing your listing');
+  if(!validateDelHow()){errPop('Contact info needed',['Enter your phone or email so we can reach you if needed.']);return}
+  $('delGo').disabled=true;busy('Sending confirmation email');
   sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim()},function(m){
     $('delGo').disabled=false;busy(false);
     if(m&&m.ok){
-      $('doneH').textContent='Listing removed';
-      $('doneExtraNav').style.display='flex';
+      $('doneH').textContent='Check your email';
+      $('doneNote').textContent='We sent you a confirmation email. Tap the link in that email to confirm the removal. The listing stays up until you confirm.';
+      $('doneExtraNav').style.display='none';
       qa('.step').forEach(function(s){s.classList.remove('show')});
       $('steps').style.display='none';$('delConfirm').style.display='none';
       $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});

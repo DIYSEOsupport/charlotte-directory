@@ -53,7 +53,7 @@ var LIVE_HEADER = 'Live Since';
 var LICENSED_HEADER = 'Licensed & Insured';
 // Pending tab shows only these columns (others are hidden there, data is kept). Change the words if you want more or less.
 var PENDING_SHOW = /^business name|^contact$|^name$|^title$|how to contact|google account email|^timestamp$|status \(private\)|check notes|approved by/i;
-var STATUS_LIST = ['Unconfirmed', 'Pending', 'Approved', 'Flagged', 'Rejected'];
+var STATUS_LIST = ['Unconfirmed', 'Pending', 'Approved', 'Flagged', 'Rejected', 'PendingRemoval'];
 var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvPKMbAhq2-oa0jrXDS_af_bXADEdrayXn5_XUrvfQE5gSx7wJg/exec';
 var MAX_CHECKS_PER_RUN = 12;
 var PENDING_TAB = 'Pending';
@@ -112,6 +112,7 @@ function sendQueuedMail_() {
       var job = JSON.parse(all[k]);
       if (job.kind === 'confirm') sendConfirm_(job.to, job.name, job.token, job.ckind);
       else if (job.kind === 'boss') notifyBoss_(job.name, job.d, job.label);
+      else if (job.kind === 'removeConfirm') sendRemoveConfirm_(job.to, job.name, job.token, job.wasLive);
       else if (job.kind === 'removed') {
         if (!job.ownerSent) { sendRemoved_(job.by, job.name, job.wasLive !== false); job.ownerSent = true; props.setProperty(k, JSON.stringify(job)); }
       }
@@ -225,6 +226,11 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
   if (p.confirm) return confirmPage_(String(p.confirm));
+  if (p.confirmRemove && useCallback) {
+    return ContentService.createTextOutput(p.callback + '(' + JSON.stringify(confirmRemoveToken_(String(p.confirmRemove))) + ');')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  if (p.confirmRemove) return confirmRemovePage_(String(p.confirmRemove));
   var csv = '', problem = '';
   try { csv = publicCsv_(); } catch (err) { problem = String(err); }
   if (useCallback) {
@@ -271,7 +277,7 @@ function doPost(e) {
       return reply_({ ok: true, kind: 'mine', businesses: getMine_(sheet, key, isAdmin, ownerCol, pend, email) });
     }
 
-    // "Remove my business" (hides the row, stamps column P, recoverable)
+    // "Remove my business" - Step 1: send confirmation email, set status to PendingRemoval
     if (data.action === 'remove') {
       var rmName = String(data.businessName || '').trim();
       if (!rmName) return reply_({ ok: false, error: 'No business chosen.' });
@@ -288,18 +294,31 @@ function doPost(e) {
       var siRm = colNamed_(headersRm, STATUS_HEADER);
       rmRows = rmRows.filter(function (r) { return isLiveStatus_(siRm >= 0 ? r.vals[siRm] : ''); });
       if (!rmRows.length && !rmPendRows.length) return reply_({ ok: false, error: 'Business not found.' });
-      var ncRm = colNamed_(headersRm, NOTES_HEADER);
-      var noteRm = 'Removed by owner (' + email + ') on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm') +
-          (String(data.reason || '').trim() ? '. Reason: ' + String(data.reason).trim().slice(0, 1000) : '');
-      if (ncRm >= 0) rmRows.forEach(function (r) { sheet.getRange(r.row, ncRm + 1).setValue(noteRm); });
-      var ncPendRm = colNamed_(headersPendRm, NOTES_HEADER);
-      if (ncPendRm >= 0) rmPendRows.forEach(function (r) { pend.getRange(r.row, ncPendRm + 1).setValue(noteRm); });
-      hideRows_(sheet, rmRows);
-      hideRows_(pend, rmPendRows);
-      try { CacheService.getScriptCache().remove('directory_csv'); } catch (cacheErr) { }
+      // Generate removal confirmation token
+      var rmToken = Utilities.getUuid().replace(/-/g, '');
       var rmReason = String(data.reason || '').trim().slice(0, 1000);
+      var tcRm = colNamed_(headersRm, TOKEN_HEADER);
+      var ncRm = colNamed_(headersRm, NOTES_HEADER);
+      var noteRm = 'Removal requested by owner (' + email + ') on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm') +
+          (rmReason ? '. Reason: ' + rmReason : '');
+      // Set status to PendingRemoval and store token (on main sheet rows)
+      rmRows.forEach(function (r) {
+        if (siRm >= 0) sheet.getRange(r.row, siRm + 1).setValue('PendingRemoval');
+        if (tcRm >= 0) sheet.getRange(r.row, tcRm + 1).setValue(rmToken);
+        if (ncRm >= 0) sheet.getRange(r.row, ncRm + 1).setValue(noteRm);
+      });
+      // Also mark pending rows
+      var siPendRm = colNamed_(headersPendRm, STATUS_HEADER);
+      var tcPendRm = colNamed_(headersPendRm, TOKEN_HEADER);
+      var ncPendRm = colNamed_(headersPendRm, NOTES_HEADER);
+      rmPendRows.forEach(function (r) {
+        if (siPendRm >= 0) pend.getRange(r.row, siPendRm + 1).setValue('PendingRemoval');
+        if (tcPendRm >= 0) pend.getRange(r.row, tcPendRm + 1).setValue(rmToken);
+        if (ncPendRm >= 0) pend.getRange(r.row, ncPendRm + 1).setValue(noteRm);
+      });
+      // Send confirmation email
       var rmLive = rmRows.length > 0;
-      queueMail_({ kind: 'removed', name: rmName, by: email, reason: rmReason, wasLive: rmLive, label: rmLive ? 'LISTING REMOVED by owner' : 'WAITING SUBMISSION WITHDRAWN by owner' });
+      queueMail_({ kind: 'removeConfirm', to: email, name: rmName, token: rmToken, wasLive: rmLive });
       return reply_({ ok: true, kind: 'remove' });
     }
 
@@ -456,7 +475,7 @@ function sendLink_(to, businessName, d, logoUrl) {
   if (lm) {
     try {
       try { inline.logo = DriveApp.getFileById(lm[1]).getBlob().setName('logo'); }
-      catch (e1) { inline.logo = UrlFetchApp.fetch('https://drive.google.com/thumbnail?id=' + lm[1] + '&sz=w300', { muteHttpExceptions: false }).getBlob().setName('logo'); }
+      catch (e1) { inline.logo = UrlFetchApp.fetch('https://lh3.googleusercontent.com/d/' + lm[1], { muteHttpExceptions: false }).getBlob().setName('logo'); }
       logoHtml = '<td width="76" style="padding-right:14px;vertical-align:middle"><img src="cid:logo" width="64" height="64" alt="" style="display:block;width:64px;height:64px;object-fit:contain;background:#fff;border:3px solid ' + INK + ';border-radius:10px"></td>';
     } catch (logoErr) { inline = {}; logoHtml = ''; }
   }
@@ -648,6 +667,22 @@ function sendUpdatePending_(to, businessName, wasLive) {
   sendMail_(to, 'Update pending: ' + businessName, text, html);
 }
 
+function sendRemoveConfirm_(to, businessName, token, wasLive) {
+  var link = FORM_URL + '?confirmRemove=' + encodeURIComponent(token);
+  var intro = wasLive
+      ? 'You requested to remove <b>' + htmlEsc_(businessName) + '</b> from the directory.'
+      : 'You requested to withdraw your submission for <b>' + htmlEsc_(businessName) + '</b>.';
+  var html = noticeHtml_('CONFIRM REMOVAL', businessName, [
+    intro,
+    'Tap the button below to confirm this removal. If you did not request this, just ignore this email.'
+  ], 'CONFIRM REMOVAL', link, link, [
+    'This link expires in 24 hours.'
+  ]);
+  var text = 'Confirm removal\n\n' + intro.replace(/<[^>]+>/g, '') + '\n\nTap the link to confirm:\n' + link +
+      '\n\nIf you did not request this, just ignore this email. This link expires in 24 hours.';
+  sendMail_(to, 'Confirm removal: ' + businessName, text, html);
+}
+
 function sendRemoved_(to, businessName, wasLive) {
   var first = wasLive
       ? '<b>' + htmlEsc_(businessName) + '</b> is no longer in the directory.'
@@ -686,8 +721,7 @@ function confirmPageHtml_(title, lines, good) {
       '<h1>' + htmlEsc_(title) + '</h1>' + body +
       '<p><a class="b" href="' + htmlEsc_(DIRECTORY_URL) + '">SEE THE DIRECTORY</a></p>' +
       '<p style="margin-top:18px"><a href="' + htmlEsc_(SITE_URL) + '" style="text-decoration:none;display:inline-block;vertical-align:middle">' +
-      '<img src="' + htmlEsc_(QR_URL) + '" width="32" height="32" alt="DIYSEO" style="display:inline-block;vertical-align:middle;width:32px;height:32px;object-fit:contain;background:transparent;border:0;border-radius:0;margin-right:6px">' +
-      '<span style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:' + INK + ';vertical-align:middle">Built by DIYSEO</span></a></p></div></body></html>';
+      '<img src="' + htmlEsc_(QR_URL) + '" width="32" height="32" alt="DIYSEO" style="display:inline-block;vertical-align:middle;width:32px;height:32px;object-fit:contain;background:transparent;border:0;border-radius:0"></a></p></div></body></html>';
 }
 
 // Confirms the email for a pending row. Returns { res: 'done' | 'used' | 'error', name }.
@@ -751,6 +785,90 @@ function confirmPage_(token) {
       .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
+// Confirms a removal request. Returns { res: 'done' | 'used' | 'error', name }.
+// form.html?confirmRemove=CODE calls this by JSONP.
+function confirmRemoveToken_(token) {
+  var out;
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(20000);
+    var done = false, bizName = '', sendTo = '';
+    if (/^[A-Fa-f0-9]{20,64}$/.test(token)) {
+      var sheet = directorySheet_();
+      var pend = pendingSheet_();
+      var headers = getHeaders_(sheet);
+      var headersPend = getHeaders_(pend);
+      var tc = colNamed_(headers, TOKEN_HEADER), sc = colNamed_(headers, STATUS_HEADER), n = nameCol_(headers);
+      var ec = colNamed_(headers, EMAIL_HEADER), nc = colNamed_(headers, NOTES_HEADER);
+      var tcP = colNamed_(headersPend, TOKEN_HEADER), scP = colNamed_(headersPend, STATUS_HEADER), nP = nameCol_(headersPend);
+      var ecP = colNamed_(headersPend, EMAIL_HEADER), ncP = colNamed_(headersPend, NOTES_HEADER);
+
+      // Check main directory sheet
+      var lastRow = sheet.getLastRow();
+      if (tc >= 0 && sc >= 0 && n >= 0 && lastRow >= 2) {
+        var vals = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+        for (var i = 0; i < vals.length; i++) {
+          if (String(vals[i][tc]) === token && String(vals[i][sc]).trim().toLowerCase() === 'pendingremoval') {
+            bizName = firstLine_(vals[i][n]);
+            sendTo = ec >= 0 ? String(vals[i][ec] || '') : '';
+            var noteVal = nc >= 0 ? String(vals[i][nc] || '') : '';
+            noteVal += ' | Confirmed removal on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+            if (nc >= 0) sheet.getRange(i + 2, nc + 1).setValue(noteVal);
+            sheet.hideRows(i + 2);
+            sheet.getRange(i + 2, tc + 1).setValue('');
+            done = true;
+          }
+        }
+      }
+      // Check pending sheet
+      var lastRowP = pend.getLastRow();
+      if (tcP >= 0 && scP >= 0 && nP >= 0 && lastRowP >= 2) {
+        var valsP = pend.getRange(2, 1, lastRowP - 1, pend.getLastColumn()).getValues();
+        for (var j = 0; j < valsP.length; j++) {
+          if (String(valsP[j][tcP]) === token && String(valsP[j][scP]).trim().toLowerCase() === 'pendingremoval') {
+            if (!bizName) bizName = firstLine_(valsP[j][nP]);
+            if (!sendTo && ecP >= 0) sendTo = String(valsP[j][ecP] || '');
+            var noteValP = ncP >= 0 ? String(valsP[j][ncP] || '') : '';
+            noteValP += ' | Confirmed removal on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+            if (ncP >= 0) pend.getRange(j + 2, ncP + 1).setValue(noteValP);
+            pend.hideRows(j + 2);
+            pend.getRange(j + 2, tcP + 1).setValue('');
+            done = true;
+          }
+        }
+      }
+      // Send final removal confirmation email
+      if (done && sendTo) {
+        try { CacheService.getScriptCache().remove('directory_csv'); } catch (cacheErr) { }
+        queueMail_({ kind: 'removed', by: sendTo, name: bizName, wasLive: true });
+      }
+    }
+    out = { res: done ? 'done' : 'used', name: bizName };
+  } catch (err) {
+    out = { res: 'error', name: '' };
+  } finally {
+    try { lock.releaseLock(); } catch (ignore) { }
+  }
+  return out;
+}
+
+function confirmRemovePage_(token) {
+  var r = confirmRemoveToken_(token), out, bizName = r.name;
+  if (r.res === 'done') {
+    out = confirmPageHtml_('LISTING REMOVED', [
+      '<b>' + htmlEsc_(bizName) + '</b> has been removed from the directory.',
+      'Changed your mind? You can sign in and add it again as a new business.'
+    ], true);
+  } else {
+    out = confirmPageHtml_('LINK EXPIRED', [
+      'This removal link was already used or has expired.',
+      'If you still want to remove your listing, sign in to the form and request removal again.'
+    ], false);
+  }
+  if (r.res === 'error') out = confirmPageHtml_('OOPS', ['Something went wrong. Please try the link again in a minute, or email us.'], false);
+  return HtmlService.createHtmlOutput(out).setTitle('Charlotte County Small Business Directory')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
 
 // ---------------------------------------------------------------
 // Pending tab (v27): new submissions wait here. When approved they move to the directory tab.

@@ -895,7 +895,7 @@ function pushUniq(arr,v,keyfn){var k=keyfn?keyfn(v):v.toLowerCase();if(!arr.some
 function setLogo(r,v){
   if(r.logo)return true;
   var m=/(?:[?&]id=|\/d\/)([\w-]{15,})/.exec(v);
-  if(m){r.logo='https://drive.google.com/thumbnail?id='+m[1]+'&sz=w300';return true}
+  if(m){r.logo='https://lh3.googleusercontent.com/d/'+m[1];return true}
   var u=(v.match(/https?:\/\/[^\s,]+/)||[''])[0];
   if(/\.(png|jpe?g|gif|webp|svg)(\?|$)/i.test(u)){r.logo=u;return true}
   return false;
@@ -1310,9 +1310,16 @@ $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLogin
 $('lpGo').onclick=function(){
   closeLoginPop();
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
-  setTimeout(function(){
-    var gbtn=$('gbtn');if(gbtn){var btn=gbtn.querySelector('div[role="button"]');if(btn)btn.click();else if(window.google&&google.accounts&&google.accounts.id)google.accounts.id.prompt()}
-  },400);
+  var attempts=0;
+  function tryClick(){
+    attempts++;
+    var gbtn=$('gbtn');if(!gbtn)return;
+    var btn=gbtn.querySelector('div[role="button"]')||gbtn.querySelector('[tabindex="0"]')||gbtn.querySelector('iframe');
+    if(btn){btn.click();return}
+    if(window.google&&google.accounts&&google.accounts.id){google.accounts.id.prompt();return}
+    if(attempts<5)setTimeout(tryClick,300);
+  }
+  setTimeout(tryClick,500);
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
