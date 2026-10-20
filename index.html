@@ -182,7 +182,7 @@ mark{background:var(--yellow);color:inherit;border-radius:3px;padding:0 2px;box-
 .toast .tundo{margin-left:6px;background:var(--purple);color:#fff;border:2px solid var(--ink);border-radius:8px;padding:2px 10px;font:inherit;cursor:pointer}
 .toast.blue{background:var(--blue);color:#fff}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-.totop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
+.totop{position:fixed;right:14px;bottom:calc(140px + env(safe-area-inset-bottom));width:50px;height:50px;border-radius:50%;border:3px solid var(--ink);background:var(--magenta);color:#fff;font-size:18px;box-shadow:var(--shadow);cursor:pointer;opacity:0;pointer-events:none;transition:.25s;z-index:30}
 .totop.show{opacity:1;pointer-events:auto}
 
 @media(max-width:640px){
@@ -574,10 +574,10 @@ input,textarea,select,option,#printArea{text-transform:none}
 .applybar{padding:8px 12px;margin-top:2px}
 .applybar .btn{min-height:38px;font-size:14px}
 /* footer */
-.site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:flex;flex-direction:column-reverse;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-family:var(--fh);font-size:16px;letter-spacing:1px}
+.site-footer{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:25}
+.site-footer a{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;text-decoration:none;color:var(--ink);font-family:var(--fh);font-size:12px;letter-spacing:1px}
 .site-footer a:hover{opacity:.85}
-.site-footer img{width:120px;height:120px}
+.site-footer img{width:100px;height:100px}
 </style>
 </head>
 <body>
@@ -2124,7 +2124,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)load
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.gumroad.com" target="_blank" rel="noopener">
-    <img src="The_new_dynamic_logo.gif" alt="DIYSEO logo">
+    <img src="diyseo_logo_transparent.gif" alt="DIYSEO logo">
     <span>Built by DIYSEO</span>
   </a>
 </footer>
