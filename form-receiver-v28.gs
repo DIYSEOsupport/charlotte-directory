@@ -31,9 +31,11 @@ var LOGO_FOLDER_NAME = 'Directory Logos';
 var DIRECTORY_URL = 'https://diyseosupport.github.io/charlotte-directory/';
 var FORM_URL = 'https://diyseosupport.github.io/charlotte-directory/form.html';
 var FROM_EMAIL = 'DIYSEO.support@gmail.com';
-var QR_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_round_logo.gif';
+var QR_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_logo_static.png';
 var BANNER_URL = 'https://diyseosupport.github.io/charlotte-directory/hero.jpg';
-var DIYSEO_LOGO_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_round_logo.gif';
+var DIYSEO_LOGO_URL = 'https://diyseosupport.github.io/charlotte-directory/diyseo_logo_static.png';
+var FB_ICON = 'https://cdn-icons-png.flaticon.com/24/733/733547.png';
+var ND_ICON = 'https://cdn-icons-png.flaticon.com/24/2111/2111398.png';
 
 var TIMESTAMP_HEADER = 'Timestamp';
 var OTHER_HEADER = 'Other details'; // what owners type when they pick category Other
@@ -439,10 +441,10 @@ function sendLink_(to, businessName, d, logoUrl) {
   d = d || {};
   var BADGE = 'YOUR LISTING IS LIVE!';
   var rows = [];
-  function add(label, value, href, shown) {
+  function add(label, value, href, shown, icon) {
     value = String(value || '').trim();
     if (!value) return;
-    rows.push({ label: label, value: value, href: href || '', shown: shown || '' });
+    rows.push({ label: label, value: value, href: href || '', shown: shown || '', icon: icon || '' });
   }
   var listingUrl = DIRECTORY_URL + '?card=' + encodeURIComponent(businessName);
   var who = [d.pubName, d.pubTitle].filter(function (x) { return String(x || '').trim(); }).join(', ');
@@ -454,9 +456,9 @@ function sendLink_(to, businessName, d, logoUrl) {
   add('Phone', d.phone, d.phone ? 'tel:' + String(d.phone).replace(/[^\d+]/g, '') : '');
   add('Email', d.email, d.email ? 'mailto:' + d.email : '');
   add('Website', d.website, d.website ? fullUrl_(d.website) : '');
-  add('Facebook', d.facebook, d.facebook ? fullUrl_(d.facebook) : '');
-  add('NextDoor business', d.ndBiz, d.ndBiz ? fullUrl_(d.ndBiz) : '');
-  add('NextDoor personal', d.ndPersonal, d.ndPersonal ? fullUrl_(d.ndPersonal) : '');
+  add('Facebook', d.facebook, d.facebook ? fullUrl_(d.facebook) : '', '', FB_ICON);
+  add('NextDoor', d.ndBiz, d.ndBiz ? fullUrl_(d.ndBiz) : '', '', ND_ICON);
+  add('NextDoor', d.ndPersonal, d.ndPersonal ? fullUrl_(d.ndPersonal) : '', '', ND_ICON);
   add('Google Reviews', d.reviews, d.reviews ? fullUrl_(d.reviews) : '', 'See our Google reviews');
   add('Address', addr, addr ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr) : '');
   add('About', splitDescribe_(d.describe).text);
@@ -470,8 +472,9 @@ function sendLink_(to, businessName, d, logoUrl) {
     var val = r.href
         ? '<a href="' + htmlEsc_(r.href) + '" style="color:' + PURPLE + ';font-weight:bold">' + htmlEsc_(r.shown || r.value.replace(/^https?:\/\//i, '')) + '</a>'
         : htmlEsc_(r.value).replace(/\n/g, '<br>');
+    var iconHtml = r.icon ? '<img src="' + htmlEsc_(r.icon) + '" width="18" height="18" alt="" style="display:inline-block;vertical-align:middle;margin-right:6px;width:18px;height:18px">' : '';
     return '<tr><td style="padding:10px 0;border-bottom:2px dotted #d9c9a0">' +
-        '<div class="lbl" style="font-family:' + HEAD + ';font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:' + MAGENTA + ';line-height:1.2;padding-bottom:3px">' + htmlEsc_(r.label) + '</div>' +
+        '<div class="lbl" style="font-family:' + HEAD + ';font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:' + MAGENTA + ';line-height:1.2;padding-bottom:3px">' + iconHtml + htmlEsc_(r.label) + '</div>' +
         '<div class="val" style="font-family:' + BODY + ';font-size:16px;color:' + INK + ';line-height:1.4;word-break:break-word">' + val + '</div></td></tr>';
   }).join('');
 
