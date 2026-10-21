@@ -127,11 +127,12 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 .builtby img{width:20px;height:20px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 /* footer */
 .site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:block;text-decoration:none}
+.site-footer a{display:flex;align-items:center;gap:10px;text-decoration:none}
 .site-footer a:hover{opacity:.85}
-.site-footer img{width:100px;height:100px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);-webkit-animation:logospin 8s linear infinite;animation:logospin 8s linear infinite}
-@-webkit-keyframes logospin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
-@keyframes logospin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.site-footer .cog{width:50px;height:50px;-webkit-animation:cogspin 4s linear infinite;animation:cogspin 4s linear infinite}
+.site-footer .wordmark{height:40px;width:auto}
+@-webkit-keyframes cogspin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
+@keyframes cogspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -760,7 +761,8 @@ try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
-    <img src="diyseo_logo_static.png" alt="DIYSEO">
+    <img src="logos/diyseo_cog_static.png" alt="" class="cog">
+    <img src="logos/diyseo_wordmark_1line_1024.png" alt="DIYSEO" class="wordmark">
   </a>
 </footer>
 </body>
