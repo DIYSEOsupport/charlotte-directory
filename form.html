@@ -169,15 +169,15 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld" data-req><label class="l" for="how">How to contact you with questions about your submission? <span class="req">*</span></label><input type="text" id="how" placeholder="Phone or email"><div class="err" id="howerr">Enter a 10 digit phone number or a valid email.</div></div>
       <div class="nav" id="contactNav"><span></span><button type="button" class="b" data-next>Next</button></div>
       </div>
-      <div class="fld" id="delConfirm" style="display:none">
-        <span class="l">Remove this listing?</span>
-        <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
-        <div id="delDetails" style="background:#fff;border:2px solid var(--ink);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px"></div>
-        <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
-        <label class="l" for="delReason">Reason for removing <span style="font-weight:400">(optional)</span></label>
-        <textarea id="delReason" rows="3" maxlength="1000"></textarea>
-        <div class="nav"><button type="button" class="b alt" id="delCancel">Cancel</button><button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></div>
-      </div>
+    </div>
+
+    <div class="card" id="delConfirm" style="display:none">
+      <span class="l">Remove this listing?</span>
+      <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
+      <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
+      <label class="l" for="delReason">Reason for removing <span style="font-weight:400">(optional)</span></label>
+      <textarea id="delReason" rows="3" maxlength="1000"></textarea>
+      <div class="nav"><button type="button" class="b alt" id="delCancel">Cancel</button><button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></div>
     </div>
 
     <div class="card step" data-step="1">
@@ -534,24 +534,9 @@ $('modeDel').addEventListener('click',function(){
   $('name').value='';$('title').value='';$('how').value='';
   showBizList();
 });
-function showDelConfirm(b){
-  origName=b.businessName;
-  $('modebox').style.display='none';
-  $('delName').textContent=b.businessName;$('delReason').value='';
-  // Show business details for verification
-  var details=[];
-  if(b.category)details.push('<b>Category:</b> '+esc(b.category));
-  if(b.phone)details.push('<b>Phone:</b> '+esc(b.phone));
-  if(b.email)details.push('<b>Email:</b> '+esc(b.email));
-  if(b.website)details.push('<b>Website:</b> '+esc(b.website));
-  if(b.street||b.city)details.push('<b>Address:</b> '+esc([b.street,b.city,b.state,b.zip].filter(Boolean).join(', ')));
-  if(b.area)details.push('<b>Area:</b> '+esc(b.area));
-  $('delDetails').innerHTML=details.length?details.join('<br>'):'<span style="color:#888">(No details on file)</span>';
-  $('contactNav').style.display='none';
-  $('delConfirm').style.display='block';
-}
 $('delCancel').addEventListener('click',function(){
-  $('delConfirm').style.display='none';$('modebox').style.display='block';$('contactNav').style.display='';
+  $('delConfirm').style.display='none';
+  $('modebox').style.display='block';
 });
 $('delGo').addEventListener('click',function(){
   var nm=$('name').value.trim(),ttl=$('title').value.trim(),how=$('how').value.trim();
@@ -581,10 +566,17 @@ function showBizList(){
   if(f)f.addEventListener('input',function(){var q=f.value.toLowerCase();qa('#bizbtns button').forEach(function(b){b.style.display=b.textContent.toLowerCase().indexOf(q)===-1?'none':''})});
   $('bizbtns').addEventListener('click',function(e){
     var b=e.target.closest('[data-bi]');if(!b)return;
-    if(mode==='remove'){showDelConfirm(bizList[+b.dataset.bi]);return}
     qa('#bizbtns button').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
-    fillBiz(bizList[+b.dataset.bi]);
-    show(1);
+    var biz=bizList[+b.dataset.bi];
+    fillBiz(biz);
+    if(mode==='remove'){
+      origName=biz.businessName;
+      $('delName').textContent=biz.businessName;$('delReason').value='';
+      $('modebox').style.display='none';
+      $('delConfirm').style.display='block';
+    }else{
+      show(1);
+    }
   });
 }
 function esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -605,7 +597,7 @@ function clearBiz(){
 function fillBiz(b){
   clearBiz();
   origName=b.businessName||'';
-  if(mode!=='update'){$('name').value=b.name||'';$('title').value=b.title||'';$('how').value=b.how||'';}
+  if(mode==='new'){$('name').value=b.name||'';$('title').value=b.title||'';$('how').value=b.how||'';}
   $('biz').value=b.businessName||'';$('pubname').value=b.pubName||'';$('pubtitle').value=b.pubTitle||'';
   setRadio('cat',b.category||'');
   var d=b.describe||'';
