@@ -24,7 +24,7 @@
 // Settings
 // ---------------------------------------------------------------
 var CLIENT_ID = '429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
-var BUILD = '2026-10-18 11:31pm — check page support (check.html, sends nothing)';
+var BUILD = '2026-10-20 11:18pm — update emails show changes + listing link';
 var SHEET_ID = '1mSNjflXI-u1B4zHkbUT2SKx7lklbE08nFwmoFFzYQvE';
 var SHEET_GID = 112379302;
 var LOGO_FOLDER_NAME = 'Directory Logos';
