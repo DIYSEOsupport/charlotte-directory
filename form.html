@@ -530,7 +530,8 @@ $('modeDel').addEventListener('click',function(){
   mode='remove';origName='';
   clearModeSel();$('modeDel').classList.add('sel');
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
-  $('contactBlock').style.display='none';
+  $('contactBlock').style.display='block';
+  $('name').value='';$('title').value='';$('how').value='';
   if(bizList.length===1){showDelConfirm(bizList[0]);return}
   showBizList();
 });
@@ -758,7 +759,7 @@ try{var sv=localStorage.getItem('ccdir-token'),si=sv?jwtInfo(sv):null;if(si&&si.
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
-    <img src="logos/giflogo.gif" alt="DIYSEO">
+    <img src="logos/giflogo_small.gif" alt="DIYSEO">
   </a>
 </footer>
 </body>
