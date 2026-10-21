@@ -24,7 +24,7 @@
 // Settings
 // ---------------------------------------------------------------
 var CLIENT_ID = '429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
-var BUILD = '2026-10-20 11:40pm — fix remove for pending-only listings';
+var BUILD = '2026-10-21 — fix removals not hiding from directory CSV';
 var SHEET_ID = '1mSNjflXI-u1B4zHkbUT2SKx7lklbE08nFwmoFFzYQvE';
 var SHEET_GID = 112379302;
 var LOGO_FOLDER_NAME = 'Directory Logos';
@@ -60,8 +60,8 @@ var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvP
 var MAX_CHECKS_PER_RUN = 12;
 var PENDING_TAB = 'Pending';
 var REJECTED_TAB = 'Rejected';
-var SITE_URL = 'https://diyseosupport.github.io/maps-guide-landing/';
-var SITE_TEXT = 'diyseosupport.github.io/maps-guide-landing';
+var SITE_URL = 'https://diyseosupport.github.io/';
+var SITE_TEXT = 'diyseosupport.github.io';
 
 var ADMIN_EMAILS = ['diyseo.support@gmail.com'];
 var ALLOW_CLAIM_OLD_ROWS = true;
@@ -838,8 +838,10 @@ function confirmRemoveToken_(token) {
       var headersPend = getHeaders_(pend);
       var tc = colNamed_(headers, TOKEN_HEADER), sc = colNamed_(headers, STATUS_HEADER), n = nameCol_(headers);
       var ec = colNamed_(headers, EMAIL_HEADER), nc = colNamed_(headers, NOTES_HEADER);
+      var hc = ensureColumn_(sheet, HIDDEN_HEADER);
       var tcP = colNamed_(headersPend, TOKEN_HEADER), scP = colNamed_(headersPend, STATUS_HEADER), nP = nameCol_(headersPend);
       var ecP = colNamed_(headersPend, EMAIL_HEADER), ncP = colNamed_(headersPend, NOTES_HEADER);
+      var hcP = ensureColumn_(pend, HIDDEN_HEADER);
 
       // Check main directory sheet
       var lastRow = sheet.getLastRow();
@@ -852,6 +854,8 @@ function confirmRemoveToken_(token) {
             var noteVal = nc >= 0 ? String(vals[i][nc] || '') : '';
             noteVal += ' | Confirmed removal on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
             if (nc >= 0) sheet.getRange(i + 2, nc + 1).setValue(noteVal);
+            var stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+            sheet.getRange(i + 2, hc).setValue('Removed ' + stamp);
             sheet.hideRows(i + 2);
             sheet.getRange(i + 2, tc + 1).setValue('');
             done = true;
@@ -869,6 +873,8 @@ function confirmRemoveToken_(token) {
             var noteValP = ncP >= 0 ? String(valsP[j][ncP] || '') : '';
             noteValP += ' | Confirmed removal on ' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
             if (ncP >= 0) pend.getRange(j + 2, ncP + 1).setValue(noteValP);
+            var stampP = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+            pend.getRange(j + 2, hcP).setValue('Removed ' + stampP);
             pend.hideRows(j + 2);
             pend.getRange(j + 2, tcP + 1).setValue('');
             done = true;
@@ -1462,9 +1468,11 @@ function previewEmails() {
   sendConfirm_(to, name, 'PREVIEW0000000000000000', 'updateLive', d);
   sendLink_(to, name, d, 'https://drive.google.com/open?id=' + (d.logoId || ''));
   sendRejected_(to, name);
+  sendRemoveConfirm_(to, name, 'PREVIEW0000000000000000', true);
+  sendRemoveConfirm_(to, name, 'PREVIEW0000000000000000', false);
   sendRemoved_(to, name, true);
   sendRemoved_(to, name, false);
-  return 'Sent 6 preview emails to ' + to + ' using "' + name + '".';
+  return 'Sent 8 preview emails to ' + to + ' using "' + name + '".';
 }
 
 function testBossEmail() {
