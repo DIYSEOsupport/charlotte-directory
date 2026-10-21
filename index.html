@@ -405,7 +405,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .star:hover svg path{stroke:rgba(26,16,51,.6)}
 .card.saved .star svg path{fill:#ffd23f;stroke:#1a1033;stroke-width:2}
 .card.saved .star{filter:drop-shadow(1px 1px 0 var(--ink))}
-.card.saved .blogo{-webkit-animation:logospin 6s linear infinite;animation:logospin 6s linear infinite;border-radius:50%}
+.card.saved .blogo{-webkit-animation:cogspin 6s linear infinite;animation:cogspin 6s linear infinite;border-radius:50%}
 .grid .hidebtn{pointer-events:auto;cursor:pointer;background:none;border:0;padding:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;top:46px;right:50px;filter:none;color:rgba(26,16,51,.4)}
 .hidebtn:hover{color:rgba(26,16,51,.75)}
 .hidebtn[aria-pressed="true"]{color:var(--magenta)}
@@ -577,9 +577,12 @@ input,textarea,select,option,#printArea{text-transform:none}
 .applybar .btn{min-height:38px;font-size:14px}
 /* footer */
 .site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:block;text-decoration:none}
+.site-footer a{display:block;text-decoration:none;position:relative;width:80px;height:80px}
 .site-footer a:hover{opacity:.85}
-.site-footer img{width:80px;height:80px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.site-footer .bg{width:80px;height:80px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.site-footer .cog{position:absolute;top:0;left:0;width:80px;height:80px;-webkit-animation:cogspin 4s linear infinite;animation:cogspin 4s linear infinite}
+@-webkit-keyframes cogspin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
+@keyframes cogspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -1310,14 +1313,17 @@ var fbLogin=false;
 $('lpNo').onclick=function(){if(fbLogin){closeLoginPop();return}loginSkipped=true;try{localStorage.setItem('ccdir-login-skip','1')}catch(e){}closeLoginPop();try{buildFilters()}catch(e){}};
 $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLoginPop()});
 $('lpGo').onclick=function(){
-  closeLoginPop();
-  // Try Google One Tap first (works on mobile)
-  if(window.google&&google.accounts&&google.accounts.id){
-    google.accounts.id.prompt();
-  }
-  // Also scroll to button and highlight it as fallback
+  // Scroll to Google button first, then close popup
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
-  var gbtn=$('gbtn');if(gbtn){gbtn.style.animation='pulse .5s ease 3';setTimeout(function(){gbtn.style.animation=''},1600)}
+  setTimeout(function(){
+    closeLoginPop();
+    // Try Google One Tap
+    if(window.google&&google.accounts&&google.accounts.id){
+      google.accounts.id.prompt();
+    }
+    // Highlight the button
+    var gbtn=$('gbtn');if(gbtn){gbtn.style.animation='pulse .5s ease 3';setTimeout(function(){gbtn.style.animation=''},1600)}
+  },400);
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
@@ -1329,7 +1335,7 @@ function toggleFav(k,el){
   if(favs[k])delete favs[k];else favs[k]=1;
   if(st.fav&&!favs[k])favKeep[k]=1;
   saveFavs();
-  if(favs[k]&&!acct.email){if(hasUser||loginSkipped)favHonk();else showLoginPop()}
+  if(favs[k]&&!acct.email){showLoginPop()}
   if(acct.email||hasUser){
     ops[k]=favs[k]?1:0;saveOps();
     if(acct.token&&acct.exp>Date.now()+30000)syncSaves();
@@ -2131,7 +2137,8 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)load
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
-    <img src="diyseo_round_logo.gif" alt="DIYSEO">
+    <img src="diyseo_logo_static.png" alt="DIYSEO" class="bg">
+    <img src="logos/diyseo_cog_static.png" alt="" class="cog">
   </a>
 </footer>
 </body>
