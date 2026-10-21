@@ -1314,13 +1314,18 @@ $('lpGo').onclick=function(){
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
   setTimeout(function(){
     closeLoginPop();
-    // Try Google One Tap
-    if(window.google&&google.accounts&&google.accounts.id){
-      google.accounts.id.prompt();
+    // Try Google One Tap with retry
+    function tryPrompt(attempts){
+      if(window.google&&google.accounts&&google.accounts.id){
+        google.accounts.id.prompt();
+      }else if(attempts<5){
+        setTimeout(function(){tryPrompt(attempts+1)},300);
+      }
     }
+    tryPrompt(0);
     // Highlight the button
     var gbtn=$('gbtn');if(gbtn){gbtn.style.animation='pulse .5s ease 3';setTimeout(function(){gbtn.style.animation=''},1600)}
-  },400);
+  },600);
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;

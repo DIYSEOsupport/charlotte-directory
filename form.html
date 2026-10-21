@@ -161,21 +161,22 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
         </div>
         <button type="button" class="b alt" id="modeRetry" style="display:none;margin-top:8px;font-size:16px;min-height:38px;padding:4px 14px">Try again</button>
       </div>
-      <div class="fld" id="delConfirm" style="display:none">
-        <span class="l">Remove this listing?</span>
-        <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
-        <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
-        <label class="l" for="delReason">Reason for removing <span style="font-weight:400">(optional)</span></label>
-        <textarea id="delReason" rows="3" maxlength="1000"></textarea>
-        <div class="nav"><span></span><span><button type="button" class="b alt" id="delCancel">Cancel</button> <button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></span></div>
-      </div>
       <div id="contactBlock" style="display:none">
       <h2 style="margin-top:6px">Contact info for person completing form</h2>
       <p class="note">Not published. We only use this if we have questions about your submission.</p>
       <div class="fld" data-req><label class="l" for="name">Name <span class="req">*</span></label><input type="text" id="name" autocomplete="name"></div>
       <div class="fld" data-req><label class="l" for="title">Title <span class="req">*</span></label><input type="text" id="title" autocomplete="organization-title"></div>
       <div class="fld" data-req><label class="l" for="how">How to contact you with questions about your submission? <span class="req">*</span></label><input type="text" id="how" placeholder="Phone or email"><div class="err" id="howerr">Enter a 10 digit phone number or a valid email.</div></div>
-      <div class="nav"><span></span><button type="button" class="b" data-next>Next</button></div>
+      <div class="nav" id="contactNav"><span></span><button type="button" class="b" data-next>Next</button></div>
+      </div>
+      <div class="fld" id="delConfirm" style="display:none">
+        <span class="l">Remove this listing?</span>
+        <p id="delName" style="font-weight:800;font-size:18px;margin:4px 0"></p>
+        <div id="delDetails" style="background:#fff;border:2px solid var(--ink);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px"></div>
+        <p class="note">We will email you a confirmation link. The listing stays up until you confirm.</p>
+        <label class="l" for="delReason">Reason for removing <span style="font-weight:400">(optional)</span></label>
+        <textarea id="delReason" rows="3" maxlength="1000"></textarea>
+        <div class="nav"><button type="button" class="b alt" id="delCancel">Cancel</button><button type="button" class="b" id="delGo" style="background:var(--magenta)">Remove it</button></div>
       </div>
     </div>
 
@@ -537,14 +538,24 @@ function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
   $('delName').textContent=b.businessName;$('delReason').value='';
+  // Show business details for verification
+  var details=[];
+  if(b.category)details.push('<b>Category:</b> '+esc(b.category));
+  if(b.phone)details.push('<b>Phone:</b> '+esc(b.phone));
+  if(b.email)details.push('<b>Email:</b> '+esc(b.email));
+  if(b.website)details.push('<b>Website:</b> '+esc(b.website));
+  if(b.street||b.city)details.push('<b>Address:</b> '+esc([b.street,b.city,b.state,b.zip].filter(Boolean).join(', ')));
+  if(b.area)details.push('<b>Area:</b> '+esc(b.area));
+  $('delDetails').innerHTML=details.length?details.join('<br>'):'<span style="color:#888">(No details on file)</span>';
+  $('contactNav').style.display='none';
   $('delConfirm').style.display='block';
 }
 $('delCancel').addEventListener('click',function(){
-  $('delConfirm').style.display='none';$('modebox').style.display='block';
+  $('delConfirm').style.display='none';$('modebox').style.display='block';$('contactNav').style.display='';
 });
 $('delGo').addEventListener('click',function(){
-  var how=$('how').value.trim();
-  if(!how){alert('Please fill in contact info first.');return}
+  var nm=$('name').value.trim(),ttl=$('title').value.trim(),how=$('how').value.trim();
+  if(!nm||!ttl||!how){alert('Please fill in all contact info first.');return}
   $('delGo').disabled=true;busy('Sending confirmation email');
   sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim(),name:$('name').value.trim(),title:$('title').value.trim(),how:how},function(m){
     $('delGo').disabled=false;busy(false);

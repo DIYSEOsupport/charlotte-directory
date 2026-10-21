@@ -113,7 +113,7 @@ function sendQueuedMail_() {
     if (k.indexOf('MAILQ_') !== 0) return;
     try {
       var job = JSON.parse(all[k]);
-      if (job.kind === 'confirm') sendConfirm_(job.to, job.name, job.token, job.ckind);
+      if (job.kind === 'confirm') sendConfirm_(job.to, job.name, job.token, job.ckind, job.data);
       else if (job.kind === 'boss') notifyBoss_(job.name, job.d, job.label);
       else if (job.kind === 'removeConfirm') sendRemoveConfirm_(job.to, job.name, job.token, job.wasLive);
       else if (job.kind === 'removed') {
@@ -416,8 +416,8 @@ function doPost(e) {
     // Send the email now (queued mail waits on a Google timer that can take minutes). Queue it only if this fails.
     // Skip confirmation emails for DIYSEO entries
     if (!isDiyseo_(newName)) {
-      try { sendConfirm_(sendTo, newName, token, ckind); }
-      catch (ce) { queueMail_({ kind: 'confirm', to: sendTo, name: newName, token: token, ckind: ckind }); }
+      try { sendConfirm_(sendTo, newName, token, ckind, data); }
+      catch (ce) { queueMail_({ kind: 'confirm', to: sendTo, name: newName, token: token, ckind: ckind, data: data }); }
     }
     if (isUpdate) checkSoon_();
     return reply_({ ok: true, status: status, emailTo: sendTo });
@@ -590,8 +590,7 @@ function colNamed_(headers, name) {
 function footerRow_() {
   return '<tr><td align="center" style="background:#7b3ff2;padding:8px 12px;text-align:center">' +
     '<a href="' + htmlEsc_(SITE_URL) + '" style="text-decoration:none;display:inline-block;vertical-align:middle">' +
-    '<img src="' + htmlEsc_(QR_URL) + '" width="32" height="32" alt="DIYSEO" style="display:inline-block;vertical-align:middle;width:32px;height:32px;object-fit:contain;background:transparent;border:0;border-radius:0;margin-right:6px">' +
-    '<span style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#ffd23f;vertical-align:middle">' + htmlEsc_(SITE_TEXT) + '</span></a>' +
+    '<img src="' + htmlEsc_(QR_URL) + '" width="32" height="32" alt="DIYSEO" style="display:inline-block;vertical-align:middle;width:32px;height:32px;object-fit:contain;background:transparent;border:0;border-radius:0"></a>' +
     '</td></tr>';
 }
 
@@ -610,7 +609,7 @@ function sendMail_(to, subject, text, html, extra) {
 }
 
 // Same look as the listing email: banner, stripe, cream card, one message, optional button
-function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, badgeHref, afterParagraphs) {
+function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, badgeHref, afterParagraphs, rawHtml) {
   var INK = '#1a1033', PURPLE = '#7b3ff2', MAGENTA = '#0070e0', ORANGE = '#ff7a1a', YELLOW = '#ffd23f', CREAM = '#fff6dc';
   var HEAD = "'Bangers','Impact','Arial Black',sans-serif";
   var BODY = "'Walter Turncoat','Comic Sans MS','Trebuchet MS',Arial,sans-serif";
@@ -621,6 +620,7 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
   var afterParas = (afterParagraphs || []).map(function (t) {
     return '<p style="' + paraStyle + '">' + t + '</p>';
   }).join('');
+  var extraHtml = rawHtml || '';
   var btn = buttonHref
       ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 10px"><tr><td align="center" style="text-align:center"><table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center"><a href="' + htmlEsc_(buttonHref) + '" style="background:' + ORANGE + ';color:#fff;text-decoration:none;padding:12px 26px;border:3px solid ' + INK + ';border-radius:12px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;display:block;text-align:center;box-shadow:3px 3px 0 ' + INK + '">' + htmlEsc_(buttonLabel) + '</a></td></tr></table></td></tr></table>'
       : '';
@@ -640,17 +640,17 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
       '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center" bgcolor="' + PURPLE + '" style="background:' + PURPLE + ';color:#ffffff;border:3px solid ' + INK + ';border-radius:8px;padding:6px 16px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;text-align:center">' + badgeInner + '</td></tr></table>' +
       '</td></tr></table>' +
       '<div class="biz" style="font-family:' + HEAD + ';font-size:30px;letter-spacing:1px;color:#0e95a8;line-height:1.1;margin:16px 0 12px">' + htmlEsc_(businessName) + '</div>' +
-      paras + btn + afterParas +
+      paras + btn + afterParas + extraHtml +
       '</td></tr>' +
       '<tr><td class="bar" style="background:' + INK + ';padding:12px 22px;font-family:' + HEAD + ';font-size:14px;letter-spacing:2px;color:' + YELLOW + ';text-align:center;line-height:1.5">CHARLOTTE COUNTY<br>SMALL BUSINESS DIRECTORY</td></tr>' +
       footerRow_() + '</table></td></tr></table></body></html>';
 }
 
-function sendConfirm_(to, businessName, token, kind) {
+function sendConfirm_(to, businessName, token, kind, data) {
   // Our own page, not the web app: Apps Script pages break for people signed into several Google accounts
   var link = DIRECTORY_URL + '?confirm=' + encodeURIComponent(token);
   var upd = kind === 'updateLive' || kind === 'updateWaiting';
-  if (upd) return sendUpdatePending_(to, businessName, kind === 'updateLive');
+  if (upd) return sendUpdatePending_(to, businessName, kind === 'updateLive', data);
   var intro = kind === 'updateLive'
       ? 'Thanks for updating your listing. Your changes are <b>not</b> live yet. Your current listing stays up until the changes are approved.'
       : kind === 'updateWaiting'
@@ -670,13 +670,38 @@ function sendConfirm_(to, businessName, token, kind) {
 }
 
 // Updates need no email check: just tell the owner the new version is waiting for review
-function sendUpdatePending_(to, businessName, wasLive) {
+function sendUpdatePending_(to, businessName, wasLive, data) {
+  data = data || {};
+  var listingUrl = DIRECTORY_URL + '?card=' + encodeURIComponent(businessName);
   var first = wasLive
       ? 'We got your changes. They are <b>pending</b> review. Your current listing stays up until they are approved.'
       : 'We got your changes. They replace the version you sent before and are <b>pending</b> review.';
   var next = 'We check that your website works and matches your listing details, and we review images for clarity, obscenity, etc. Usually a few hours, up to 12. We will email you when the changes are live.';
-  var html = noticeHtml_('UPDATE PENDING', businessName, [first, next, 'Did not do this? Reply to this email right away.']);
-  var text = 'Update pending\n\n' + first.replace(/<[^>]+>/g, '') + '\n\n' + next + '\n\nDid not do this? Reply to this email right away.';
+
+  // Build submitted changes summary
+  var changes = [];
+  if (data.category) changes.push('<b>Category:</b> ' + htmlEsc_(data.category));
+  if (data.pubName || data.pubTitle) changes.push('<b>Contact:</b> ' + htmlEsc_([data.pubName, data.pubTitle].filter(Boolean).join(', ')));
+  if (data.phone) changes.push('<b>Phone:</b> ' + htmlEsc_(data.phone));
+  if (data.email) changes.push('<b>Email:</b> ' + htmlEsc_(data.email));
+  if (data.website) changes.push('<b>Website:</b> ' + htmlEsc_(data.website));
+  if (data.describe) changes.push('<b>About:</b> ' + htmlEsc_(splitDescribe_(data.describe).text));
+  if (data.slogan) changes.push('<b>Slogan:</b> ' + htmlEsc_(data.slogan));
+  if (data.street || data.city) changes.push('<b>Address:</b> ' + htmlEsc_([data.street, data.city, data.state, data.zip].filter(Boolean).join(', ')));
+  if (data.area) changes.push('<b>Service area:</b> ' + htmlEsc_(data.area));
+  if (data.facebook) changes.push('<b>Facebook:</b> ' + htmlEsc_(data.facebook));
+  if (data.ndBiz) changes.push('<b>NextDoor:</b> ' + htmlEsc_(data.ndBiz));
+  if (data.logoAction === 'new') changes.push('<b>Logo:</b> New logo uploaded');
+  if (data.logoAction === 'delete') changes.push('<b>Logo:</b> Removed');
+
+  var BODY = "'Walter Turncoat','Comic Sans MS','Trebuchet MS',Arial,sans-serif";
+  var changesHtml = changes.length ? '<p style="margin:16px 0 8px;font-weight:bold;font-family:' + BODY + ';font-size:16px;color:#1a1033">Your submitted changes:</p><ul style="margin:0;padding-left:20px;font-family:' + BODY + ';font-size:15px;color:#1a1033">' + changes.map(function(c){ return '<li style="margin:4px 0">' + c + '</li>'; }).join('') + '</ul>' : '';
+  var linkHtml = wasLive ? '<p style="margin:16px 0;font-family:' + BODY + '"><a href="' + htmlEsc_(listingUrl) + '" style="color:#7b3ff2;font-weight:bold">See your current listing</a></p>' : '';
+
+  var html = noticeHtml_('UPDATE PENDING', businessName, [first, next, 'Did not do this? Reply to this email right away.'], null, null, null, null, changesHtml + linkHtml);
+
+  var textChanges = changes.length ? '\n\nYour submitted changes:\n' + changes.map(function(c){ return '- ' + c.replace(/<[^>]+>/g, ''); }).join('\n') : '';
+  var text = 'Update pending\n\n' + first.replace(/<[^>]+>/g, '') + '\n\n' + next + textChanges + (wasLive ? '\n\nSee your current listing: ' + listingUrl : '') + '\n\nDid not do this? Reply to this email right away.';
   sendMail_(to, 'Update pending: ' + businessName, text, html);
 }
 
@@ -1321,6 +1346,7 @@ function notifyBoss_(name, d, label, notes) {
     d = d || {};
     var pend = pendingSheet_();
     var pendingUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + pend.getSheetId();
+    var listingUrl = DIRECTORY_URL + '?card=' + encodeURIComponent(name);
     var lines = [
       'Tap the link below to open the Pending tab, then set Status to Approved (goes live) or Rejected.',
       notes ? 'Why it needs you: ' + notes : '',
@@ -1333,6 +1359,7 @@ function notifyBoss_(name, d, label, notes) {
       'Website: ' + (d.website || '(none)'),
       'Logo: ' + (d.logoId ? 'attached below, check it before approving' : '(none)'),
       '',
+      'SEE LISTING: ' + listingUrl,
       'OPEN PENDING TAB: ' + pendingUrl,
       '',
       SITE_TEXT + '  ' + SITE_URL
@@ -1409,8 +1436,8 @@ function healthCheck_() {
   try {
     var to = ADMIN_EMAILS[0], name = 'Sample Business', d = {};
     if (main) { var rows = liveRows_(main), r = rows[rows.length - 1]; if (r) { d = rowObj_(main.getRange(1, 1, 1, main.getLastColumn()).getValues()[0], r); name = r.name; } }
-    sendConfirm_(to, name, 'CHECK000000000000000000');
-    sendUpdatePending_(to, name, true);
+    sendConfirm_(to, name, 'CHECK000000000000000000', null, d);
+    sendUpdatePending_(to, name, true, d);
     sendLink_(to, name, d, '');
     sendRejected_(to, name);
     sendRemoved_(to, name, true);
@@ -1431,8 +1458,8 @@ function previewEmails() {
   var main = findSheet_(), headers = getHeaders_(main);
   var rows = liveRows_(main), r = rows[rows.length - 1];
   var d = r ? rowObj_(headers, r) : {}, name = r ? r.name : 'Sample Business';
-  sendConfirm_(to, name, 'PREVIEW0000000000000000');
-  sendConfirm_(to, name, 'PREVIEW0000000000000000', 'updateLive');
+  sendConfirm_(to, name, 'PREVIEW0000000000000000', null, d);
+  sendConfirm_(to, name, 'PREVIEW0000000000000000', 'updateLive', d);
   sendLink_(to, name, d, 'https://drive.google.com/open?id=' + (d.logoId || ''));
   sendRejected_(to, name);
   sendRemoved_(to, name, true);
