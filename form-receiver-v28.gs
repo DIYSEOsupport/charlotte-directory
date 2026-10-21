@@ -24,7 +24,7 @@
 // Settings
 // ---------------------------------------------------------------
 var CLIENT_ID = '429873674496-c3ld7ru88i8b0acssaeh26adtvfok12e.apps.googleusercontent.com';
-var BUILD = '2026-10-20 11:18pm — update emails show changes + listing link';
+var BUILD = '2026-10-20 11:40pm — fix remove for pending-only listings';
 var SHEET_ID = '1mSNjflXI-u1B4zHkbUT2SKx7lklbE08nFwmoFFzYQvE';
 var SHEET_GID = 112379302;
 var LOGO_FOLDER_NAME = 'Directory Logos';
@@ -285,7 +285,7 @@ function doPost(e) {
       var rmName = String(data.businessName || '').trim();
       if (!rmName) return reply_({ ok: false, error: 'No business chosen.' });
       if (PROTECTED_NAMES.indexOf(nameKey_(rmName)) !== -1) return reply_({ ok: false, error: 'This listing cannot be removed.' });
-      if (!ownerAllowed_(sheet, ownerCol, rmName, key)) return reply_({ ok: false, error: 'WRONG_OWNER' });
+      if (!ownerAllowed_(sheet, ownerCol, rmName, key) && !ownerAllowed_(pend, ownerCol, rmName, key)) return reply_({ ok: false, error: 'WRONG_OWNER' });
       var headersRm = getHeaders_(sheet);
       var headersPendRm = getHeaders_(pend);
       var rmRows = liveRows_(sheet).filter(function (r) {

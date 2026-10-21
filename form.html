@@ -552,7 +552,8 @@ $('delGo').addEventListener('click',function(){
       $('steps').style.display='none';$('delConfirm').style.display='none';
       $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});
     }else{
-      alert((m&&m.error)||'Could not remove. Try again.');
+      console.log('Remove failed:',m);
+      alert((m&&m.error)||'Could not remove. Try again.'+(m?' ('+JSON.stringify(m)+')':''));
     }
   },'remove');
 });

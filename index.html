@@ -1294,6 +1294,7 @@ function beepBeep(){
   }catch(e){}
 }
 function showLoginPop(){
+  if(loginSkipped)return;
   fbLogin=false;$('lpP').textContent='Log in to save favorites across devices.';
   $('loginPop').classList.add('show');favHonk()
 }
