@@ -538,6 +538,7 @@ $('modeDel').addEventListener('click',function(){
 function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
+  $('contactBlock').style.display='none';
   $('delName').textContent=b.businessName;$('delReason').value='';
   $('delConfirm').style.display='block';
 }
