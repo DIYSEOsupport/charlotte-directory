@@ -577,12 +577,9 @@ input,textarea,select,option,#printArea{text-transform:none}
 .applybar .btn{min-height:38px;font-size:14px}
 /* footer */
 .site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:block;text-decoration:none;position:relative;width:80px;height:80px}
+.site-footer a{display:block;text-decoration:none}
 .site-footer a:hover{opacity:.85}
-.site-footer .bg{width:80px;height:80px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
-.site-footer .cog{position:absolute;top:4px;left:4px;width:72px;height:72px;-webkit-animation:cogspin 4s linear infinite;animation:cogspin 4s linear infinite}
-@-webkit-keyframes cogspin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
-@keyframes cogspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.site-footer img{width:80px;height:80px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 </style>
 </head>
 <body>
@@ -2134,8 +2131,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)load
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
-    <img src="diyseo_logo_static.png" alt="DIYSEO" class="bg">
-    <img src="logos/diyseo_cog_static.png" alt="" class="cog">
+    <img src="diyseo_round_logo.gif" alt="DIYSEO">
   </a>
 </footer>
 </body>
