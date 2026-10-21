@@ -405,6 +405,7 @@ div.ln.addr>span:last-child{text-decoration:none;color:var(--ink)}
 .star:hover svg path{stroke:rgba(26,16,51,.6)}
 .card.saved .star svg path{fill:#ffd23f;stroke:#1a1033;stroke-width:2}
 .card.saved .star{filter:drop-shadow(1px 1px 0 var(--ink))}
+.card.saved .blogo{-webkit-animation:logospin 6s linear infinite;animation:logospin 6s linear infinite;border-radius:50%}
 .grid .hidebtn{pointer-events:auto;cursor:pointer;background:none;border:0;padding:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;top:46px;right:50px;filter:none;color:rgba(26,16,51,.4)}
 .hidebtn:hover{color:rgba(26,16,51,.75)}
 .hidebtn[aria-pressed="true"]{color:var(--magenta)}
@@ -576,12 +577,11 @@ input,textarea,select,option,#printArea{text-transform:none}
 .applybar .btn{min-height:38px;font-size:14px}
 /* footer */
 .site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:flex;align-items:center;gap:10px;text-decoration:none}
+.site-footer a{display:block;text-decoration:none}
 .site-footer a:hover{opacity:.85}
-.site-footer .cog{width:50px;height:50px;-webkit-animation:cogspin 4s linear infinite;animation:cogspin 4s linear infinite}
-.site-footer .wordmark{height:40px;width:auto}
-@-webkit-keyframes cogspin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
-@keyframes cogspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.site-footer img{width:80px;height:80px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);-webkit-animation:logospin 6s linear infinite;animation:logospin 6s linear infinite}
+@-webkit-keyframes logospin{from{-webkit-transform:rotate(0deg)}to{-webkit-transform:rotate(360deg)}}
+@keyframes logospin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -2133,8 +2133,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden)load
 </script>
 <footer class="site-footer">
   <a href="https://diyseosupport.github.io/maps-guide-landing/" target="_blank" rel="noopener">
-    <img src="logos/diyseo_cog_static.png" alt="" class="cog">
-    <img src="logos/diyseo_wordmark_1line_1024.png" alt="DIYSEO" class="wordmark">
+    <img src="diyseo_round_logo.gif" alt="DIYSEO">
   </a>
 </footer>
 </body>

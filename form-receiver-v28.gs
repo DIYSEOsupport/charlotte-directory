@@ -66,6 +66,7 @@ var SITE_TEXT = 'diyseosupport.github.io/maps-guide-landing';
 var ADMIN_EMAILS = ['diyseo.support@gmail.com'];
 var ALLOW_CLAIM_OLD_ROWS = true;
 var PROTECTED_NAMES = ['diyseo']; // nameKey_() values that can never be removed via the form (sheet edit only)
+function isDiyseo_(name) { return /^diyseo$/i.test(String(name || '').trim()); }
 
 var EMAIL_RE = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}$/;
 var URL_RE = /^(https?:\/\/)?([A-Za-z0-9\-]+\.)+[A-Za-z]{2,}(:\d+)?([\/?#]\S*)?$/;
@@ -413,8 +414,11 @@ function doPost(e) {
     CacheService.getScriptCache().remove('directory_csv');
 
     // Send the email now (queued mail waits on a Google timer that can take minutes). Queue it only if this fails.
-    try { sendConfirm_(sendTo, newName, token, ckind); }
-    catch (ce) { queueMail_({ kind: 'confirm', to: sendTo, name: newName, token: token, ckind: ckind }); }
+    // Skip confirmation emails for DIYSEO entries
+    if (!isDiyseo_(newName)) {
+      try { sendConfirm_(sendTo, newName, token, ckind); }
+      catch (ce) { queueMail_({ kind: 'confirm', to: sendTo, name: newName, token: token, ckind: ckind }); }
+    }
     if (isUpdate) checkSoon_();
     return reply_({ ok: true, status: status, emailTo: sendTo });
   } catch (err) {
@@ -1222,8 +1226,8 @@ function finishRows_(sheet) {
       sheet.getRange(o.row, nfc + 1).setValue(stamp);
       if (lvc >= 0) sheet.getRange(o.row, lvc + 1).setValue(stamp);
       changed = true;
-      if (!to) sendBossMail_('\u26A0\uFE0F NO EMAIL FOR LIVE LISTING: ' + o.name, 'This listing went live but has no email to tell the owner.');
-      if (to) {
+      if (!to && !isDiyseo_(o.name)) sendBossMail_('\u26A0\uFE0F NO EMAIL FOR LIVE LISTING: ' + o.name, 'This listing went live but has no email to tell the owner.');
+      if (to && !isDiyseo_(o.name)) {
         try { sendLink_(to, o.name, d, 'https://drive.google.com/open?id=' + (d.logoId || '')); }
         catch (me) { sendBossMail_('\u26A0\uFE0F LIVE EMAIL FAILED: ' + o.name, 'Could not send the "your listing is live" email to ' + to + '.\n\n' + me); }
       }
