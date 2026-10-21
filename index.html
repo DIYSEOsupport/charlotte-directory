@@ -1315,18 +1315,26 @@ $('lpGo').onclick=function(){
   var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
   setTimeout(function(){
     closeLoginPop();
-    // Try Google One Tap with retry
+    // Try Google One Tap with retry, then fall back to clicking the button
     function tryPrompt(attempts){
       if(window.google&&google.accounts&&google.accounts.id){
         google.accounts.id.prompt();
-      }else if(attempts<5){
-        setTimeout(function(){tryPrompt(attempts+1)},300);
+        // Also try to click the Google button after prompt in case One Tap is blocked
+        setTimeout(function(){
+          var gbtn=$('gbtn');
+          if(gbtn){
+            var btn=gbtn.querySelector('[role="button"]')||gbtn.querySelector('div[style*="cursor"]')||gbtn.querySelector('iframe');
+            if(btn&&btn.click)btn.click();
+          }
+        },400);
+      }else if(attempts<8){
+        setTimeout(function(){tryPrompt(attempts+1)},400);
       }
     }
     tryPrompt(0);
     // Highlight the button
     var gbtn=$('gbtn');if(gbtn){gbtn.style.animation='pulse .5s ease 3';setTimeout(function(){gbtn.style.animation=''},1600)}
-  },600);
+  },800);
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
