@@ -520,6 +520,7 @@ input,textarea,select,option,#printArea{text-transform:none}
 #loginPop .go{display:block;box-sizing:border-box;width:100%;margin:8px 0 0;padding:12px;border:3px solid #1a1033;border-radius:12px;background:#ff7a1a;color:#fff;font-family:var(--fh);font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:3px 3px 0 #1a1033}
 #loginPop .go.alt{background:#fff;color:#1a1033}
 @keyframes lpIn{from{transform:scale(.6) rotate(-4deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
 #pdfReady{position:fixed;inset:0;z-index:99999;background:rgba(26,16,51,.7);display:flex;align-items:center;justify-content:center;padding:20px}
 #pdfReady .bx{background:#fff6dc;border:4px solid #1a1033;border-radius:16px;box-shadow:6px 6px 0 #1a1033;padding:20px;max-width:340px;width:100%;text-align:center}
 #pdfReady h3{font-family:var(--fh);font-weight:400;font-size:26px;margin:0 0 6px;color:#5b2a86}
@@ -1311,17 +1312,13 @@ $('lpNo').onclick=function(){if(fbLogin){closeLoginPop();return}loginSkipped=tru
 $('loginPop').addEventListener('click',function(e){if(e.target===this)closeLoginPop()});
 $('lpGo').onclick=function(){
   closeLoginPop();
-  var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
-  var attempts=0;
-  function tryClick(){
-    attempts++;
-    var gbtn=$('gbtn');if(!gbtn)return;
-    var btn=gbtn.querySelector('div[role="button"]')||gbtn.querySelector('[tabindex="0"]')||gbtn.querySelector('iframe');
-    if(btn){btn.click();return}
-    if(window.google&&google.accounts&&google.accounts.id){google.accounts.id.prompt();return}
-    if(attempts<5)setTimeout(tryClick,300);
+  // Try Google One Tap first (works on mobile)
+  if(window.google&&google.accounts&&google.accounts.id){
+    google.accounts.id.prompt();
   }
-  setTimeout(tryClick,500);
+  // Also scroll to button and highlight it as fallback
+  var box=$('acct');if(box&&box.scrollIntoView)box.scrollIntoView({behavior:'smooth',block:'center'});
+  var gbtn=$('gbtn');if(gbtn){gbtn.style.animation='pulse .5s ease 3';setTimeout(function(){gbtn.style.animation=''},1600)}
 };
 function isDiy(b){return /diyseo/i.test((b&&b.name)||'')}
 var favHonked=false;
