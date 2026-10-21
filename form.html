@@ -127,7 +127,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
 .builtby img{width:20px;height:20px;border-radius:0;object-fit:contain;background:transparent;flex:none}
 /* footer */
 .site-footer{display:flex;justify-content:center;padding:32px 14px 40px;margin-top:24px}
-.site-footer a{display:block;text-decoration:none;width:106px;height:106px;background:#fff6dc;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.site-footer a{display:flex;align-items:center;justify-content:center;text-decoration:none;width:106px;height:106px;background:#fff6dc;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);overflow:hidden}
 .site-footer a:hover{opacity:.85}
 .site-footer img{width:100px;height:100px;display:block;margin:3px}
 </style>
@@ -523,7 +523,6 @@ $('modeUpd').addEventListener('click',function(){
   $('contactBlock').style.display='block';
   $('name').value='';$('title').value='';$('how').value='';
   if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);show(1);return}
-  if(!origName){clearBiz()}
   showBizList();
 });
 $('modeDel').addEventListener('click',function(){
