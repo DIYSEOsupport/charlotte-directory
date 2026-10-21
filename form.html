@@ -532,13 +532,11 @@ $('modeDel').addEventListener('click',function(){
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='block';
   $('name').value='';$('title').value='';$('how').value='';
-  if(bizList.length===1){showDelConfirm(bizList[0]);return}
   showBizList();
 });
 function showDelConfirm(b){
   origName=b.businessName;
   $('modebox').style.display='none';
-  $('contactBlock').style.display='none';
   $('delName').textContent=b.businessName;$('delReason').value='';
   $('delConfirm').style.display='block';
 }
@@ -546,8 +544,10 @@ $('delCancel').addEventListener('click',function(){
   $('delConfirm').style.display='none';$('modebox').style.display='block';
 });
 $('delGo').addEventListener('click',function(){
+  var how=$('how').value.trim();
+  if(!how){alert('Please fill in contact info first.');return}
   $('delGo').disabled=true;busy('Sending confirmation email');
-  sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim()},function(m){
+  sendToScript({action:'remove',idToken:idToken,businessName:origName,reason:$('delReason').value.trim(),name:$('name').value.trim(),title:$('title').value.trim(),how:how},function(m){
     $('delGo').disabled=false;busy(false);
     if(m&&m.ok){
       $('doneH').textContent='Check your email';
