@@ -467,7 +467,7 @@ function resetMode(){
   $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');$('modeDel').classList.remove('sel');
   $('modeDel').style.display='none';$('delConfirm').style.display='none';
   $('oldlogo').style.display='none';$('dellogo').checked=false;
-  $('contactBlock').style.display='none';
+  $('contactBlock').style.display='none';$('contactNav').style.display='';
 }
 function busy(msg){var b=$('busy');if(msg){$('busyT').textContent=msg;b.classList.add('show')}else b.classList.remove('show')}
 function sendToScript(payload,done,wantKind){
@@ -508,7 +508,7 @@ function loadMine(){
 $('modeRetry').addEventListener('click',loadMine);
 function clearModeSel(){
   $('modeNew').classList.remove('sel');$('modeUpd').classList.remove('sel');$('modeDel').classList.remove('sel');
-  $('delConfirm').style.display='none';
+  $('delConfirm').style.display='none';$('contactNav').style.display='';
 }
 $('modeNew').addEventListener('click',function(){
   mode='new';origName='';origLogoId='';
@@ -528,7 +528,7 @@ $('modeUpd').addEventListener('click',function(){
 });
 $('modeDel').addEventListener('click',function(){
   mode='remove';origName='';
-  clearModeSel();$('modeDel').classList.add('sel');
+  clearModeSel();$('modeDel').classList.add('sel');$('contactNav').style.display='none';
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='block';
   $('name').value='';$('title').value='';$('how').value='';

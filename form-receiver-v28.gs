@@ -624,9 +624,8 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
   var btn = buttonHref
       ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 10px"><tr><td align="center" style="text-align:center"><table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center"><a href="' + htmlEsc_(buttonHref) + '" style="background:' + ORANGE + ';color:#fff;text-decoration:none;padding:12px 26px;border:3px solid ' + INK + ';border-radius:12px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;display:block;text-align:center;box-shadow:3px 3px 0 ' + INK + '">' + htmlEsc_(buttonLabel) + '</a></td></tr></table></td></tr></table>'
       : '';
-  var badgeInner = badgeHref
-      ? '<a href="' + htmlEsc_(badgeHref) + '" style="color:#ffffff;text-decoration:none;display:block">' + htmlEsc_(badge) + '</a>'
-      : htmlEsc_(badge);
+  // Badge is a plain heading; the only call to action is the centered button
+  var badgeInner = htmlEsc_(badge);
   return '<html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><meta name="viewport" content="width=device-width,initial-scale=1"><style>@media only screen and (max-width:480px){.pad{padding:16px 14px 6px!important}.biz{font-size:24px!important}.bar{padding:10px 14px!important}}</style><link href="https://fonts.googleapis.com/css2?family=Walter+Turncoat&family=Bangers&display=swap" rel="stylesheet"></head>' +
       '<body style="margin:0;padding:0;background:' + PURPLE + '">' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + PURPLE + '"><tr><td align="center" style="padding:20px 10px">' +
@@ -658,8 +657,8 @@ function sendConfirm_(to, businessName, token, kind, data) {
       : 'Thanks for adding your business to the directory. It is <b>not</b> listed yet.';
   var html = noticeHtml_(upd ? 'CONFIRM YOUR UPDATE' : 'CONFIRM YOUR EMAIL', businessName, [
     intro,
-    'Tap the purple button above to confirm this email is yours.'
-  ], '', '', link, [
+    'Tap the button below to confirm this email is yours.'
+  ], 'CONFIRM MY EMAIL', link, null, [
     '<b>Next:</b> we check that your website works and matches your listing details. We review images for clarity, obscenity, etc. If needed, we may text, call, or email you. Usually a few hours, up to 12. We will email you when you are live.',
     'Not you? Ignore this email.'
   ]);
