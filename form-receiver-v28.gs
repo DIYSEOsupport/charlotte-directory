@@ -658,8 +658,8 @@ function sendConfirm_(to, businessName, token, kind, data) {
       : 'Thanks for adding your business to the directory. It is <b>not</b> listed yet.';
   var html = noticeHtml_(upd ? 'CONFIRM YOUR UPDATE' : 'CONFIRM YOUR EMAIL', businessName, [
     intro,
-    'Tap the button to confirm this email is yours.'
-  ], 'CONFIRM MY EMAIL', link, link, [
+    'Tap the purple button above to confirm this email is yours.'
+  ], '', '', link, [
     '<b>Next:</b> we check that your website works and matches your listing details. We review images for clarity, obscenity, etc. If needed, we may text, call, or email you. Usually a few hours, up to 12. We will email you when you are live.',
     'Not you? Ignore this email.'
   ]);
