@@ -497,7 +497,7 @@ function loadMine(){
     if(tok!==idToken)return;
     if(!m||!m.ok){
       $('modemsg').textContent=(m&&m.error==='LOGIN_EXPIRED')?'Your sign-in ran out of time. Sign in again.':'Could not check your businesses. Tap Try again, or just fill in the form as a new business.';
-      if(!m||m.error!=='LOGIN_EXPIRED')$('modeRetry').style.display='inline-block';
+      if(!m||m.error!=='LOGIN_EXPIRED'){$('modeRetry').style.display='inline-block';mode='new';$('contactBlock').style.display='block'}
       return;
     }
     bizList=m.businesses||[];
