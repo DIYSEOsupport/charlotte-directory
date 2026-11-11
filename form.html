@@ -153,8 +153,8 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
           <span class="l">What do you want to do?</span>
           <div class="opts" id="modeopts">
             <button type="button" class="opt" id="modeNew"><span class="bx"></span><span>New business</span></button>
-            <button type="button" class="opt" id="modeUpd"><span class="bx"></span><span>Update my business</span></button>
-            <button type="button" class="opt" id="modeDel" style="display:none"><span class="bx"></span><span>Remove my business</span></button>
+            <button type="button" class="opt" id="modeUpd"><span class="bx"></span><span>Update your business</span></button>
+            <button type="button" class="opt" id="modeDel" style="display:none"><span class="bx"></span><span>Remove your business</span></button>
           </div>
           <div class="biglist" id="bizlist" style="display:none"></div>
           <div class="err" id="modeerr">Pick one to continue.</div>
@@ -231,7 +231,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld"><span class="l">Upload Logo</span><div class="help">Shows on your card.</div>
         <div class="logo-row"><input type="file" id="logo" accept="image/*"></div>
         <div id="logoprev" class="logocrop"><canvas id="logocan" width="480" height="480" aria-label="Logo preview"></canvas><div><label class="note" for="logozoom" style="display:block;margin:0 0 4px">Zoom</label><input type="range" id="logozoom" min="1" max="4" step="0.01" value="1"><div class="note" style="margin:4px 0 0">Drag the picture to frame it. This square is how it shows on your card.</div></div></div><div class="err" id="logoerr" style="display:none">That file is too big. Try a smaller picture.</div>
-        <div class="oldlogo" id="oldlogo"><img id="oldlogoimg" alt="Current logo"><div><div class="note" style="margin:0 0 4px">This is your current logo. It stays unless you pick a new one or delete it.</div><label><input type="checkbox" id="dellogo"> Delete my logo</label></div></div></div>
+        <div class="oldlogo" id="oldlogo"><img id="oldlogoimg" alt="Current logo" referrerpolicy="no-referrer"><div><div class="note" style="margin:0 0 4px">This is your current logo. It stays unless you pick a new one or delete it.</div><label><input type="checkbox" id="dellogo"> Delete your logo</label></div></div></div>
       <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="button" class="b" data-next>Review</button></div>
     </div>
 
@@ -240,14 +240,14 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <p class="note">Check your answers. To change something, tap Edit. Edit takes you back to step 1 and keeps all your answers.</p>
       <div id="review"></div>
       <div class="fail" id="fail"></div>
-      <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="submit" class="b" id="go">Submit my business</button></div>
+      <div class="nav"><button type="button" class="b alt" data-back>Back</button><button type="submit" class="b" id="go">Submit your business</button></div>
     </div>
   </form>
 
   <div class="card done-card" id="done">
     <h1 id="doneH">Check your email.</h1>
     <p class="note" id="doneNote"></p>
-    <div class="nav" id="doneExtraNav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove my business</button></div>
+    <div class="nav" id="doneExtraNav" style="justify-content:center;flex-wrap:wrap"><a class="lnk" href="index.html"><button type="button" class="b alt">See the directory</button></a><button type="button" class="b" id="again">Add another business</button><button type="button" class="b alt" id="updateBiz">Update or remove your business</button></div>
   </div>
 </div>
 <div class="navtabs"><a href="index.html">Directory</a></div>
@@ -420,7 +420,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
 function popForBad(panel){
   var login=$('loginfld').classList.contains('bad'),mode2=$('modefld').classList.contains('bad');
   if(login){errPop('Sign in first, neighbor!',['Tap the Google sign-in button, then try again.']);return}
-  if(mode2){errPop('Pick one, neighbor!',['Choose New business or Update my business.']);return}
+  if(mode2){errPop('Pick one, neighbor!',['Choose New business or Update your business.']);return}
   var L=[];
   qa('.fld.bad',panel).forEach(function(f){
     var err=f.querySelector('.err'),msg=err?err.textContent.trim():'';
@@ -623,8 +623,8 @@ function fillBiz(b){
   $('street').value=b.street||'';$('city').value=b.city||'';$('state').value=b.state||'';$('zip').value=b.zip||'';
   $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('slogan').value=b.slogan||'';
   $('licensed').checked=!!b.licensed;
-  origLogoId=b.logoId||'';
-  if(origLogoId){$('oldlogoimg').src='https://drive.google.com/thumbnail?id='+encodeURIComponent(origLogoId)+'&sz=w200';$('oldlogo').style.display='flex'}
+  origLogoId=b.logoId||b.logoUrl||'';
+  if(origLogoId){var oi=$('oldlogoimg');oi.referrerPolicy='no-referrer';oi.onerror=function(){if(b.logoId&&oi.src.indexOf('thumbnail')<0)oi.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(b.logoId)+'&sz=w200'};oi.src=b.logoId?'https://lh3.googleusercontent.com/d/'+encodeURIComponent(b.logoId):b.logoUrl;$('oldlogo').style.display='flex'}
   qa('.bad').forEach(function(x){x.classList.remove('bad')});
 }
 
@@ -721,9 +721,9 @@ $('f').addEventListener('submit',function(e){
   if(t==='Physical Location'){d.street=$('street').value.trim();d.street2=$('street2').value.trim();d.city=$('city').value.trim();d.state=$('state').value.trim();d.zip=$('zip').value.trim()}
   if(/^Mobile/.test(t)){d.area=a.map(function(x){return x==='Other'?$('areatext').value.trim():x}).filter(Boolean).join(', ')}
   var go=$('go');go.disabled=true;go.textContent='Sending... wait a few seconds';busy('Sending your business');$('fail').style.display='none';
-  if(!/^https:\/\//.test(ENDPOINT)){go.disabled=false;go.textContent='Submit my business';$('fail').textContent='This form is not connected to the directory yet. Tell the site owner.';$('fail').style.display='block';return}
+  if(!/^https:\/\//.test(ENDPOINT)){go.disabled=false;go.textContent='Submit your business';$('fail').textContent='This form is not connected to the directory yet. Tell the site owner.';$('fail').style.display='block';return}
   function fail(code){
-    busy(false);go.disabled=false;go.textContent='Submit my business';
+    busy(false);go.disabled=false;go.textContent='Submit your business';
     var msg={
       WRONG_OWNER:'That business name belongs to a different Google account. Sign in with the account you used before.',
       LOGIN_EXPIRED:'Your sign-in ran out of time. Go back to step 1 and sign in again.',
