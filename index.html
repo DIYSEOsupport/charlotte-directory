@@ -968,7 +968,7 @@ function parseGrid(grid){
     }
     var n=rec.name;
     var hint=row.filter(function(x){return clean(x)}).slice(0,3).join(' | ');
-    if(!n||n.length<2||n.toLowerCase()==='test'||n.toLowerCase()==='none'||n.toLowerCase().indexOf('business name')!==-1){
+    if(!n||n.toLowerCase()==='test'||n.toLowerCase()==='none'||n.toLowerCase().indexOf('business name')!==-1){
       log.push('Row '+(r+1)+': SKIPPED - '+(!n?'no Business Name found':'name looks like test/none')+(hint?' ('+hint+')':''));
       continue;
     }
