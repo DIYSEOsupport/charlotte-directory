@@ -1849,7 +1849,7 @@ async function buildPdfCanvas(list,keepPages){
     var c=cv.getContext('2d');c.scale(S,S);c.textBaseline='alphabetic';
     c.fillStyle='#fff';c.fillRect(0,0,PW,PH);
     var links=[],reg=function(o){links.push(o)};
-    if(DIYI)c.drawImage(DIYI,M+CW-34,FOOT+6,34,34)
+    if(DIYI){c.drawImage(DIYI,M+CW-34,FOOT+6,34,34);reg({x:M+CW-34,y:FOOT+6,w:34,h:34,u:'https://diyseosupport.github.io/'})}
     if(pi===0){
       if(BANI){
         var bw=460,bh=bw*BANI.naturalHeight/BANI.naturalWidth;
