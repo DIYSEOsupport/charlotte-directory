@@ -2117,7 +2117,7 @@ $('fbSend').addEventListener('click',function(){
   fm.appendChild(ta);document.body.appendChild(fm);fm.submit();
   setTimeout(function(){if(fm.parentNode)fm.parentNode.removeChild(fm)},1000);
   setTimeout(function(){
-    $('fbSend').disabled=false;toast('Thanks for the feedback!');
+    $('fbSend').disabled=false;errPop('Thanks, neighbor!',['We got your feedback. We read every message and will reach out if we need more info.'],true);
     $('fbMsg').value='';fbShots=[];drawShots();
   },800);
 });
