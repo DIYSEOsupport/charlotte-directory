@@ -533,12 +533,13 @@ $('modeDel').addEventListener('click',function(){
   mode='remove';origName='';
   clearModeSel();$('modeDel').classList.add('sel');$('contactNav').style.display='none';
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
-  $('contactBlock').style.display='block';
+  $('contactBlock').style.display='none'; // shown once a business is picked, so it never dead-ends
   $('name').value='';$('title').value='';$('how').value='';
   showBizList();
+  if(bizList.length===1)$('bizbtns').querySelector('[data-bi]').click();
 });
 $('delCancel').addEventListener('click',function(){
-  $('delConfirm').style.display='none';
+  $('delConfirm').style.display='none';$('contactBlock').style.display='none';
   $('modebox').style.display='block';
 });
 $('delGo').addEventListener('click',function(){
@@ -579,7 +580,8 @@ function showBizList(){
       origName=biz.businessName;
       $('delName').textContent=biz.businessName;$('delReason').value='';
       $('modebox').style.display='none';
-      $('delConfirm').style.display='block';
+      $('contactBlock').style.display='block';$('delConfirm').style.display='block';
+      toContact();
     }else{
       toContact();
     }
