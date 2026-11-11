@@ -2096,6 +2096,8 @@ function busy(msg){var b=$('busy');if(msg){$('busyT').textContent=msg;b.classLis
   busy('Confirming your email');
   jsonpCall('confirm='+encodeURIComponent(decodeURIComponent(code)),function(r){
     busy(false);
+    /* start the listing check now (boss alert in seconds); nobody waits on it */
+    if(r&&r.res==='done')jsonpCall('runcheck='+encodeURIComponent(decodeURIComponent(code)),function(){},120000);
     if(r&&r.res==='done')errPop("You're pending!",['Email confirmed. We will email you when '+(r.name||'your business')+' is live, usually within a few hours.'],true);
     else if(r&&r.res==='used')errPop('All set',['This link was already used. We will email you when your listing is live.'],true);
     else errPop('Oops',['Could not confirm right now. Please tap the link in your email again in a minute, or email us.']);
