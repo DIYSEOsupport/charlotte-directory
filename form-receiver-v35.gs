@@ -160,7 +160,7 @@ function showBuild() {
 }
 
 // ---------------------------------------------------------------
-// Backups: a full copy of the whole spreadsheet (Full Form, Saves, Pending,
+// Backups: a full copy of the whole spreadsheet (Directory, Saves, Pending,
 // everything) goes to a "Charlotte Directory Backups" Drive folder once a day,
 // plus on demand via the "Backup now" menu item. Keeps the last 30 days; older
 // copies are trashed automatically so Drive doesn't fill up. Restoring from a
@@ -1211,7 +1211,7 @@ function setupTriggers() {
 
 // You setting Status to Approved/Rejected by hand in the Pending tab moves it to the
 // main tab (and the live directory) right away, instead of waiting for the hourly check.
-// Any hand edit to the Full Form tab (delete a row, blank it out, tweak a field) also
+// Any hand edit to the Directory tab (delete a row, blank it out, tweak a field) also
 // busts the directory cache right away, so the live site matches the sheet within a minute
 // instead of waiting up to 6 hours for the cache to expire on its own.
 function onStatusEdit_(e) {
@@ -1618,13 +1618,13 @@ function healthCheck_() {
   function ok(msg) { out.push('OK       ' + msg); }
   function no(msg) { out.push('PROBLEM  ' + msg); bad++; }
   var ss = SpreadsheetApp.openById(SHEET_ID), main = null, mh = [];
-  try { main = findSheet_(); mh = trimHeaders_(getHeaders_(main)); ok('Full Form tab found, ' + liveRows_(main).length + ' listings showing'); }
-  catch (e) { no('Full Form tab: ' + e); }
+  try { main = findSheet_(); mh = trimHeaders_(getHeaders_(main)); ok('Directory tab found, ' + liveRows_(main).length + ' listings showing'); }
+  catch (e) { no('Directory tab: ' + e); }
   if (main) {
     var need = [TIMESTAMP_HEADER, OWNER_HEADER, EMAIL_HEADER, HIDDEN_HEADER, STATUS_HEADER, TOKEN_HEADER, NOTES_HEADER, OTHER_HEADER];
     var missing = need.filter(function (h) { return mh.indexOf(h) < 0; });
-    if (missing.length) no('Full Form missing columns: ' + missing.join(', ') + ' (added on next submission)');
-    else ok('Full Form has all script columns');
+    if (missing.length) no('Directory missing columns: ' + missing.join(', ') + ' (added on next submission)');
+    else ok('Directory has all script columns');
   }
   var pend = ss.getSheetByName(PENDING_TAB);
   if (!pend) no('No Pending tab (made on next submission)');
@@ -1632,8 +1632,8 @@ function healthCheck_() {
     var ph = pend.getLastColumn() ? trimHeaders_(pend.getRange(1, 1, 1, pend.getLastColumn()).getValues()[0]) : [];
     var off = [];
     mh.forEach(function (h, i) { if (ph[i] !== h) off.push(String.fromCharCode(65 + (i % 26)) + ' "' + h + '" vs "' + (ph[i] || '') + '"'); });
-    if (off.length) no('Pending headers do not line up with Full Form: ' + off.slice(0, 5).join('; ') + ' (do not move Pending columns)');
-    else ok('Pending headers line up with Full Form');
+    if (off.length) no('Pending headers do not line up with Directory: ' + off.slice(0, 5).join('; ') + ' (do not move Pending columns)');
+    else ok('Pending headers line up with Directory');
     var sc = ph.indexOf(STATUS_HEADER), counts = {};
     if (sc >= 0 && pend.getLastRow() > 1) {
       pend.getRange(2, 1, pend.getLastRow() - 1, ph.length).getValues().forEach(function (r) {
