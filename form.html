@@ -278,7 +278,7 @@ function setSignedIn(t){
   resetMode();
   if(t){if(linkBusy)mineWait=true;else loadMine()}
 }
-/* an email link (confirm / confirmRemove) holds the script lock; look up businesses after it finishes */
+/* an email link (confirm / confirmRemove) holds the script lock; afterwards the page starts fresh at Sign in */
 var linkBusy=false,mineWait=false;
 function linkDone(){linkBusy=false;if(mineWait&&idToken){mineWait=false;loadMine()}}
 function initLogin(){
@@ -392,7 +392,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
   busy('Confirming your email');linkBusy=true;
   var cb='cfm'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
   function fin(r){
-    clearTimeout(t);delete window[cb];sc.remove();busy(false);linkDone();
+    clearTimeout(t);delete window[cb];sc.remove();busy(false);mineWait=false;linkDone();setSignedIn('');
     if(r&&r.res==='done')errPop("You're pending!",['Email confirmed. We will email you when '+(r.name||'your business')+' is live, usually within a few hours.'],true);
     else if(r&&r.res==='used')errPop('All set',['This link was already used. We will email you when your listing is live.'],true);
     else errPop('Oops',['Could not confirm right now. Please tap the link in your email again in a minute, or email us.']);
@@ -408,7 +408,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')$('errPop').
   busy('Confirming removal');linkBusy=true;
   var cb='cfmr'+Date.now(),sc=document.createElement('script'),t=setTimeout(function(){fin(null)},20000);
   function fin(r){
-    clearTimeout(t);delete window[cb];sc.remove();busy(false);linkDone();
+    clearTimeout(t);delete window[cb];sc.remove();busy(false);mineWait=false;linkDone();setSignedIn('');
     if(r&&r.res==='done')errPop('Listing removed',[(r.name||'Your business')+' has been removed from the directory.'],true);
     else if(r&&r.res==='used')errPop('Link expired',['This removal link was already used or has expired. If you still want to remove your listing, sign in and request removal again.'],true);
     else errPop('Oops',['Could not confirm removal right now. Please tap the link in your email again in a minute, or email us.']);
