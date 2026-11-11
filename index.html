@@ -2126,6 +2126,9 @@ $('fbSend').addEventListener('click',function(){
     $('fbMsg').value='';fbShots=[];drawShots();
   },800);
 });
+/* #feedback link (from posts) opens the feedback box */
+function openFb(){if(location.hash==='#feedback'){var d=$('fbBox');d.open=true;setTimeout(function(){d.scrollIntoView({behavior:'smooth',block:'center'})},600)}}
+openFb();window.addEventListener('hashchange',openFb);
 /* feedback screenshots: up to 3, shrunk to JPEG so the upload stays small */
 var fbShots=[];
 function drawShots(){

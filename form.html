@@ -266,7 +266,8 @@ var catOther=false;
 function syncOther(){$('otherfld').style.display=catOther?'':'none'}
 function syncCat(c){catOther=c==='Other';syncOther()}
 var step=0,logoData='',logoName='',idToken='';
-var bizList=null,mode='',origName='',origLogoId='';
+var bizList=null,mode='',origName='',origLogoId='',signupsFull=false;
+var FULL_MSG='New sign-ups are paused while our first 10 testers help us work out the bugs. Please check back soon.';
 function jwtInfo(t){try{return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')))))}catch(e){return null}}
 function setSignedIn(t){
   idToken=t;var p=t?jwtInfo(t):null;
@@ -503,7 +504,8 @@ function loadMine(){
       if(!m||m.error!=='LOGIN_EXPIRED'){$('modeRetry').style.display='inline-block';mode='new';$('contactBlock').style.display='block'}
       return;
     }
-    bizList=m.businesses||[];
+    bizList=m.businesses||[];signupsFull=!!m.full;
+    if(!bizList.length&&signupsFull){mode='';$('modemsg').textContent=FULL_MSG;return}
     if(!bizList.length){$('modefld').style.display='none';mode='new';$('contactBlock').style.display='block';return}
     $('modemsg').textContent='';$('modebox').style.display='block';$('modeDel').style.display='';
   });
@@ -514,6 +516,7 @@ function clearModeSel(){
   $('delConfirm').style.display='none';$('contactNav').style.display='';
 }
 $('modeNew').addEventListener('click',function(){
+  if(signupsFull){errPop('We are full for now, neighbor!',[FULL_MSG]);return}
   mode='new';origName='';origLogoId='';
   clearModeSel();$('modeNew').classList.add('sel');
   $('bizlist').style.display='none';$('modebox').style.display='block';$('modefld').classList.remove('bad');
@@ -733,7 +736,8 @@ $('f').addEventListener('submit',function(e){
       BAD_URL:'One of the web addresses does not look right.',
       BAD_PHONE:'The phone number needs 10 digits.',
       NOT_LIVE:'You can only update your own listings.',
-      NAME_TAKEN:'Another business in the directory already uses that name. Pick a different name.'
+      NAME_TAKEN:'Another business in the directory already uses that name. Pick a different name.',
+      SIGNUPS_FULL:FULL_MSG
     }[code]||('Something went wrong. Please try again.'+(code?' ('+String(code).slice(0,200)+')':''));
     $('fail').textContent=msg;$('fail').style.display='block';
     errPop(code==='NAME_TAKEN'?'Name taken, neighbor!':code==='LOGIN_EXPIRED'?'Sign in again, neighbor!':'Whoa there, neighbor!',[msg]);
