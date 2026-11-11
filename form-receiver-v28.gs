@@ -635,9 +635,9 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
       '<td height="10" width="25%" style="background:' + PURPLE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + MAGENTA + ';font-size:0;line-height:0">&nbsp;</td>' +
       '<td width="25%" style="background:' + ORANGE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + YELLOW + ';font-size:0;line-height:0">&nbsp;</td></tr></table></td></tr>' +
       '<tr><td class="pad" style="padding:22px 22px 8px">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="text-align:center">' +
+      (badge ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="text-align:center">' +
       '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center" bgcolor="' + PURPLE + '" style="background:' + PURPLE + ';color:#ffffff;border:3px solid ' + INK + ';border-radius:8px;padding:6px 16px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;text-align:center">' + badgeInner + '</td></tr></table>' +
-      '</td></tr></table>' +
+      '</td></tr></table>' : '') +
       '<div class="biz" style="font-family:' + HEAD + ';font-size:30px;letter-spacing:1px;color:#0e95a8;line-height:1.1;margin:16px 0 12px">' + htmlEsc_(businessName) + '</div>' +
       paras + btn + afterParas + extraHtml +
       '</td></tr>' +
@@ -709,7 +709,7 @@ function sendRemoveConfirm_(to, businessName, token, wasLive) {
   var intro = wasLive
       ? 'You requested to remove <b>' + htmlEsc_(businessName) + '</b> from the directory.'
       : 'You requested to withdraw your submission for <b>' + htmlEsc_(businessName) + '</b>.';
-  var html = noticeHtml_('CONFIRM REMOVAL', businessName, [
+  var html = noticeHtml_('', businessName, [
     intro,
     'Tap the button below to confirm this removal. If you did not request this, just ignore this email.'
   ], 'CONFIRM REMOVAL', link, link, [
@@ -831,7 +831,7 @@ function confirmRemoveToken_(token) {
     lock.waitLock(20000);
     var done = false, bizName = '', sendTo = '';
     if (/^[A-Fa-f0-9]{20,64}$/.test(token)) {
-      var sheet = directorySheet_();
+      var sheet = findSheet_();
       var pend = pendingSheet_();
       var headers = getHeaders_(sheet);
       var headersPend = getHeaders_(pend);
