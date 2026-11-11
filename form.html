@@ -526,7 +526,7 @@ $('modeUpd').addEventListener('click',function(){
   $('modebox').style.display='block';$('modefld').classList.remove('bad');
   $('contactBlock').style.display='block';
   $('name').value='';$('title').value='';$('how').value='';
-  if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);show(1);return}
+  if(bizList.length===1){$('bizlist').style.display='none';fillBiz(bizList[0]);toContact();return}
   showBizList();
 });
 $('modeDel').addEventListener('click',function(){
@@ -560,6 +560,8 @@ $('delGo').addEventListener('click',function(){
     }
   },'remove');
 });
+/* updates still need contact info: stay on this step and jump to it */
+function toContact(){$('contactBlock').scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$('name').focus({preventScroll:true})},400)}
 function showBizList(){
   var box=$('bizlist');box.style.display='grid';
   var h='';
@@ -579,7 +581,7 @@ function showBizList(){
       $('modebox').style.display='none';
       $('delConfirm').style.display='block';
     }else{
-      show(1);
+      toContact();
     }
   });
 }
