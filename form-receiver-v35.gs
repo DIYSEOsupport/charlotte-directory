@@ -1,5 +1,5 @@
 /**
- * Directory form receiver (version 35: boss email bottom bar blue; removing a listing also removes its older versions)
+ * Directory form receiver (version 35: boss email bottom bar blue; boss subjects marked new/update; removing a listing also removes its older versions)
  * Paste the WHOLE file into Apps Script. Then Deploy > Manage deployments > pencil > New version.
  * NEVER click "New deployment".
  * BUILD: bump this line every time you paste a new copy in. Check it anytime with
@@ -1540,7 +1540,8 @@ function notifyBoss_(name, d, label, notes, old) {
           : '<p style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:14px;color:#1a1033">(Nothing changed.)</p>');
     }
     var html = noticeHtml_(label, name, paras, 'OPEN PENDING TAB', pendingUrl, null, null, changesHtml + info + logoHtml, BOSS_BG);
-    sendBossMail_('🔔 ' + label + ': ' + name, lines.join('\n'), logo, html);
+    // Subject icon tells new from update at a glance in the inbox
+    sendBossMail_((old ? '\u270F\uFE0F ' : '\uD83C\uDD95 ') + label + ': ' + name, lines.join('\n'), logo, html);
   } catch (e) { Logger.log('notifyBoss_ failed: ' + e); }
 }
 
