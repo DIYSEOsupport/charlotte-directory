@@ -60,6 +60,7 @@ var WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw3yK823DH4sQqc1nFkvP
 var MAX_CHECKS_PER_RUN = 12;
 var PENDING_TAB = 'Pending';
 var REJECTED_TAB = 'Rejected';
+var REMOVED_TAB = 'Removed';
 var SITE_URL = 'https://diyseosupport.github.io/';
 var SITE_TEXT = 'diyseosupport.github.io';
 
@@ -872,6 +873,10 @@ function confirmRemoveToken_(token) {
           }
         }
       }
+      if (done) {
+        try { moveRemovedRows_(sheet); moveRemovedRows_(pend); formatSheet_(sheet); }
+        catch (mvErr) { Logger.log('moveRemovedRows_ failed: ' + mvErr); }
+      }
       // Send final removal confirmation email
       if (done && sendTo) {
         try { CacheService.getScriptCache().remove('directory_csv'); } catch (cacheErr) { }
@@ -956,6 +961,61 @@ function pendingSheet_() {
     applyPendingStatusColors_(pend, target.indexOf(STATUS_HEADER) + 1, target.length);
   }
   return pend;
+}
+
+// Removed listings land here (owner confirmed removal), so the main tabs stay clean.
+function removedSheet_() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var pend = pendingSheet_();
+  var cols = pend.getLastColumn();
+  var sh = ss.getSheetByName(REMOVED_TAB);
+  if (!sh) {
+    sh = ss.insertSheet(REMOVED_TAB, ss.getSheets().length);
+    try { sh.setTabColor('#888888'); } catch (e) { }
+    try { sh.setFrozenRows(1); } catch (e2) { }
+  }
+  if (sh.getMaxColumns() < cols) sh.insertColumnsAfter(sh.getMaxColumns(), cols - sh.getMaxColumns());
+  var ph = trimHeaders_(pend.getRange(1, 1, 1, cols).getValues()[0]);
+  var rh = sh.getLastColumn() ? trimHeaders_(sh.getRange(1, 1, 1, Math.min(sh.getLastColumn(), ph.length)).getValues()[0]) : [];
+  var same = rh.length === ph.length;
+  for (var i = 0; same && i < ph.length; i++) { if (rh[i] !== ph[i]) same = false; }
+  if (!same) sh.getRange(1, 1, 1, ph.length).setValues([ph]);
+  return sh;
+}
+
+// Moves every row whose Hidden cell starts with "Removed" from src to the Removed tab.
+function moveRemovedRows_(src) {
+  var lastRow = src.getLastRow();
+  if (lastRow < 2) return 0;
+  var headers = trimHeaders_(getHeaders_(src));
+  var hc = colNamed_(headers, HIDDEN_HEADER);
+  if (hc < 0) return 0;
+  var vals = src.getRange(2, 1, lastRow - 1, src.getLastColumn()).getValues();
+  var hits = [];
+  for (var i = 0; i < vals.length; i++) {
+    if (/^removed/i.test(String(vals[i][hc] || '').trim())) hits.push(i);
+  }
+  if (!hits.length) return 0;
+  var dest = removedSheet_();
+  var destHeaders = trimHeaders_(getHeaders_(dest));
+  hits.forEach(function (i) {
+    var out = remapRow_(headers, destHeaders, vals[i]);
+    dest.getRange(dest.getLastRow() + 1, 1, 1, out.length).setValues([out]);
+  });
+  for (var k = hits.length - 1; k >= 0; k--) src.deleteRow(hits[k] + 2);
+  stripeTab_(dest);
+  return hits.length;
+}
+
+// Alternating row colors on a plain tab (Removed, Rejected)
+function stripeTab_(sh) {
+  try {
+    sh.getBandings().forEach(function (b) { b.remove(); });
+    var lr = Math.max(sh.getLastRow(), 2), lc = Math.max(sh.getLastColumn(), 1);
+    sh.getRange(1, 1, lr, lc).applyRowBanding()
+      .setHeaderRowColor('#1A73E8').setFirstRowColor('#FFF6DC').setSecondRowColor('#FFFFFF');
+    sh.getRange(1, 1, 1, lc).setFontColor('#FFFFFF');
+  } catch (e) { Logger.log('stripeTab_ failed: ' + e); }
 }
 
 // Rejected rows land here instead of being deleted, so you can look back at them.
@@ -1054,11 +1114,12 @@ function movePendingDecisions_(main, pend) {
       var rTarget = nextFreeRow_(rej, rejHeaders);
       var rVals = remapRow_(headers, rejHeaders, o.vals);
       rej.getRange(rTarget, 1, 1, rVals.length).setValues([rVals]);
+      stripeTab_(rej);
       pend.deleteRow(o.row);
       moved = true;
     }
   }
-  if (moved) finishRows_(main);
+  if (moved) { finishRows_(main); try { sortSheet_(main); formatSheet_(main); } catch (fe) { Logger.log('tidy after move failed: ' + fe); } }
 }
 
 // ---------------------------------------------------------------
@@ -1947,9 +2008,12 @@ function tidySheet() {
   ensureColumn_(sheet, HIDDEN_HEADER);
   ensureStatusCols_(sheet);
   deleteBlankRows_(sheet);
+  var moved = moveRemovedRows_(sheet) + moveRemovedRows_(pendingSheet_());
   sortSheet_(sheet);
   formatSheet_(sheet);
-  Logger.log('Sheet tidied.');
+  stripeTab_(rejectedSheet_());
+  stripeTab_(removedSheet_());
+  Logger.log('Sheet tidied. Moved ' + moved + ' removed listing(s) to the Removed tab.');
 }
 
 function deleteBlankRows_(sheet) {
@@ -1962,7 +2026,7 @@ function deleteBlankRows_(sheet) {
   }
 }
 
-// A to Z by business name. Same name: oldest first, newest last.
+// Oldest submission first, newest last.
 function sortSheet_(sheet) {
   var lastRow = sheet.getLastRow();
   var lastCol = sheet.getLastColumn();
@@ -1972,9 +2036,24 @@ function sortSheet_(sheet) {
   var n = nameCol_(headers);
   if (n < 0) return;
   var t = colByKey_(headers, 'timestamp');
-  var spec = [{ column: n + 1, ascending: true }];
-  if (t >= 0) spec.push({ column: t + 1, ascending: true });
-  sheet.getRange(2, 1, lastRow - 1, lastCol).sort(spec);
+  if (t < 0) return;
+  // Some timestamps are text, some are dates: make them all dates so the sort is in true order
+  var tr = sheet.getRange(2, t + 1, lastRow - 1, 1), tv = tr.getValues(), fixed = false;
+  for (var i = 0; i < tv.length; i++) {
+    if (!(tv[i][0] instanceof Date) && String(tv[i][0]).trim()) {
+      var d = new Date(String(tv[i][0]).trim().replace(/^(\d{4})-(\d{2})-(\d{2}) /, '$2/$3/$1 '));
+      if (!isNaN(d.getTime())) { tv[i][0] = d; fixed = true; }
+    }
+  }
+  if (fixed) { tr.setValues(tv); tr.setNumberFormat('m/d/yyyy h:mm am/pm'); }
+  sheet.getRange(2, 1, lastRow - 1, lastCol).sort([{ column: t + 1, ascending: true }]);
+  // Sorting moves the data but not which rows are hidden: re-hide by the Hidden column
+  var hc = colOf_(headers, function (x) { return x === HIDDEN_HEADER; });
+  if (hc >= 0) {
+    sheet.showRows(2, lastRow - 1);
+    var hv = sheet.getRange(2, hc + 1, lastRow - 1, 1).getValues();
+    for (var r = 0; r < hv.length; r++) { if (String(hv[r][0]).trim() !== '') sheet.hideRows(r + 2); }
+  }
 }
 
 function widthFor_(header) {
@@ -2014,10 +2093,11 @@ function formatSheet_(sheet) {
   var shade = headers.map(function (h) { return SHADE_HEADERS.test(String(h).trim()); });
   var sc = colOf_(headers, function (t) { return t === STATUS_HEADER; });
   var STATUS_BG = { unconfirmed: '#EAD1DC', pending: '#FFF2CC', flagged: '#F9CB9C', rejected: '#F4CCCC', approved: '#D9EAD3' };
-  var bg = [], fc = [], fl = [], fw = [];
+  var bg = [], fc = [], fl = [], fw = [], shown = 0;
   for (var i = 0; i < vals.length; i++) {
     var replaced = hc >= 0 && String(vals[i][hc]).trim() !== '';
-    var stripe = (i % 2 === 0) ? '#FFF6DC' : '#FFFFFF';
+    var stripe = (shown % 2 === 0) ? '#FFF6DC' : '#FFFFFF';
+    if (!replaced) shown++;
     var b = [], f = [], l = [], w = [];
     for (var c = 0; c < lastCol; c++) {
       var sbg = (c === sc && !replaced) ? STATUS_BG[String(vals[i][sc]).trim().toLowerCase()] : '';
