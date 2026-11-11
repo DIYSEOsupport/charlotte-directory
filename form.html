@@ -740,7 +740,7 @@ $('f').addEventListener('submit',function(e){
     if(m.ok)showDone(m.status,m.emailTo);else fail(m.error);
   }
   window.addEventListener('message',onMsg);
-  timer=setTimeout(function(){window.removeEventListener('message',onMsg);showDone('unconfirmed')},12000);
+  timer=setTimeout(function(){window.removeEventListener('message',onMsg);showDone('unconfirmed')},30000);
   var fm=document.createElement('form');
   fm.method='POST';fm.action=ENDPOINT;fm.target='subframe';fm.style.display='none';
   var ta=document.createElement('textarea');ta.name='payload';ta.value=JSON.stringify(d);
@@ -749,8 +749,13 @@ $('f').addEventListener('submit',function(e){
 function showDone(flag,emailTo){
   busy(false);
   $('doneExtraNav').style.display='none';
-  $('doneH').textContent='Check your email.';
-  $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
+  if(flag==='unconfirmed'){
+    $('doneH').textContent='Almost there.';
+    $('doneNote').textContent='We could not tell if your business went through. Check your email (and spam folder) in 5 minutes. No email from us? Fill in the form again.';
+  }else{
+    $('doneH').textContent='Check your email.';
+    $('doneNote').textContent='It can take 2-3 minutes to arrive. Not there? Check your spam folder.';
+  }
   qa('.step').forEach(function(s){s.classList.remove('show')});
   $('steps').style.display='none';
   $('done').style.display='block';window.scrollTo({top:0,behavior:'smooth'});

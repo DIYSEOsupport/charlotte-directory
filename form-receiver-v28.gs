@@ -505,9 +505,6 @@ function sendLink_(to, businessName, d, logoUrl) {
       '<td height="10" width="25%" style="background:' + PURPLE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + MAGENTA + ';font-size:0;line-height:0">&nbsp;</td>' +
       '<td width="25%" style="background:' + ORANGE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + YELLOW + ';font-size:0;line-height:0">&nbsp;</td></tr></table></td></tr>' +
       '<tr><td class="pad" style="padding:22px 22px 8px">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="text-align:center">' +
-      '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center" bgcolor="' + PURPLE + '" style="background:' + PURPLE + ';color:#ffffff;border:3px solid ' + INK + ';border-radius:8px;padding:6px 16px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;text-align:center">' + BADGE + '</td></tr></table>' +
-      '</td></tr></table>' +
       '<table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:16px"><tr>' + logoHtml +
       '<td style="vertical-align:middle"><div class="biz" style="font-family:' + HEAD + ';font-size:30px;letter-spacing:1px;color:#0e95a8;line-height:1.1">' + htmlEsc_(businessName) + '</div></td></tr></table>' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;border-collapse:collapse">' + trs + '</table>' +
@@ -624,8 +621,6 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
   var btn = buttonHref
       ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 10px"><tr><td align="center" style="text-align:center"><table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center"><a href="' + htmlEsc_(buttonHref) + '" style="background:' + ORANGE + ';color:#fff;text-decoration:none;padding:12px 26px;border:3px solid ' + INK + ';border-radius:12px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;display:block;text-align:center;box-shadow:3px 3px 0 ' + INK + '">' + htmlEsc_(buttonLabel) + '</a></td></tr></table></td></tr></table>'
       : '';
-  // Badge is a plain heading; the only call to action is the centered button
-  var badgeInner = htmlEsc_(badge);
   return '<html><head><meta charset="utf-8"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light"><meta name="viewport" content="width=device-width,initial-scale=1"><style>@media only screen and (max-width:480px){.pad{padding:16px 14px 6px!important}.biz{font-size:24px!important}.bar{padding:10px 14px!important}}</style><link href="https://fonts.googleapis.com/css2?family=Walter+Turncoat&family=Bangers&display=swap" rel="stylesheet"></head>' +
       '<body style="margin:0;padding:0;background:' + PURPLE + '">' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' + PURPLE + '"><tr><td align="center" style="padding:20px 10px">' +
@@ -635,9 +630,6 @@ function noticeHtml_(badge, businessName, paragraphs, buttonLabel, buttonHref, b
       '<td height="10" width="25%" style="background:' + PURPLE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + MAGENTA + ';font-size:0;line-height:0">&nbsp;</td>' +
       '<td width="25%" style="background:' + ORANGE + ';font-size:0;line-height:0">&nbsp;</td><td width="25%" style="background:' + YELLOW + ';font-size:0;line-height:0">&nbsp;</td></tr></table></td></tr>' +
       '<tr><td class="pad" style="padding:22px 22px 8px">' +
-      (badge ? '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="text-align:center">' +
-      '<table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:0 auto"><tr><td align="center" bgcolor="' + PURPLE + '" style="background:' + PURPLE + ';color:#ffffff;border:3px solid ' + INK + ';border-radius:8px;padding:6px 16px;font-family:' + HEAD + ';font-size:20px;letter-spacing:1.5px;text-align:center">' + badgeInner + '</td></tr></table>' +
-      '</td></tr></table>' : '') +
       '<div class="biz" style="font-family:' + HEAD + ';font-size:30px;letter-spacing:1px;color:#0e95a8;line-height:1.1;margin:16px 0 12px">' + htmlEsc_(businessName) + '</div>' +
       paras + btn + afterParas + extraHtml +
       '</td></tr>' +
