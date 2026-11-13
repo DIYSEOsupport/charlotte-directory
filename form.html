@@ -445,7 +445,9 @@ function checkStep(n){
     if(f.closest('#contactBlock')&&$('contactBlock').style.display==='none')return;
     var el=f.querySelector('input,textarea');if(!el)return;
     var v=el.value.trim();
+    if(el.id==='biz')f.querySelector('.err').textContent='Enter your business name.';
     if(!v){bad(f);return}
+    if(el.id==='biz'){var be=f.querySelector('.err'),bl=v.toLowerCase();if(bl==='test'||bl==='none'||bl.indexOf('business name')!==-1){be.textContent='Use your real business name. "'+v+'" will not show in the directory.';bad(f)}}
     if(el.id==='phone'&&v.replace(/\D/g,'').length!==10)bad(f);
     if(el.id==='how'){
       if(v.indexOf('@')!==-1){if(!EMAIL_RE.test(v))bad(f)}
