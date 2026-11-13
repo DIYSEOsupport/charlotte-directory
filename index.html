@@ -486,6 +486,8 @@ input,textarea,select,option,#printArea{text-transform:none}
 
 /* v26 phone cards, stacked: logo + name on top, category pill and arrow in a row below */
 @media(max-width:640px){
+  .ln{word-break:normal;min-width:0}
+  .ln:not(.addr)>span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .grid .card .bar{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo bt bt" "cat cat chev";align-items:center;column-gap:0;row-gap:8px;padding:12px!important}
   .grid .card .bar .blogo{grid-area:logo;height:50px;width:50px;margin-right:10px;align-self:start}
   .grid .card .bar .bt{grid-area:bt;min-width:0;flex:none;padding-right:42px!important;align-self:center}

@@ -226,6 +226,7 @@ button.opt{width:100%;text-align:left;color:var(--ink);-webkit-appearance:none;a
       <div class="fld"><label class="l" for="fb">Facebook Business Facebook Page</label><input type="text" id="fb" data-url inputmode="url"><div class="err">Enter a web address like facebook.com/yourpage.</div></div>
       <div class="fld"><label class="l" for="ndb">NextDoor Business Page</label><input type="text" id="ndb" data-url inputmode="url"><div class="err">Enter a web address like nextdoor.com/pages/yourbiz.</div></div>
       <div class="fld"><label class="l" for="ndp">NextDoor Contact Personal Page</label><input type="text" id="ndp" data-url inputmode="url"><div class="err">Enter a web address like nextdoor.com/profile/you.</div></div>
+      <div class="fld"><label class="l" for="rev">Google Reviews Link</label><div class="help">In Google Maps, open your business, tap Share, and paste the link here.</div><input type="text" id="rev" data-url inputmode="url"><div class="err">Enter a web address like maps.app.goo.gl/abc123.</div></div>
       <div class="fld"><label class="l" for="slogan">Slogan</label><input type="text" id="slogan" maxlength="120"></div>
       <div class="fld"><label class="l" for="licensed" style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="licensed">Licensed &amp; Insured</label></div>
       <div class="fld"><span class="l">Upload Logo</span><div class="help">Shows on your card.</div>
@@ -628,7 +629,7 @@ function fillBiz(b){
   $('other').value=b.other||'';
   $('phone').value=maskPhone(b.phone||'');$('web').value=b.website||'';$('email').value=b.email||'';
   $('street').value=b.street||'';$('city').value=b.city||'';$('state').value=b.state||'';$('zip').value=b.zip||'';
-  $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('slogan').value=b.slogan||'';
+  $('fb').value=b.facebook||'';$('ndb').value=b.ndBiz||'';$('ndp').value=b.ndPersonal||'';$('rev').value=b.reviews||'';$('slogan').value=b.slogan||'';
   $('licensed').checked=!!b.licensed;
   origLogoId=b.logoId||b.logoUrl||'';
   if(origLogoId){var oi=$('oldlogoimg');oi.referrerPolicy='no-referrer';oi.onerror=function(){if(b.logoId&&oi.src.indexOf('thumbnail')<0)oi.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(b.logoId)+'&sz=w200'};oi.src=b.logoId?'https://lh3.googleusercontent.com/d/'+encodeURIComponent(b.logoId):b.logoUrl;$('oldlogo').style.display='flex'}
@@ -648,7 +649,7 @@ function renderReview(){
     ['1. About you',row('Name (private)',$('name').value.trim())+row('Title (private)',$('title').value.trim())+row('How to contact you (private)',$('how').value.trim())],
     ['2. Business',row('Business name',$('biz').value.trim())+row('Public contact name',$('pubname').value.trim())+row('Public contact title',$('pubtitle').value.trim())+row('Category',val('cat'))+($('otherfld').style.display==='none'?'':row('Other details',$('other').value.trim()))+row('About your business',t)+(t==='Other'?row('Other details',$('typeOtherTxt').value.trim()):'')+row('Describe your business',$('desc').value.trim())],
     ['3. Contact',row('Business phone',maskPhone($('phone').value))+row('Website',fixUrl($('web').value))+row('Email for customers',$('email').value.trim())+(phys?row('Street',$('street').value.trim())+row('Suite / Unit',$('street2').value.trim())+row('City',$('city').value.trim())+row('State',$('state').value.trim())+row('Zip',$('zip').value.trim()):'')+(mob?row('Area served',a):'')],
-    ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Slogan',$('slogan').value.trim())+row('Licensed & Insured',$('licensed').checked?'Yes':'No')+row('Logo',logo)]
+    ['4. Optional',row('Facebook',fixUrl($('fb').value))+row('NextDoor business page',fixUrl($('ndb').value))+row('NextDoor personal page',fixUrl($('ndp').value))+row('Google Reviews',fixUrl($('rev').value))+row('Slogan',$('slogan').value.trim())+row('Licensed & Insured',$('licensed').checked?'Yes':'No')+row('Logo',logo)]
   ];
   $('review').innerHTML=sec.map(function(x,i){return '<div class="rv"><div class="rv-h"><h2>'+esc(x[0])+'</h2><button type="button" class="b alt" data-edit="'+i+'">Edit</button></div><dl>'+x[1]+'</dl></div>'}).join('');
   qa('[data-edit]',$('review')).forEach(function(b){b.addEventListener('click',function(){show(+b.getAttribute('data-edit'))})});
@@ -719,7 +720,7 @@ $('f').addEventListener('submit',function(e){
     describe:t==='Other'?($('typeOtherTxt').value.trim()+'\n\n'+$('desc').value.trim()).trim().slice(0,400):t+'\n\n'+$('desc').value.trim().slice(0,400),
     street:'',street2:'',city:'',state:'',zip:'',area:'',
     phone:maskPhone($('phone').value),website:fixUrl($('web').value),email:$('email').value.trim().toLowerCase(),
-    facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),slogan:$('slogan').value.trim(),
+    facebook:fixUrl($('fb').value),ndBiz:fixUrl($('ndb').value),ndPersonal:fixUrl($('ndp').value),reviews:fixUrl($('rev').value),slogan:$('slogan').value.trim(),
     logoData:logoData,logoName:logoName,
     originalName:mode==='update'?origName:'',
     logoAction:logoData?'new':((mode==='update'&&origLogoId&&$('dellogo').checked)?'delete':(mode==='update'&&origLogoId?'keep':'none')),
