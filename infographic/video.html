@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>Honk Video</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Walter+Turncoat&family=Bangers&family=Oswald:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a1033;--purple:#5b2a86;--violet:#7b3ff2;--magenta:#c2307a;--orange:#ff7a1a;
+  --yellow:#ffd23f;--teal:#1fb5c9;--green:#1f8a4c;--red:#e5322d;--cream:#fff6dc;
+  --fh:'Bangers','Comic Sans MS',Arial,sans-serif;
+  --fb:'Walter Turncoat','Comic Sans MS',Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink)}
+/* 1080x1920 vertical, 15s. render(t) draws any moment; scripts/export-video.js steps through it. */
+.stage{position:relative;width:1080px;height:1920px;overflow:hidden;color:var(--ink);font-family:var(--fb);
+  background:linear-gradient(165deg,var(--purple) 0%,var(--magenta) 38%,var(--orange) 72%,var(--yellow) 100%)}
+.stage::before{content:"";position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,246,220,.13) 2.4px,transparent 2.7px);background-size:21px 21px}
+.scene{position:absolute;inset:0;visibility:hidden}
+.a{position:absolute;will-change:transform,opacity}
+.h{font-family:var(--fh);font-weight:400;letter-spacing:2px;line-height:.95}
+
+/* ---------- shared: caption + device frame ---------- */
+.cap{left:40px;right:40px;top:340px;text-align:center}
+.cap .big{font-family:var(--fh);font-size:104px;line-height:.92;letter-spacing:2px;color:var(--yellow);
+  -webkit-text-stroke:5px var(--ink);text-shadow:10px 10px 0 var(--ink)}
+.cap .sm{font-family:var(--fh);font-size:60px;line-height:1;letter-spacing:1px;color:var(--cream);
+  text-shadow:6px 6px 0 var(--ink);margin-top:18px}
+.frame{left:50%;top:1200px;transform:translate(-50%,-50%);border:11px solid var(--ink);border-radius:40px;
+  background:var(--ink);padding:11px;box-shadow:17px 17px 0 var(--ink)}
+.frame img{display:block;width:100%;border-radius:29px}
+.frame.paper{border-radius:14px;background:#fff;padding:10px;border-width:9px}
+.frame.paper img{border-radius:4px}
+.win{overflow:hidden;border-radius:29px}
+.win img{border-radius:0}
+.chip{left:0;right:0;top:1740px;text-align:center}
+.chip span{display:inline-block;font-family:var(--fh);font-size:56px;letter-spacing:2px;border:7px solid var(--ink);
+  border-radius:24px;box-shadow:9px 9px 0 var(--ink);padding:6px 32px}
+.who{left:46px;top:74px;width:212px;height:212px;border-radius:50%;border:7px solid var(--ink);box-shadow:9px 9px 0 var(--ink);
+  display:flex;align-items:center;justify-content:center;text-align:center;font-size:41px;line-height:.95;color:var(--cream);
+  text-shadow:4px 4px 0 var(--ink)}
+
+/* ---------- A: hero ---------- */
+.herocard{left:50px;top:680px;width:980px;height:726px;border:8px solid var(--ink);border-radius:30px;box-shadow:14px 14px 0 var(--ink);overflow:hidden;background:var(--ink)}
+.herocard img{width:100%;height:100%;object-fit:cover;display:block;transform-origin:49% 60%}
+.newtag{left:0;right:0;top:450px;text-align:center;font-size:110px;color:var(--yellow);-webkit-text-stroke:4px var(--ink);text-shadow:9px 9px 0 var(--ink)}
+.herosub{left:0;right:0;top:1500px;text-align:center;font-size:78px;color:var(--cream);text-shadow:6px 6px 0 var(--ink)}
+.flash{inset:0;background:var(--cream)}
+
+/* ---------- B: lockup + honk ---------- */
+.burst{left:-160px;top:40px;width:1400px;height:1400px}
+.cc{left:0;right:0;top:250px;text-align:center;font-size:76px;letter-spacing:10px;color:var(--yellow);-webkit-text-stroke:3px var(--ink);text-shadow:5px 5px 0 var(--ink)}
+.sb{left:0;right:0;top:350px;text-align:center;font-size:156px;color:var(--cream);letter-spacing:3px;text-shadow:9px 9px 0 var(--ink);-webkit-text-stroke:3px var(--ink)}
+.dirw{left:0;right:0;top:530px;text-align:center}
+.dir{display:inline-block;font-family:var(--fh);font-size:110px;letter-spacing:7px;color:var(--cream);background:var(--orange);border:7px solid var(--ink);border-radius:26px;padding:0 54px;box-shadow:11px 11px 0 var(--ink);text-shadow:5px 5px 0 var(--ink)}
+.horn{left:290px;top:690px;width:500px;height:500px}
+.hlines{left:0;right:0;top:1080px;text-align:center;font-size:178px;color:var(--yellow);-webkit-text-stroke:5px var(--ink);text-shadow:11px 11px 0 var(--ink)}
+.bsub{left:0;right:0;top:1520px;text-align:center;font-size:66px;line-height:1.05;color:var(--cream);text-shadow:5px 5px 0 var(--ink)}
+
+/* ---------- I: end card ---------- */
+.e-cc{left:0;right:0;top:90px;text-align:center;font-size:58px;letter-spacing:8px;color:var(--yellow);-webkit-text-stroke:2px var(--ink);text-shadow:4px 4px 0 var(--ink)}
+.e-sb{left:0;right:0;top:160px;text-align:center;font-size:120px;color:var(--cream);text-shadow:7px 7px 0 var(--ink);-webkit-text-stroke:3px var(--ink)}
+.e-dirw{left:0;right:0;top:300px;text-align:center}
+.e-dirw .dir{font-size:84px;padding:0 40px;border-width:6px;box-shadow:9px 9px 0 var(--ink)}
+.e-honk{left:0;right:0;top:480px;text-align:center;font-size:96px;color:var(--yellow);-webkit-text-stroke:4px var(--ink);text-shadow:8px 8px 0 var(--ink)}
+.cta{left:50px;top:640px;width:980px;height:1000px;background:var(--purple);border:8px solid var(--ink);border-radius:40px;box-shadow:14px 14px 0 var(--ink)}
+.col{top:50px;width:430px;display:flex;flex-direction:column;align-items:center}
+.col1{left:40px}.col2{left:494px}
+.col .lab{font-size:70px;color:var(--cream);text-shadow:5px 5px 0 var(--ink);text-align:center;line-height:.95;height:140px;display:flex;align-items:center}
+.qr{position:relative;width:400px;height:400px;background:#fff;border:7px solid var(--ink);border-radius:26px;padding:24px;box-shadow:9px 9px 0 var(--ink);margin-top:20px}
+.qr svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
+.tab{margin-top:-24px;position:relative;font-family:var(--fh);font-size:56px;letter-spacing:2px;color:var(--cream);border:6px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:2px 24px;text-shadow:4px 4px 0 var(--ink);white-space:nowrap}
+.qcap{margin-top:26px;font-family:var(--fh);font-size:46px;letter-spacing:1px;line-height:1;color:var(--yellow);text-align:center;text-shadow:4px 4px 0 var(--ink)}
+.urlw{left:0;right:0;top:1700px;text-align:center}
+.url{display:inline-block;background:var(--cream);color:var(--ink);border:6px solid var(--ink);border-radius:20px;padding:8px 26px;font-family:'Oswald',Arial,sans-serif;font-weight:600;font-size:44px;box-shadow:7px 7px 0 var(--ink)}
+.foot{left:0;right:0;top:1820px;display:flex;justify-content:center;align-items:center;gap:16px;font-size:44px;color:var(--ink)}
+.foot img{width:60px;height:60px;border-radius:8px;border:4px solid var(--ink);object-fit:contain;background:#fff;display:block}
+
+.wipe{left:-400px;top:-200px;width:1880px;height:2320px;border-left:16px solid var(--ink);border-right:16px solid var(--ink)}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- ================= A: hero ================= -->
+  <section class="scene" id="sA">
+    <div class="a h newtag" id="newtag">BRAND-NEW &amp; LOCAL!</div>
+    <div class="a herocard" id="herocard"><img src="video-assets/hero.jpg" alt="" id="heroimg"></div>
+    <div class="a h herosub" id="herosub">CHARLOTTE COUNTY, FL</div>
+  </section>
+
+  <!-- ================= B: lockup + honk ================= -->
+  <section class="scene" id="sB">
+    <svg class="a burst" id="burst" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+    <div class="a h cc" id="cc">CHARLOTTE COUNTY</div>
+    <div class="a h sb" id="sb">SMALL BUSINESS</div>
+    <div class="a dirw" id="dirw"><span class="dir">DIRECTORY</span></div>
+    <svg class="a horn" id="horn" viewBox="-10 -10 120 120" aria-hidden="true">
+      <g stroke="#1a1033" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M46 44 L84 20 Q92 50 84 80 L46 56 Z" fill="#ffd23f"/>
+        <rect x="30" y="43" width="18" height="14" rx="3" fill="#c2307a"/>
+        <circle cx="20" cy="50" r="15" fill="#e5322d"/>
+        <path d="M14 43 Q18 39 23 41" fill="none" stroke="#fff6dc" stroke-width="4"/>
+      </g>
+      <g id="hornlines" stroke="#fff6dc" stroke-width="5" stroke-linecap="round">
+        <path d="M94 12 L104 2"/><path d="M98 50 L110 50"/><path d="M94 88 L104 98"/>
+      </g>
+    </svg>
+    <div class="a h hlines" id="hl">HONK IF<br>YOU'RE LOCAL!</div>
+    <div class="a h bsub" id="bsub">ONE DIRECTORY FOR<br>SHOPPERS &amp; SMALL BIZ OWNERS</div>
+  </section>
+
+  <!-- ================= C: search ================= -->
+  <section class="scene" id="sC">
+    <div class="a h who" id="cwho" style="background:var(--teal)">FOR<br>CUSTOMERS</div>
+    <div class="a cap" id="ccap"><div class="big">FIND LOCAL<br>BUSINESSES</div><div class="sm">SEARCH OR BROWSE</div></div>
+    <div class="a frame" id="cf1" style="width:640px"><img src="video-assets/01-list.jpg" alt=""></div>
+    <div class="a frame" id="cf2" style="width:640px"><img src="video-assets/02-search.jpg" alt=""></div>
+  </section>
+
+  <!-- ================= D: filter ================= -->
+  <section class="scene" id="sD">
+    <div class="a h who" id="dwho" style="background:var(--teal)">FOR<br>CUSTOMERS</div>
+    <div class="a cap" id="dcap"><div class="big">NARROW IT DOWN</div><div class="sm">BY CATEGORY OR SERVICE AREA</div></div>
+    <div class="a frame" id="df" style="width:640px"><img src="video-assets/03-filter.jpg" alt=""></div>
+  </section>
+
+  <!-- ================= E: the listing ================= -->
+  <section class="scene" id="sE">
+    <div class="a h who" id="ewho" style="background:var(--teal)">FOR<br>CUSTOMERS</div>
+    <div class="a cap" id="ecap"><div class="big">ONE TAP TO CALL,<br>EMAIL OR MAP</div></div>
+    <div class="a frame" id="ef" style="width:640px"><div class="win" id="ewin" style="height:1000px"><img src="video-assets/04-card-full.jpg" alt="" id="eimg"></div></div>
+  </section>
+
+  <!-- ================= F: save it ================= -->
+  <section class="scene" id="sF">
+    <div class="a h who" id="fwho" style="background:var(--teal)">FOR<br>CUSTOMERS</div>
+    <div class="a cap" id="fcap"><div class="big">SAVE IT TO<br>YOUR PHONE</div><div class="sm">ONE TAP INTO YOUR CONTACTS</div></div>
+    <div class="a frame" id="ff1" style="width:572px"><img src="video-assets/06-share.jpg" alt=""></div>
+    <div class="a frame" id="ff2" style="width:470px"><img src="video-assets/09-contact.jpg" alt=""></div>
+  </section>
+
+  <!-- ================= G: the whole list ================= -->
+  <section class="scene" id="sG">
+    <div class="a h who" id="gwho" style="background:var(--teal)">FOR<br>CUSTOMERS</div>
+    <div class="a cap" id="gcap"><div class="big">OR TAKE THE<br>WHOLE LIST</div><div class="sm">SAVE IT AS A PDF</div></div>
+    <div class="a frame paper" id="gf" style="width:660px"><img src="video-assets/pdf4.jpg" alt=""></div>
+  </section>
+
+  <!-- ================= H: add your biz ================= -->
+  <section class="scene" id="sH">
+    <div class="a h who" id="hwho" style="background:var(--orange);font-size:35px">FOR<br>SMALL BIZ<br>OWNERS</div>
+    <div class="a cap" id="hcap"><div class="big">OWN A BUSINESS?</div><div class="sm">ADD YOURS IN 5 QUICK STEPS</div></div>
+    <div class="a frame" id="hf" style="width:640px"><img src="video-assets/08-form.jpg" alt=""></div>
+    <div class="a chip" id="hchip"><span style="background:#ffd0b0">UPDATE OR REMOVE ANYTIME</span></div>
+  </section>
+
+  <!-- ================= I: end card ================= -->
+  <section class="scene" id="sI">
+    <div class="a h e-cc" id="ecc">CHARLOTTE COUNTY</div>
+    <div class="a h e-sb" id="esb">SMALL BUSINESS</div>
+    <div class="a e-dirw" id="edir"><span class="dir">DIRECTORY</span></div>
+    <div class="a h e-honk" id="ehonk">HONK IF YOU'RE LOCAL!</div>
+    <div class="a cta" id="cta">
+      <div class="a col col1" id="col1">
+        <div class="h lab">SHOPPING<br>LOCAL?</div>
+        <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37"><path stroke="#1a1033" d="M0 0.5h7m1 0h1m2 0h1m1 0h1m1 0h3m2 0h3m1 0h2m2 0h1m1 0h7m-37 1h1m5 0h1m2 0h1m1 0h1m2 0h4m1 0h2m5 0h2m2 0h1m5 0h1m-37 1h1m1 0h3m1 0h1m2 0h3m1 0h3m1 0h1m1 0h4m1 0h1m3 0h1m1 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m4 0h1m2 0h1m1 0h1m3 0h1m1 0h1m1 0h3m3 0h1m1 0h3m1 0h1m-37 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h2m3 0h1m1 0h2m1 0h2m5 0h1m1 0h3m1 0h1m-37 1h1m5 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h6m4 0h2m1 0h1m5 0h1m-37 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-26 1h1m1 0h1m1 0h2m2 0h4m5 0h1m-28 1h7m4 0h2m1 0h1m1 0h4m1 0h1m8 0h2m3 0h1m-36 1h3m4 0h2m1 0h6m6 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-32 1h4m1 0h4m1 0h3m2 0h1m1 0h6m1 0h5m1 0h3m2 0h2m-36 1h4m2 0h1m1 0h3m1 0h1m1 0h3m1 0h4m1 0h1m1 0h1m1 0h1m1 0h3m2 0h2m-37 1h2m2 0h3m6 0h2m1 0h5m1 0h2m1 0h2m2 0h2m1 0h3m-35 1h1m1 0h3m4 0h1m1 0h6m1 0h2m3 0h1m4 0h2m1 0h1m1 0h3m-35 1h2m1 0h1m1 0h1m1 0h3m1 0h2m8 0h1m2 0h3m1 0h1m1 0h3m1 0h2m-34 1h2m2 0h1m3 0h1m3 0h3m1 0h2m3 0h1m1 0h1m2 0h1m5 0h1m-36 1h1m3 0h1m1 0h1m3 0h2m2 0h1m1 0h2m1 0h1m1 0h7m1 0h2m1 0h1m1 0h1m1 0h1m-36 1h3m6 0h5m1 0h1m4 0h1m3 0h1m3 0h1m1 0h1m-32 1h2m3 0h2m1 0h1m3 0h6m1 0h9m7 0h2m-37 1h3m1 0h1m2 0h1m2 0h1m2 0h1m1 0h2m4 0h3m2 0h3m1 0h1m5 0h1m-36 1h1m3 0h2m1 0h1m2 0h7m4 0h6m1 0h4m1 0h3m-35 1h2m1 0h1m1 0h1m1 0h1m5 0h2m1 0h4m1 0h1m1 0h2m4 0h1m2 0h1m-34 1h3m2 0h1m1 0h1m1 0h1m3 0h1m1 0h4m4 0h4m2 0h1m3 0h3m-36 1h1m1 0h1m3 0h1m3 0h1m2 0h1m5 0h2m3 0h1m5 0h1m1 0h1m-30 1h1m1 0h1m1 0h2m1 0h5m2 0h1m5 0h1m1 0h1m2 0h2m1 0h3m1 0h1m-37 1h2m2 0h2m1 0h4m6 0h1m1 0h3m1 0h1m5 0h1m1 0h1m1 0h1m-34 1h1m1 0h5m2 0h2m2 0h1m3 0h1m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m3 0h3m-37 1h1m2 0h1m1 0h1m3 0h2m1 0h1m1 0h2m4 0h2m5 0h1m1 0h1m1 0h1m-32 1h1m2 0h1m2 0h1m2 0h1m2 0h2m2 0h1m2 0h1m2 0h1m2 0h2m1 0h5m1 0h2m-28 1h1m2 0h2m1 0h2m2 0h4m1 0h1m1 0h1m2 0h1m3 0h1m2 0h1m-36 1h7m1 0h4m2 0h1m2 0h3m1 0h1m6 0h1m1 0h1m1 0h2m1 0h2m-37 1h1m5 0h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m2 0h1m-36 1h1m1 0h3m1 0h1m1 0h3m2 0h1m1 0h2m2 0h1m1 0h1m1 0h1m1 0h8m1 0h2m-36 1h1m1 0h3m1 0h1m1 0h4m1 0h3m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h2m1 0h1m-36 1h1m1 0h3m1 0h1m1 0h1m2 0h2m1 0h1m3 0h2m1 0h1m4 0h2m1 0h1m1 0h1m1 0h1m2 0h1m-37 1h1m5 0h1m1 0h2m3 0h1m2 0h7m1 0h1m3 0h1m1 0h3m3 0h1m-37 1h7m4 0h1m1 0h1m1 0h1m1 0h4m1 0h1m2 0h2m4 0h2m1 0h3"/></svg></div>
+        <div class="tab" style="background:var(--teal)">FIND LOCAL BIZ</div>
+        <div class="qcap">SCAN TO FIND<br>LOCAL BUSINESSES</div>
+      </div>
+      <div class="a col col2" id="col2">
+        <div class="h lab">OWN A<br>BUSINESS?</div>
+        <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 41 41"><path stroke="#1a1033" d="M0 0.5h7m2 0h2m1 0h2m1 0h1m8 0h4m1 0h2m3 0h7m-41 1h1m5 0h1m2 0h3m2 0h1m2 0h1m3 0h1m3 0h2m1 0h2m1 0h1m2 0h1m5 0h1m-41 1h1m1 0h3m1 0h1m1 0h1m2 0h1m2 0h2m1 0h5m2 0h1m1 0h3m3 0h1m1 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m5 0h1m1 0h1m3 0h1m1 0h2m6 0h3m3 0h1m1 0h3m1 0h1m-41 1h1m1 0h3m1 0h1m1 0h2m9 0h1m1 0h1m1 0h2m2 0h2m1 0h1m3 0h1m1 0h3m1 0h1m-41 1h1m5 0h1m1 0h1m1 0h2m1 0h2m3 0h1m9 0h1m2 0h1m2 0h1m5 0h1m-41 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-32 1h1m1 0h1m1 0h1m1 0h5m1 0h3m2 0h1m2 0h1m2 0h1m-32 1h1m2 0h1m1 0h1m1 0h1m3 0h1m2 0h1m4 0h1m1 0h2m3 0h1m1 0h1m1 0h3m1 0h2m1 0h1m-38 1h1m1 0h1m1 0h1m2 0h1m2 0h1m1 0h3m2 0h2m1 0h3m1 0h1m1 0h2m1 0h1m3 0h4m2 0h1m-40 1h2m1 0h3m2 0h2m1 0h2m1 0h1m2 0h1m4 0h1m1 0h1m1 0h1m4 0h1m7 0h1m-41 1h1m1 0h4m2 0h3m3 0h2m1 0h2m4 0h2m1 0h2m1 0h1m1 0h4m1 0h2m1 0h1m-40 1h1m2 0h2m1 0h3m1 0h6m1 0h2m4 0h1m5 0h2m8 0h2m-41 1h1m6 0h1m1 0h1m1 0h3m2 0h3m2 0h1m2 0h1m1 0h1m1 0h1m1 0h3m2 0h6m-40 1h4m1 0h2m1 0h1m3 0h1m1 0h2m4 0h1m1 0h4m1 0h1m3 0h3m1 0h1m1 0h1m1 0h1m-41 1h1m2 0h2m6 0h2m3 0h2m1 0h1m1 0h1m1 0h1m2 0h1m2 0h2m6 0h1m-37 1h3m1 0h3m2 0h1m6 0h1m3 0h1m2 0h1m2 0h3m1 0h2m2 0h1m3 0h2m-41 1h2m1 0h3m1 0h1m2 0h1m4 0h1m2 0h1m2 0h1m1 0h1m2 0h3m4 0h4m1 0h3m-41 1h3m3 0h1m1 0h4m4 0h4m1 0h3m1 0h5m3 0h1m1 0h1m4 0h1m-39 1h1m1 0h1m3 0h2m1 0h2m2 0h1m5 0h1m3 0h1m2 0h4m2 0h2m1 0h1m-38 1h3m1 0h3m1 0h2m3 0h4m2 0h4m1 0h2m4 0h2m1 0h1m5 0h2m-34 1h1m2 0h1m3 0h1m2 0h2m1 0h4m1 0h3m1 0h1m3 0h5m2 0h1m-41 1h3m1 0h1m1 0h1m2 0h2m2 0h2m1 0h5m2 0h1m1 0h1m1 0h1m1 0h1m4 0h1m5 0h1m-41 1h1m3 0h1m2 0h4m1 0h1m4 0h2m7 0h1m2 0h2m2 0h2m1 0h2m2 0h1m-41 1h2m2 0h4m6 0h4m9 0h1m1 0h1m2 0h2m5 0h2m-41 1h4m4 0h1m1 0h3m2 0h2m1 0h4m1 0h1m3 0h3m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-41 1h2m1 0h1m1 0h2m1 0h1m5 0h4m3 0h1m1 0h1m3 0h1m2 0h1m1 0h3m4 0h2m-38 1h3m8 0h3m4 0h1m1 0h1m4 0h2m1 0h4m2 0h1m2 0h1m-41 1h2m1 0h5m1 0h4m2 0h2m2 0h1m1 0h1m2 0h1m3 0h2m2 0h1m6 0h2m-41 1h5m2 0h2m1 0h3m4 0h4m4 0h2m3 0h2m3 0h2m1 0h1m1 0h1m-39 1h2m2 0h1m1 0h1m1 0h1m2 0h2m1 0h1m2 0h1m1 0h2m2 0h3m1 0h3m1 0h1m1 0h2m3 0h1m-37 1h1m6 0h1m1 0h1m1 0h3m4 0h1m1 0h1m2 0h3m1 0h3m2 0h1m2 0h2m-41 1h2m1 0h2m1 0h1m1 0h3m2 0h2m1 0h1m1 0h1m4 0h1m4 0h2m2 0h6m1 0h2m-33 1h1m2 0h1m1 0h1m3 0h1m1 0h5m1 0h6m1 0h1m3 0h1m1 0h1m1 0h1m-41 1h7m2 0h2m1 0h1m2 0h5m1 0h4m2 0h1m2 0h3m1 0h1m1 0h1m3 0h1m-41 1h1m5 0h1m2 0h2m5 0h3m2 0h2m1 0h1m1 0h1m4 0h2m3 0h2m1 0h2m-41 1h1m1 0h3m1 0h1m1 0h3m2 0h2m4 0h2m1 0h2m1 0h3m3 0h7m-38 1h1m1 0h3m1 0h1m2 0h3m1 0h1m1 0h4m1 0h1m1 0h2m1 0h1m1 0h4m1 0h1m2 0h1m2 0h3m-41 1h1m1 0h3m1 0h1m4 0h1m2 0h3m2 0h2m2 0h2m1 0h2m1 0h1m2 0h2m5 0h2m-41 1h1m5 0h1m1 0h1m1 0h3m1 0h2m3 0h5m2 0h5m1 0h1m1 0h2m1 0h1m1 0h2m-41 1h7m2 0h3m5 0h2m1 0h2m5 0h3m2 0h1m2 0h3m1 0h1"/></svg></div>
+        <div class="tab" style="background:var(--orange)">ADD YOUR BIZ</div>
+        <div class="qcap">SCAN TO ADD<br>YOUR BUSINESS</div>
+      </div>
+    </div>
+    <div class="a urlw" id="url"><span class="url">diyseosupport.github.io/charlotte-directory</span></div>
+    <div class="a h foot" id="foot"><img src="../diyseo-logo.png" alt=""><span>BUILT BY DIYSEO</span></div>
+  </section>
+
+  <div class="a wipe" id="wipe"></div>
+  <div class="a flash" id="flash"></div>
+</div>
+
+<script>
+// scene start times (seconds)
+var T={B:0,A:4,C:7,D:11,E:14,F:17.5,G:21.5,H:24.5,I:28,END:33};
+var ORDER=['sB','sA','sC','sD','sE','sF','sG','sH','sI'];
+var STARTS=[T.B,T.A,T.C,T.D,T.E,T.F,T.G,T.H,T.I];
+var WIPE=0.46;                 // slab wipe length; used only at A, H and I
+var WIPES=[[T.A,'#c2307a'],[T.H,'#ff7a1a'],[T.I,'#5b2a86']];
+var HONK=0.8, BEEP=28.7;       // sound cues, mirrored in scripts/export-video.js
+
+var $=function(id){return document.getElementById(id)};
+function clamp(v){return v<0?0:v>1?1:v}
+function p(t,s,d){return clamp((t-s)/d)}
+function outCubic(x){return 1-Math.pow(1-x,3)}
+function inCubic(x){return x*x*x}
+function outBack(x){var c=1.9;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)}
+function lerp(a,b,x){return a+(b-a)*x}
+function put(id,o){var e=$(id);if(!e)return;var s=e.classList.contains('frame')?'translate(-50%,-50%) ':'';
+  if(o.x||o.y)s+='translate('+(o.x||0)+'px,'+(o.y||0)+'px) ';
+  if(o.r)s+='rotate('+o.r+'deg) ';
+  if(o.s!=null)s+='scale('+o.s+') ';
+  e.style.transform=s;e.style.opacity=o.o==null?1:o.o}
+function pop(id,t,s,r,d){var x=p(t,s,d||.38);put(id,{s:outBack(x),r:r||0,o:x>0?1:0})}
+function slam(id,t,s,r){var x=p(t,s,.26);put(id,{s:lerp(2.4,1,outCubic(x)),r:r||0,o:clamp(x*3)})}
+function rise(id,t,s,d){var x=p(t,s,d||.42);put(id,{y:lerp(150,0,outBack(x)),o:clamp(x*2.5)})}
+
+// starburst polygon for scene B
+(function(){var pts=[],n=22;for(var i=0;i<n*2;i++){var a=i*Math.PI/n,rr=i%2?62:98;pts.push((Math.cos(a)*rr).toFixed(1)+','+(Math.sin(a)*rr).toFixed(1))}
+  $('burst').innerHTML='<polygon points="'+pts.join(' ')+'" fill="#ffd23f" stroke="#1a1033" stroke-width="2.5" stroke-linejoin="round"/>'+
+  '<polygon points="'+pts.map(function(q){var a=q.split(',');return (a[0]*.72).toFixed(1)+','+(a[1]*.72).toFixed(1)}).join(' ')+'" fill="#ff7a1a" opacity=".55"/>'})();
+
+function show(id,on){$(id).style.visibility=on?'visible':'hidden'}
+
+function render(t){
+  // pick the scene; a wiped cut swaps at the wipe midpoint
+  var cur=0;
+  for(var i=1;i<STARTS.length;i++){
+    var wiped=WIPES.some(function(w){return w[0]===STARTS[i]});
+    if(t>=STARTS[i]-(wiped?WIPE/2:0))cur=i;
+  }
+  ORDER.forEach(function(id,i){show(id,i===cur)});
+
+  // slanted slab wipe
+  var w=$('wipe'),wc=null,wt=0;
+  WIPES.forEach(function(k){var x=p(t,k[0]-WIPE/2,WIPE);if(x>0&&x<1){wc=k[1];wt=x}});
+  if(wc){w.style.background=wc;put('wipe',{x:lerp(1500,-2400,inCubic(wt)*.5+wt*.5),r:14,o:1})}else put('wipe',{o:0});
+
+  // ---- A: hero, after the title
+  if(cur===1){
+    var hz=p(t,T.C-.6,.6);
+    pop('herocard',t,T.A,-2,.42);
+    if(hz>0){$('herocard').style.transformOrigin='49% 60%';put('herocard',{s:lerp(1,9,inCubic(hz)),r:lerp(-2,0,hz)})}
+    $('heroimg').style.transform='scale('+lerp(1,1.12,p(t,T.A+.25,2.2))+')';
+    pop('newtag',t,T.A+.28,-3);
+    rise('herosub',t,T.A+.55);
+    if(hz>0){put('newtag',{y:-500*inCubic(hz),r:-3});put('herosub',{y:600*inCubic(hz)})}
+  }
+  var fl=t<T.C?p(t,T.C-.22,.22):1-p(t,T.C,.26);
+  put('flash',{o:(t>T.C-.22&&t<T.C+.26)?fl*.95:0});
+
+  // ---- B: title + honk, fully drawn from frame 0
+  if(cur===0){
+    put('burst',{r:t*14});
+    put('cc',{});put('sb',{r:-2});put('dirw',{r:-3});put('hl',{r:-3});put('bsub',{});
+    var hk=t>HONK+.22&&t<HONK+.62, sh=hk?Math.sin(t*90)*7:0;
+    put('horn',{r:-12});
+    if(t>HONK){var sq=t<HONK+.22?1-.15*Math.sin(p(t,HONK,.22)*Math.PI):(hk?.88+.12*Math.abs(Math.sin(t*40)):1);put('horn',{s:sq,r:-12+sh})}
+    $('hornlines').style.opacity=hk?1:0;
+    if(hk)put('hl',{x:sh,r:-3,s:1});
+  }
+
+  // ---- C: search (the list, then the one result)
+  if(cur===2){
+    pop('cwho',t,T.C+.05,-12);
+    slam('ccap',t,T.C+.12);
+    var swap=t>=T.C+2;
+    if(swap){put('cf1',{o:0});pop('cf2',t,T.C+2,0,.3)}
+    else{put('cf2',{o:0});rise('cf1',t,T.C+.05,.38)}
+  }
+
+  // ---- D: filter
+  if(cur===3){
+    pop('dwho',t,T.D+.05,-12);
+    slam('dcap',t,T.D+.1);
+    rise('df',t,T.D+.05,.36);
+    if(t>T.D+.6)put('df',{s:1+.012*Math.sin((t-T.D)*9)});
+  }
+
+  // ---- E: the full listing, scrolling
+  if(cur===4){
+    pop('ewho',t,T.E+.05,-12);
+    slam('ecap',t,T.E+.1);
+    rise('ef',t,T.E+.05,.36);
+    var sc=p(t,T.E+.9,2.2);
+    $('eimg').style.transform='translateY('+(-240*outCubic(sc))+'px)';
+  }
+
+  // ---- F: save it (share sheet, then the phone's own contact screen)
+  if(cur===5){
+    pop('fwho',t,T.F+.05,-12);
+    slam('fcap',t,T.F+.1);
+    var sw=t>=T.F+2;
+    if(sw){put('ff1',{o:0});pop('ff2',t,T.F+2,0,.36)}
+    else{put('ff2',{o:0});rise('ff1',t,T.F+.05,.34)}
+  }
+
+  // ---- G: the whole list as a PDF
+  if(cur===6){
+    pop('gwho',t,T.G+.05,-12);
+    slam('gcap',t,T.G+.1);
+    var gx=p(t,T.G+.05,.5);
+    put('gf',{x:lerp(900,0,outBack(gx)),r:lerp(14,-2,outCubic(gx)),o:gx>0?1:0});
+  }
+
+  // ---- H: add your business
+  if(cur===7){
+    pop('hwho',t,T.H+.05,-12);
+    slam('hcap',t,T.H+.1);
+    rise('hf',t,T.H+.05,.36);
+    pop('hchip',t,T.H+.95,-2);
+  }
+
+  // ---- I: end card
+  if(cur===8){
+    slam('ecc',t,T.I+.05);
+    slam('esb',t,T.I+.14,-2);
+    pop('edir',t,T.I+.28,-3);
+    pop('cta',t,T.I+.42,0,.4);
+    pop('col1',t,T.I+.62,-2);
+    pop('col2',t,T.I+.76,2);
+    pop('ehonk',t,T.I+.55,-2);
+    if(t>BEEP)put('ehonk',{x:(t<BEEP+.3)?Math.sin(t*80)*5:0,r:-2});
+    pop('url',t,T.I+1.0,0);
+    pop('foot',t,T.I+1.15,0);
+  }
+}
+render(0);
+</script>
+</body>
+</html>
