@@ -1231,7 +1231,21 @@ function render(){
     return h;
   }).join('');
   syncToggleAll();
+  fitLinks();
 }
+/* phones: shrink each long card link just enough to show in full on one line */
+function fitLinks(){
+  var phone=matchMedia('(max-width:640px)').matches;
+  document.querySelectorAll('.ln:not(.addr)>span:last-child').forEach(function(s){
+    s.style.fontSize='';
+    if(!phone||!s.clientWidth||s.scrollWidth<=s.clientWidth)return;
+    var fs=Math.floor(parseFloat(getComputedStyle(s).fontSize)*s.clientWidth/s.scrollWidth*2)/2;
+    s.style.fontSize=fs+'px';
+    while(fs>6&&s.scrollWidth>s.clientWidth){fs-=0.5;s.style.fontSize=fs+'px'}
+  });
+}
+var fitT;window.addEventListener('resize',function(){clearTimeout(fitT);fitT=setTimeout(fitLinks,150)});
+if(document.fonts)document.fonts.ready.then(fitLinks);
 
 function syncToggleAll(){
   var c=$('controls');if(c)c.classList.toggle('mini',Object.keys(openSet).length>0);
